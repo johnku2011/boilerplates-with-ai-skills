@@ -36,6 +36,11 @@ bwai new node-service ./my-app --agents claude,cursor
 
 # Run the SkillSpector safety gate over the project's skills
 bwai scan-project ./my-app --threshold 50
+
+# Discover recently-updated skills from public hubs (GitHub + SkillsMP)
+bwai search-skills testing --limit 10
+# ...and score the top results with SkillSpector while you browse
+bwai search-skills "code review" --scan 3
 ```
 
 `bwai new` copies the boilerplate template, installs the curated skills into a
@@ -43,6 +48,21 @@ canonical `.bwai/skills/` plus each agent's skill directory
 (`.claude/skills/`, `.cursor/rules/`, `.codex/skills/`, `.agents/skills/`), and
 writes `skills.lock` with each skill's source, SHA-256, install targets, and
 scan status.
+
+## Discovering skills
+
+`bwai search-skills <query>` queries public hubs for recently-updated agent
+skills and merges the results (newest first):
+
+- **GitHub** repo search filtered by the `claude-skill` topic (works
+  unauthenticated; set `GITHUB_TOKEN` for a higher rate limit).
+- **SkillsMP** marketplace REST API (`sortBy=recent`; set `SKILLSMP_API_KEY`
+  for higher limits).
+
+Pass `--scan <n>` to run the SkillSpector scanner over the top `n` results and
+print each one's risk score — useful for triaging newly-discovered skills before
+promoting any into a boilerplate. Use `--source github|skillsmp|all` and
+`--sort recent|stars` to tune the query.
 
 ## The safety gate
 
