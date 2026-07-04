@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run build
+      - run: npm test
+
+  safety-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: npm ci
+      - run: npm run build
+      # Install the NVIDIA SkillSpector security scanner for the gate.
+      - run: pip install skillspector || echo "skillspector install failed; gate will report scanner unavailable"
+      # Scaffold a throwaway project and run the safety gate over its skills.
+      - run: |
+          node dist/cli.js new node-service /tmp/ci-demo --agents claude
+          node dist/cli.js scan-project /tmp/ci-demo --threshold 50
