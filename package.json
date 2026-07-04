@@ -1,0 +1,52 @@
+{
+  "name": "boilerplates-with-ai-skills",
+  "version": "0.1.0",
+  "description": "Security-vetted, cross-agent project boilerplates. Scaffold a project pre-wired with curated, SkillSpector-gated agent skills.",
+  "type": "module",
+  "bin": {
+    "bwai": "dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "boilerplates"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "tsx src/cli.ts",
+    "build": "tsup",
+    "start": "node dist/cli.js",
+    "typecheck": "tsc --noEmit",
+    "lint": "prettier --check \"src/**/*.ts\" \"tests/**/*.ts\"",
+    "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\"",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepare": "husky || true"
+  },
+  "keywords": [
+    "ai",
+    "agent",
+    "skills",
+    "boilerplate",
+    "claude",
+    "cursor",
+    "codex",
+    "copilot",
+    "skillspector",
+    "security"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^15.0.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.0",
+    "prettier": "^3.9.4",
+    "tsup": "^8.5.1",
+    "tsx": "^4.23.0",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.9"
+  }
+}
