@@ -10,9 +10,12 @@ See [`requirements.md`](./requirements.md) for the full spec and
 for why this project focuses on *bundling starters with vetted skills* and a
 *security gate* rather than reinventing skill formats, installers, or directories.
 
-> Status: Phase 1 foundation — one boilerplate (`node-service`), the `bwai`
-> CLI (`list-boilerplates`, `new`, `scan-project`), a `skills.lock` provenance
-> file, and a SkillSpector safety gate wired into CI.
+> Status: Phase 1 foundation — the `bwai` CLI (`list-boilerplates`, `new`,
+> `search-skills`, `scan-project`), a `skills.lock` provenance file, and a
+> SkillSpector safety gate wired into CI.
+>
+> Boilerplates: `nextjs-app` (Next.js App Router + React + TS), `express-api`
+> (Express.js on Vercel), and `node-service` (minimal Node ESM).
 
 ## Install / develop
 
