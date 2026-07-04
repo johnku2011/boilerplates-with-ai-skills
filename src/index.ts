@@ -1,0 +1,10 @@
+export { listBoilerplates, getBoilerplate } from "./catalog.js";
+export type { Boilerplate } from "./catalog.js";
+export { scaffold } from "./scaffold.js";
+export type { ScaffoldOptions, ScaffoldResult } from "./scaffold.js";
+export { scanProject, SkillSpectorScanner } from "./scan.js";
+export type { SkillScanner, ScanResult, ScanProjectOptions, ScanProjectReport } from "./scan.js";
+export { AGENT_TARGETS, KNOWN_AGENTS, parseAgents } from "./agents.js";
+export type { AgentId } from "./agents.js";
+export { readLock, writeLock } from "./provenance.js";
+export type { SkillsLock, LockedSkill, BoilerplateManifest } from "./schema.js";
