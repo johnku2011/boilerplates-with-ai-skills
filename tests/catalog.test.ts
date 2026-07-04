@@ -21,7 +21,9 @@ describe("catalog", () => {
 
   it("includes the Vercel-style boilerplates", async () => {
     const names = (await listBoilerplates()).map((b) => b.manifest.name);
-    expect(names).toEqual(expect.arrayContaining(["nextjs-app", "express-api", "node-service"]));
+    expect(names).toEqual(
+      expect.arrayContaining(["nextjs-app", "express-api", "node-service", "react-native-app"]),
+    );
   });
 
   it("every boilerplate has a template dir and all declared skills on disk", async () => {

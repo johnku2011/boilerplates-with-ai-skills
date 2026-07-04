@@ -15,7 +15,8 @@ for why this project focuses on *bundling starters with vetted skills* and a
 > SkillSpector safety gate wired into CI.
 >
 > Boilerplates: `nextjs-app` (Next.js App Router + React + TS), `express-api`
-> (Express.js on Vercel), and `node-service` (minimal Node ESM).
+> (Express.js on Vercel), `react-native-app` (Expo / React Native + TS), and
+> `node-service` (minimal Node ESM).
 
 ## Install / develop
 
