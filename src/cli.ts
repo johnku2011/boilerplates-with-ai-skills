@@ -5,6 +5,13 @@ import { scaffold } from "./scaffold.js";
 import { parseAgents, type AgentId } from "./agents.js";
 import { scanProject, SkillSpectorScanner } from "./scan.js";
 import { getBoilerplate } from "./catalog.js";
+import {
+  GitHubSkillSource,
+  SkillsMpSkillSource,
+  searchSkills,
+  type SkillSource,
+  type SortOrder,
+} from "./discovery.js";
 
 const program = new Command();
 
@@ -106,6 +113,76 @@ program
         process.exitCode = 1;
       } else {
         console.log(`Safety gate passed (threshold ${report.threshold}).`);
+      }
+    },
+  );
+
+program
+  .command("search-skills")
+  .alias("search")
+  .argument("[query]", "keyword to search for (e.g. testing, security)", "")
+  .option("-s, --source <source>", "github | skillsmp | all", "all")
+  .option("-l, --limit <n>", "max results", "10")
+  .option("--sort <order>", "recent | stars", "recent")
+  .option("--scan <n>", "scan the top N results with SkillSpector and show risk scores", "0")
+  .description("Discover recently-updated agent skills from public hubs.")
+  .action(
+    async (query: string, opts: { source: string; limit: string; sort: string; scan: string }) => {
+      const limit = Number.parseInt(opts.limit, 10);
+      const scanTop = Number.parseInt(opts.scan, 10) || 0;
+      const sort: SortOrder = opts.sort === "stars" ? "stars" : "recent";
+
+      const sources: SkillSource[] = [];
+      if (opts.source === "all" || opts.source === "github") {
+        sources.push(new GitHubSkillSource());
+      }
+      if (opts.source === "all" || opts.source === "skillsmp") {
+        sources.push(new SkillsMpSkillSource());
+      }
+      if (sources.length === 0) {
+        throw new Error(`Invalid --source: ${opts.source} (expected github, skillsmp, or all).`);
+      }
+
+      const { candidates, errors } = await searchSkills(sources, query, {
+        sort,
+        limit: Number.isNaN(limit) ? 10 : limit,
+      });
+
+      for (const err of errors) {
+        console.error(`[${err.source}] ${err.message}`);
+      }
+      if (candidates.length === 0) {
+        console.log("No skills found.");
+        return;
+      }
+
+      const scanner = new SkillSpectorScanner();
+      const scannerReady = scanTop > 0 ? await scanner.isAvailable() : false;
+      if (scanTop > 0 && !scannerReady) {
+        console.error(
+          "SkillSpector not found on PATH; showing results without risk scores. " +
+            "Install with `uv tool install git+https://github.com/NVIDIA/skillspector.git`.",
+        );
+      }
+
+      let index = 0;
+      for (const c of candidates) {
+        index += 1;
+        const updated = c.updatedAt ? c.updatedAt.slice(0, 10) : "unknown";
+        console.log(`${index}. ${c.fullName}  [${c.source}]  ★${c.stars}  updated ${updated}`);
+        if (c.description) console.log(`   ${c.description.slice(0, 100)}`);
+        console.log(`   ${c.url}`);
+        if (scannerReady && index <= scanTop && c.url) {
+          try {
+            const result = await scanner.scan(c.url, { useLlm: false });
+            const verdict = result.riskScore > 50 ? "HIGH RISK" : "ok";
+            console.log(
+              `   SkillSpector: risk ${result.riskScore} (${verdict}), ${result.findings} finding(s)`,
+            );
+          } catch (e) {
+            console.log(`   SkillSpector: scan failed (${e instanceof Error ? e.message : e})`);
+          }
+        }
       }
     },
   );
