@@ -27,8 +27,7 @@ npx bwai list-boilerplates
 npx bwai new node-service ./my-app --agents claude,cursor
 ```
 
-**Landing page:** https://johnku2011.github.io/boilerplates-with-ai-skills/  
-*(Requires one-time enable: repo **Settings → Pages → Build and deployment → GitHub Actions**, then re-run the **Deploy landing page** workflow.)*
+**Landing page:** deploy [`site/`](../site/) to **Vercel** (root dir `site`, no build) or GitHub Pages — see [`docs/landing-deploy.md`](./landing-deploy.md).
 
 **From source** (contributors):
 
