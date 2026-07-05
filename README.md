@@ -25,6 +25,8 @@ npx bwai list-boilerplates
 npx bwai new node-service ./my-app --agents claude,cursor
 ```
 
+Landing page: **[johnku2011.github.io/boilerplates-with-ai-skills](https://johnku2011.github.io/boilerplates-with-ai-skills/)**
+
 **From source** (contributors):
 
 ```bash

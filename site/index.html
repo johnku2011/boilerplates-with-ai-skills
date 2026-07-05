@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="bwai — security-vetted, cross-agent project boilerplates with curated AI skills and a SkillSpector safety gate."
+    />
+    <title>bwai — boilerplates with AI skills</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="logo" href="#">bwai</a>
+        <nav>
+          <a href="#boilerplates">Boilerplates</a>
+          <a href="#safety">Safety</a>
+          <a href="https://github.com/johnku2011/boilerplates-with-ai-skills">GitHub</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="container">
+          <p class="eyebrow">Security-vetted · cross-agent · reproducible</p>
+          <h1>Scaffold a stack.<br />Ship with vetted AI skills.</h1>
+          <p class="lead">
+            <strong>bwai</strong> scaffolds runnable project starters pre-wired for Claude,
+            Cursor, Codex, and Copilot — with NVIDIA SkillSpector gating and a
+            <code>skills.lock</code> provenance file.
+          </p>
+          <div class="install">
+            <pre><code>npx bwai new node-service ./my-app --agents claude,cursor
+bwai scan-project ./my-app --threshold 50</code></pre>
+            <p class="install-note">Requires Node.js 20+. Install globally: <code>npm i -g bwai</code></p>
+          </div>
+        </div>
+      </section>
+
+      <section id="boilerplates" class="section">
+        <div class="container">
+          <h2>Boilerplates</h2>
+          <p class="section-lead">Six opinionated starters. Each bundles a curated skill set for its stack.</p>
+          <ul class="grid">
+            <li class="card">
+              <h3>nextjs-app</h3>
+              <p>Next.js App Router + React + TypeScript, Vercel-ready.</p>
+            </li>
+            <li class="card">
+              <h3>express-api</h3>
+              <p>Express.js ESM API on Vercel with HTTP tests.</p>
+            </li>
+            <li class="card">
+              <h3>fastify-api</h3>
+              <p>Fastify ESM API with schema-first routes and tests.</p>
+            </li>
+            <li class="card">
+              <h3>python-service</h3>
+              <p>FastAPI + pytest with TestClient integration tests.</p>
+            </li>
+            <li class="card">
+              <h3>react-native-app</h3>
+              <p>Expo / React Native + TypeScript for iOS, Android, web.</p>
+            </li>
+            <li class="card">
+              <h3>node-service</h3>
+              <p>Minimal Node ESM service with zero-dep <code>node:test</code>.</p>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="safety" class="section section-alt">
+        <div class="container">
+          <h2>Visible safety gate</h2>
+          <ul class="features">
+            <li>
+              <strong>SkillSpector</strong> — every bundled skill is scanned; CI fails above
+              risk threshold 30 in the catalog.
+            </li>
+            <li>
+              <strong>Provenance</strong> — <code>skills.lock</code> records SHA-256, source, and
+              scan status per skill.
+            </li>
+            <li>
+              <strong>Reports</strong> — JSON + SARIF under <code>safety-reports/</code>, committed
+              in the catalog repo.
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container cta">
+          <h2>Get started</h2>
+          <pre><code>npx bwai list-boilerplates
+npx bwai new fastify-api ./api --agents claude,cursor,copilot</code></pre>
+          <p>
+            <a class="button" href="https://www.npmjs.com/package/bwai">npm</a>
+            <a class="button button-secondary" href="https://github.com/johnku2011/boilerplates-with-ai-skills/blob/main/CONTRIBUTING.md">Contribute</a>
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>MIT License · <a href="https://github.com/johnku2011/boilerplates-with-ai-skills">GitHub</a></p>
+      </div>
+    </footer>
+  </body>
+</html>

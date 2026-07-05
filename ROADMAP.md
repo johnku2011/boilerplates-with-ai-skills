@@ -29,7 +29,8 @@ Deepened skills, `deploy-vercel`, `sync-upstream`, Superpowers alignment doc.
 
 | Item | Notes |
 | --- | --- |
-| First npm publish | Maintainer runs `npm publish` or Actions workflow with `NPM_TOKEN` |
+| First npm publish | Maintainer adds `NPM_TOKEN`, runs publish workflow or `npm publish` |
+| Landing page | **`site/`** — GitHub Pages at johnku2011.github.io/boilerplates-with-ai-skills |
 | `remix-app` boilerplate | Deferred; Fastify + Python added in 2D |
 | Skill depth passes | Continue expanding shared skills on a schedule |
 | Upstream PRs to Superpowers | Contribute generic improvements back |

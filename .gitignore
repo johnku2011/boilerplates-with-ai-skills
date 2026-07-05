@@ -32,3 +32,4 @@ yarn-error.log*
 
 # Note: safety-reports/ are intentionally committed (the security gate is a
 # first-class, auditable artifact), so they are NOT ignored here.
+*.tgz

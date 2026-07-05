@@ -10,7 +10,7 @@ runnable project plus a curated `SKILL.md` skill set wired for Claude, Cursor,
 Codex, and Copilot, with NVIDIA SkillSpector gating and a `skills.lock`
 provenance file.
 
-Contributing: see [`CONTRIBUTING.md`](./CONTRIBUTING.md). Published on npm as **`bwai`** (`npx bwai`).
+Contributing: see [`CONTRIBUTING.md`](./CONTRIBUTING.md). Published on npm as **`bwai`** (`npx bwai`). Landing page: [`site/`](../site/) → GitHub Pages.
 
 ## Commands (this repo)
 
