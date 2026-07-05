@@ -1,5 +1,5 @@
 {
-  "name": "bwai",
+  "name": "@johnku2011/bwai",
   "version": "0.2.0",
   "description": "Security-vetted, cross-agent project boilerplates. Scaffold a project pre-wired with curated, SkillSpector-gated agent skills.",
   "type": "module",

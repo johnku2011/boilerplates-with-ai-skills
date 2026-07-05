@@ -10,7 +10,7 @@ See [`requirements.md`](./requirements.md) for the full spec and
 for why this project focuses on *bundling starters with vetted skills* and a
 *security gate* rather than reinventing skill formats, installers, or directories.
 
-> Status: Phase 2D — npm package **`bwai`**, `CONTRIBUTING.md`, `fastify-api` and
+> Status: Phase 2D — npm package **`@johnku2011/bwai`** (CLI command: `bwai`), `CONTRIBUTING.md`, `fastify-api` and
 > `python-service` boilerplates. See [`ROADMAP.md`](./ROADMAP.md).
 >
 > Boilerplates: `nextjs-app`, `express-api`, `fastify-api`, `python-service`,
@@ -18,13 +18,11 @@ for why this project focuses on *bundling starters with vetted skills* and a
 
 ## Install
 
-## Install
-
 **From npm** (recommended):
 
 ```bash
-npx bwai list-boilerplates
-npx bwai new node-service ./my-app --agents claude,cursor
+npx @johnku2011/bwai list-boilerplates
+npx @johnku2011/bwai new node-service ./my-app --agents claude,cursor
 ```
 
 **Landing page:** deploy [`site/`](../site/) to **Vercel** (root dir `site`, no build) or GitHub Pages — see [`docs/landing-deploy.md`](./landing-deploy.md).
