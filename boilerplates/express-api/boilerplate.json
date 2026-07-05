@@ -3,9 +3,24 @@
   "description": "Express.js (ESM) API starter deployable to Vercel, with zero-dependency HTTP tests and a curated, security-vetted skill set for AI agents.",
   "stack": "express",
   "version": "0.1.0",
-  "defaultAgents": ["claude", "cursor", "codex", "copilot"],
+  "defaultAgents": [
+    "claude",
+    "cursor",
+    "codex",
+    "copilot"
+  ],
   "skills": [
-    { "name": "express-api-design", "source": "local" },
-    { "name": "test-driven-development", "source": "shared" }
+    {
+      "name": "express-api-design",
+      "source": "local"
+    },
+    {
+      "name": "test-driven-development",
+      "source": "shared"
+    },
+    {
+      "name": "project-security",
+      "source": "shared"
+    }
   ]
 }

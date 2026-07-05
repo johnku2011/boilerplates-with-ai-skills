@@ -3,9 +3,24 @@
   "description": "Expo (React Native) + TypeScript mobile starter for iOS, Android, and web, with pure-function tests and a curated, security-vetted skill set for AI agents.",
   "stack": "react-native-expo",
   "version": "0.1.0",
-  "defaultAgents": ["claude", "cursor", "codex", "copilot"],
+  "defaultAgents": [
+    "claude",
+    "cursor",
+    "codex",
+    "copilot"
+  ],
   "skills": [
-    { "name": "react-native-development", "source": "local" },
-    { "name": "test-driven-development", "source": "shared" }
+    {
+      "name": "react-native-development",
+      "source": "local"
+    },
+    {
+      "name": "test-driven-development",
+      "source": "shared"
+    },
+    {
+      "name": "project-security",
+      "source": "shared"
+    }
   ]
 }

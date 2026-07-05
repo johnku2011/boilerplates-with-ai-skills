@@ -10,10 +10,8 @@ See [`requirements.md`](./requirements.md) for the full spec and
 for why this project focuses on *bundling starters with vetted skills* and a
 *security gate* rather than reinventing skill formats, installers, or directories.
 
-> Status: Phase 2A — catalog scan + SARIF reports in CI. See [`ROADMAP.md`](./ROADMAP.md)
-> for Phase 2B (promotion loop) and beyond. The `bwai` CLI (`list-boilerplates`, `new`,
-> `scan-catalog`, `search-skills`, `scan-project`), a `skills.lock` provenance file, and a
-> SkillSpector safety gate wired into CI.
+> Status: Phase 2B — promotion loop (`registry/`, `promote`, `sync-skills`, daily discovery).
+> See [`ROADMAP.md`](./ROADMAP.md) for Phase 2C (depth/upstream) and beyond.
 >
 > Boilerplates: `nextjs-app` (Next.js App Router + React + TS), `express-api`
 > (Express.js on Vercel), `react-native-app` (Expo / React Native + TS), and
@@ -49,6 +47,10 @@ bwai scan-catalog --threshold 30 --require-scanner
 bwai search-skills testing --limit 10
 # ...and score the top results with SkillSpector while you browse
 bwai search-skills "code review" --scan 3
+
+# Promote a vetted skill into the catalog after manual review
+bwai promote my-skill --from ./path/to/skill --target shared --require-scanner
+bwai sync-skills   # apply registry bundle rules to boilerplate manifests
 ```
 
 `bwai new` copies the boilerplate template, installs the curated skills into a

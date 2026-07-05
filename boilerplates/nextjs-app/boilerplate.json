@@ -3,9 +3,24 @@
   "description": "Next.js (App Router) + React + TypeScript starter deployable to Vercel, pre-wired with AI agent config and a curated, security-vetted skill set.",
   "stack": "nextjs",
   "version": "0.1.0",
-  "defaultAgents": ["claude", "cursor", "codex", "copilot"],
+  "defaultAgents": [
+    "claude",
+    "cursor",
+    "codex",
+    "copilot"
+  ],
   "skills": [
-    { "name": "nextjs-app-router", "source": "local" },
-    { "name": "code-review", "source": "shared" }
+    {
+      "name": "nextjs-app-router",
+      "source": "local"
+    },
+    {
+      "name": "code-review",
+      "source": "shared"
+    },
+    {
+      "name": "project-security",
+      "source": "shared"
+    }
   ]
 }

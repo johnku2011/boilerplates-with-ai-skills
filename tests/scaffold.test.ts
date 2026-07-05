@@ -33,7 +33,7 @@ describe("scaffold", () => {
       agents: ["claude", "cursor"],
     });
 
-    expect(result.skills).toEqual(["test-driven-development", "code-review"]);
+    expect(result.skills).toEqual(["test-driven-development", "code-review", "project-security"]);
 
     // Template files copied.
     expect(await exists(join(target, "package.json"))).toBe(true);
@@ -68,7 +68,11 @@ describe("scaffold", () => {
       agents: ["claude"],
     });
     const lock = await readLock(target);
-    expect(lock.skills.map((s) => s.name)).toEqual(["nextjs-app-router", "code-review"]);
+    expect(lock.skills.map((s) => s.name)).toEqual([
+      "nextjs-app-router",
+      "code-review",
+      "project-security",
+    ]);
     expect(lock.skills.find((s) => s.name === "nextjs-app-router")?.source).toBe(
       "boilerplate:nextjs-app/skills/nextjs-app-router",
     );

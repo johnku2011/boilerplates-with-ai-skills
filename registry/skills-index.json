@@ -1,0 +1,120 @@
+{
+  "indexVersion": 1,
+  "updatedAt": "2026-07-05T03:05:03.919Z",
+  "skills": [
+    {
+      "name": "code-review",
+      "catalogLocation": "shared",
+      "catalogPath": "shared/skills/code-review",
+      "description": "Use when reviewing a diff or pull request — check correctness, tests, readability, security, and server/client boundaries before approving.",
+      "promotedAt": "2026-07-05T03:00:00.000Z",
+      "sha256": "8c5102e7da323ecfb11030c40af740e7a1d1ccdde076cbf8d6517c4f6e8f4394",
+      "scan": {
+        "status": "passed",
+        "riskScore": 0,
+        "scannedAt": "2026-07-05T02:45:00.000Z",
+        "threshold": 30
+      },
+      "bundleAll": false,
+      "bundledIn": [
+        "nextjs-app",
+        "node-service"
+      ]
+    },
+    {
+      "name": "express-api-design",
+      "catalogLocation": "local",
+      "catalogPath": "boilerplates/express-api/skills/express-api-design",
+      "description": "Use when adding or changing routes, middleware, or error handling in this Express.js API, to keep endpoints consistent, validated, and testable.",
+      "promotedAt": "2026-07-05T03:00:00.000Z",
+      "sha256": "c7c0b300e8edaecad407167e3e6f8b82e36d416f66b41a9ae91d7ed1699ff33e",
+      "scan": {
+        "status": "passed",
+        "riskScore": 0,
+        "scannedAt": "2026-07-05T02:45:00.000Z",
+        "threshold": 30
+      },
+      "bundleAll": false,
+      "bundledIn": [
+        "express-api"
+      ]
+    },
+    {
+      "name": "nextjs-app-router",
+      "catalogLocation": "local",
+      "catalogPath": "boilerplates/nextjs-app/skills/nextjs-app-router",
+      "description": "Use when adding pages, layouts, route handlers, or data fetching in this Next.js App Router project, to follow server-first conventions correctly.",
+      "promotedAt": "2026-07-05T03:00:00.000Z",
+      "sha256": "d10f465fecb2769c65d1b84fdbb26fe6468eecbb0f31a4956937be7b09b00afd",
+      "scan": {
+        "status": "passed",
+        "riskScore": 0,
+        "scannedAt": "2026-07-05T02:45:00.000Z",
+        "threshold": 30
+      },
+      "bundleAll": false,
+      "bundledIn": [
+        "nextjs-app"
+      ]
+    },
+    {
+      "name": "project-security",
+      "catalogLocation": "shared",
+      "catalogPath": "shared/skills/project-security",
+      "description": "Use when reviewing security-sensitive code paths — check auth, secrets, input validation, dependency risk, and data exposure before shipping.",
+      "promotedAt": "2026-07-05T03:00:00.000Z",
+      "sha256": "6e52f88cb6ca4c49ea3a5c1bc65bdbd1a9c57a8d06b9b3860a206eb610040a47",
+      "scan": {
+        "status": "pending",
+        "riskScore": null,
+        "scannedAt": null,
+        "threshold": 30
+      },
+      "bundleAll": true,
+      "bundledIn": [
+        "express-api",
+        "nextjs-app",
+        "node-service",
+        "react-native-app"
+      ]
+    },
+    {
+      "name": "react-native-development",
+      "catalogLocation": "local",
+      "catalogPath": "boilerplates/react-native-app/skills/react-native-development",
+      "description": "Use when building screens, navigation, styling, or platform behavior in this Expo React Native app, to follow mobile-first conventions and keep logic testable.",
+      "promotedAt": "2026-07-05T03:00:00.000Z",
+      "sha256": "1b3eb92871d6e44acb33f37d27bee77d8e0179f12b035ee9a4d3dc1f3329a2ba",
+      "scan": {
+        "status": "passed",
+        "riskScore": 0,
+        "scannedAt": "2026-07-05T02:45:00.000Z",
+        "threshold": 30
+      },
+      "bundleAll": false,
+      "bundledIn": [
+        "react-native-app"
+      ]
+    },
+    {
+      "name": "test-driven-development",
+      "catalogLocation": "shared",
+      "catalogPath": "shared/skills/test-driven-development",
+      "description": "Use when implementing a feature or fixing a bug — TDD, red-green-refactor, failing test first, then minimal code, then refactor. Run npm test before claiming done.",
+      "promotedAt": "2026-07-05T03:00:00.000Z",
+      "sha256": "66ef2887ca1366bdd89df08b55dc0b59f61ff85e15f2b18995dacac17250b1c4",
+      "scan": {
+        "status": "passed",
+        "riskScore": 0,
+        "scannedAt": "2026-07-05T02:45:00.000Z",
+        "threshold": 30
+      },
+      "bundleAll": false,
+      "bundledIn": [
+        "express-api",
+        "node-service",
+        "react-native-app"
+      ]
+    }
+  ]
+}

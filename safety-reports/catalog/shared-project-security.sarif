@@ -1,0 +1,43 @@
+{
+  "version": "2.1.0",
+  "$schema": "https://schemastore.azurewebsites.net/schemas/json/sarif-2.1.0-rtm.4.json",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "skillspector",
+          "version": "2.3.9",
+          "rules": [
+            {
+              "id": "EA2",
+              "shortDescription": {
+                "text": "Autonomous Decision Making"
+              }
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "EA2",
+          "message": {
+            "text": "Autonomous Decision Making"
+          },
+          "level": "warning",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "SKILL.md"
+                },
+                "region": {
+                  "startLine": 31
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

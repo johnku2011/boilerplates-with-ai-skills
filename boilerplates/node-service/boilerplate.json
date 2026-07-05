@@ -3,9 +3,24 @@
   "description": "Minimal Node.js (ESM) service starter with zero-dependency tests (node:test), pre-wired with AI agent config and a curated, security-vetted skill set.",
   "stack": "node-esm",
   "version": "0.1.0",
-  "defaultAgents": ["claude", "cursor", "codex", "copilot"],
+  "defaultAgents": [
+    "claude",
+    "cursor",
+    "codex",
+    "copilot"
+  ],
   "skills": [
-    { "name": "test-driven-development", "source": "shared" },
-    { "name": "code-review", "source": "shared" }
+    {
+      "name": "test-driven-development",
+      "source": "shared"
+    },
+    {
+      "name": "code-review",
+      "source": "shared"
+    },
+    {
+      "name": "project-security",
+      "source": "shared"
+    }
   ]
 }

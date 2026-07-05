@@ -5,6 +5,10 @@ import { scaffold } from "./scaffold.js";
 import { parseAgents, type AgentId } from "./agents.js";
 import { scanCatalog } from "./catalog-scan.js";
 import { scanProject, SkillSpectorScanner } from "./scan.js";
+import { promoteSkill, parsePromoteTarget } from "./promote.js";
+import { syncSkills } from "./sync-skills.js";
+import { buildRegistryFromCatalog, saveRegistry } from "./registry.js";
+import { defaultRegistryPath } from "./paths.js";
 import { getBoilerplate } from "./catalog.js";
 import {
   GitHubSkillSource,
@@ -150,9 +154,13 @@ program
   .option("-l, --limit <n>", "max results", "10")
   .option("--sort <order>", "recent | stars", "recent")
   .option("--scan <n>", "scan the top N results with SkillSpector and show risk scores", "0")
+  .option("--json", "emit machine-readable JSON (for CI / discovery workflow)", false)
   .description("Discover recently-updated agent skills from public hubs.")
   .action(
-    async (query: string, opts: { source: string; limit: string; sort: string; scan: string }) => {
+    async (
+      query: string,
+      opts: { source: string; limit: string; sort: string; scan: string; json?: boolean },
+    ) => {
       const limit = Number.parseInt(opts.limit, 10);
       const scanTop = Number.parseInt(opts.scan, 10) || 0;
       const sort: SortOrder = opts.sort === "stars" ? "stars" : "recent";
@@ -183,34 +191,153 @@ program
 
       const scanner = new SkillSpectorScanner();
       const scannerReady = scanTop > 0 ? await scanner.isAvailable() : false;
-      if (scanTop > 0 && !scannerReady) {
+      if (scanTop > 0 && !scannerReady && !opts.json) {
         console.error(
           "SkillSpector not found on PATH; showing results without risk scores. " +
             "Install with `uv tool install git+https://github.com/NVIDIA/skillspector.git`.",
         );
       }
 
+      const jsonRows: Array<Record<string, unknown>> = [];
       let index = 0;
       for (const c of candidates) {
         index += 1;
+        const row: Record<string, unknown> = { ...c };
+        if (scannerReady && index <= scanTop && c.url) {
+          try {
+            const result = await scanner.scan(c.url, { useLlm: false });
+            row.scan = {
+              riskScore: result.riskScore,
+              findings: result.findings,
+              scanMode: result.scanMode,
+            };
+            if (!opts.json) {
+              const verdict = result.riskScore > 50 ? "HIGH RISK" : "ok";
+              console.log(
+                `   SkillSpector: risk ${result.riskScore} (${verdict}), ${result.findings} finding(s)`,
+              );
+            }
+          } catch (e) {
+            row.scan = { error: e instanceof Error ? e.message : String(e) };
+            if (!opts.json) {
+              console.log(`   SkillSpector: scan failed (${e instanceof Error ? e.message : e})`);
+            }
+          }
+        }
+        jsonRows.push(row);
+
+        if (opts.json) continue;
+
         const updated = c.updatedAt ? c.updatedAt.slice(0, 10) : "unknown";
         console.log(`${index}. ${c.fullName}  [${c.source}]  ★${c.stars}  updated ${updated}`);
         if (c.description) console.log(`   ${c.description.slice(0, 100)}`);
         console.log(`   ${c.url}`);
-        if (scannerReady && index <= scanTop && c.url) {
-          try {
-            const result = await scanner.scan(c.url, { useLlm: false });
-            const verdict = result.riskScore > 50 ? "HIGH RISK" : "ok";
-            console.log(
-              `   SkillSpector: risk ${result.riskScore} (${verdict}), ${result.findings} finding(s)`,
-            );
-          } catch (e) {
-            console.log(`   SkillSpector: scan failed (${e instanceof Error ? e.message : e})`);
-          }
-        }
+      }
+
+      if (opts.json) {
+        console.log(
+          JSON.stringify(
+            {
+              query,
+              sort,
+              limit: Number.isNaN(limit) ? 10 : limit,
+              scanTop,
+              scannerAvailable: scannerReady,
+              errors,
+              candidates: jsonRows,
+            },
+            null,
+            2,
+          ),
+        );
       }
     },
   );
+
+program
+  .command("promote")
+  .argument("<skill-name>", "skill directory name (lowercase-hyphen-case)")
+  .option("--from <path>", "local directory containing SKILL.md")
+  .option("--from-url <url>", "git URL to clone (must contain SKILL.md)")
+  .option("--target <target>", "shared or boilerplate:<name>", "shared")
+  .option("--threshold <n>", "block promotion when risk score exceeds this", "30")
+  .option("--require-scanner", "fail if SkillSpector is not installed", false)
+  .option("--dry-run", "validate and scan without writing files", false)
+  .description("Promote a vetted skill into the catalog (shared or boilerplate-local).")
+  .action(
+    async (
+      skillName: string,
+      opts: {
+        from?: string;
+        fromUrl?: string;
+        target?: string;
+        threshold: string;
+        requireScanner?: boolean;
+        dryRun?: boolean;
+      },
+    ) => {
+      try {
+        const result = await promoteSkill({
+          skillName,
+          fromPath: opts.from,
+          fromUrl: opts.fromUrl,
+          target: parsePromoteTarget(opts.target),
+          threshold: Number(opts.threshold),
+          scanner: new SkillSpectorScanner(),
+          requireScanner: Boolean(opts.requireScanner),
+          dryRun: Boolean(opts.dryRun),
+        });
+        console.log(
+          `${opts.dryRun ? "[dry-run] " : ""}Promoted ${result.skillName} → ${result.targetDir}`,
+        );
+        if (result.riskScore !== null) console.log(`Risk score: ${result.riskScore}`);
+        console.log(`SHA-256: ${result.sha256}`);
+        console.log(`Registry: ${result.registryPath}`);
+      } catch (error) {
+        console.error(error instanceof Error ? error.message : error);
+        process.exitCode = 1;
+      }
+    },
+  );
+
+program
+  .command("sync-skills")
+  .description(
+    "Sync boilerplate manifests with registry bundle rules and refresh skills-index.json",
+  )
+  .option("--dry-run", "show changes without writing files", false)
+  .action(async (opts: { dryRun?: boolean }) => {
+    try {
+      const result = await syncSkills({ dryRun: Boolean(opts.dryRun) });
+      if (result.addedToBoilerplates.length === 0) {
+        console.log("All boilerplates already bundle registry skills.");
+      } else {
+        for (const row of result.addedToBoilerplates) {
+          console.log(`Added ${row.skill} → ${row.boilerplate}`);
+        }
+      }
+      console.log(
+        `Registry refreshed: ${result.registryPath} (${result.registrySkillCount} skills)`,
+      );
+    } catch (error) {
+      console.error(error instanceof Error ? error.message : error);
+      process.exitCode = 1;
+    }
+  });
+
+program
+  .command("registry-refresh")
+  .description("Rebuild registry/skills-index.json from the on-disk catalog")
+  .action(async () => {
+    try {
+      const index = await buildRegistryFromCatalog();
+      await saveRegistry(index, defaultRegistryPath());
+      console.log(`Registry refreshed: ${defaultRegistryPath()} (${index.skills.length} skills)`);
+    } catch (error) {
+      console.error(error instanceof Error ? error.message : error);
+      process.exitCode = 1;
+    }
+  });
 
 program.parseAsync(process.argv).catch((error: unknown) => {
   const message = error instanceof Error ? error.message : String(error);

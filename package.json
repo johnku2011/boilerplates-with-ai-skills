@@ -9,7 +9,8 @@
   "files": [
     "dist",
     "boilerplates",
-    "shared"
+    "shared",
+    "registry"
   ],
   "engines": {
     "node": ">=20"

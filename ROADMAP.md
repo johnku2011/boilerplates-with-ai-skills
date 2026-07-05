@@ -1,32 +1,34 @@
 # Roadmap
 
-This document tracks what ships after each phase. **Phase 2A is in progress on this branch.**
+This document tracks what ships after each phase.
 
-## Phase 2A — Trust & CI (current)
+## Phase 2A — Trust & CI (done)
 
 Goal: make the security gate real in CI and match the spec’s reporting shape.
 
 | Item | Status |
 | --- | --- |
-| Fix SkillSpector install in CI (`uv tool install` from GitHub, not PyPI) | Done on branch |
-| `bwai scan-catalog` — scan `shared/skills/` + `boilerplates/*/skills/` | Done on branch |
-| SARIF output in `scan-project` and catalog scans (`safety-reports/*.sarif`) | Done on branch |
-| Stricter catalog threshold in CI (default 30) | Done on branch |
-| `LICENSE` (MIT) | Done on branch |
+| Fix SkillSpector install in CI (`uv tool install` from GitHub, not PyPI) | Done |
+| `bwai scan-catalog` — scan `shared/skills/` + `boilerplates/*/skills/` | Done |
+| SARIF output in `scan-project` and catalog scans (`safety-reports/*.sarif`) | Done |
+| Stricter catalog threshold in CI (default 30) | Done |
+| `LICENSE` (MIT) | Done |
 
-## Phase 2B — Discovery & promotion (next)
+## Phase 2B — Discovery & promotion (current)
 
 Goal: close the loop from `search-skills` to curated catalog skills.
 
-| Item | Notes |
+| Item | Status |
 | --- | --- |
-| `registry/skills-index.json` | Machine-readable index of promoted skills + metadata |
-| Daily GitHub Action | Run `bwai search-skills --scan N`, open issues or PRs for high-signal candidates |
-| `bwai promote <skill>` | Copy vetted skill into `shared/skills/` or a boilerplate with provenance |
-| `bwai sync-skills` | Refresh shared skills across boilerplates from lock/index |
-| `project-security` shared skill | Security review skill bundled with every boilerplate |
+| `registry/skills-index.json` | Done |
+| Daily GitHub Action (`.github/workflows/skill-discovery.yml`) | Done |
+| `bwai promote` | Done |
+| `bwai sync-skills` | Done |
+| `bwai registry-refresh` | Done |
+| `search-skills --json` for CI | Done |
+| `project-security` shared skill (bundled in all boilerplates) | Done |
 
-## Phase 2C — Depth & upstream (next’s next)
+## Phase 2C — Depth & upstream (next)
 
 Goal: richer agent guidance and upstream alignment.
 
@@ -35,7 +37,7 @@ Goal: richer agent guidance and upstream alignment.
 | Superpowers upstream | Align with [obra/superpowers](https://github.com/obra/superpowers) workflows where applicable |
 | Deepen thin skills | Expand shared skills beyond ~30-line stubs |
 | `deploy-vercel` shared skill | Deployment guidance for Next/Express boilerplates |
-| Baseline SARIF in repo | Optional committed `safety-reports/catalog/` from real scans |
+| Registry upstream sync | Pull pinned upstream refs into `shared/skills/` on schedule |
 
 ## Phase 2D — Distribution & community
 
@@ -46,7 +48,7 @@ Goal: richer agent guidance and upstream alignment.
 | `CONTRIBUTING.md` | Promotion criteria, scan thresholds, skill authoring |
 | Close stale PRs | #1 (spec-only AGENTS), #2 (landscape — already on main) |
 
-## Commands reference (today)
+## Commands reference
 
 ```bash
 bwai list-boilerplates
@@ -54,6 +56,10 @@ bwai new <boilerplate> [dir] --agents claude,cursor
 bwai scan-catalog --threshold 30 --require-scanner
 bwai scan-project [dir] --threshold 50 --require-scanner
 bwai search-skills [query] --source all --scan 5
+bwai search-skills security --scan 5 --json   # CI / discovery
+bwai promote <name> --from ./path --target shared --require-scanner
+bwai sync-skills                              # apply registry bundle rules
+bwai registry-refresh                         # rebuild index from disk
 ```
 
 SkillSpector install:

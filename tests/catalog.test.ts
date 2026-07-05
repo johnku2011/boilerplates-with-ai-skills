@@ -53,6 +53,7 @@ describe("catalog", () => {
     expect(b.manifest.skills).toEqual([
       { name: "test-driven-development", source: "shared" },
       { name: "code-review", source: "shared" },
+      { name: "project-security", source: "shared" },
     ]);
   });
 
@@ -61,6 +62,7 @@ describe("catalog", () => {
     expect(b.manifest.skills).toEqual([
       { name: "nextjs-app-router", source: "local" },
       { name: "code-review", source: "shared" },
+      { name: "project-security", source: "shared" },
     ]);
   });
 

@@ -18,3 +18,7 @@ export function defaultBoilerplatesDir(): string {
 export function defaultSharedSkillsDir(): string {
   return resolve(packageRoot(), "shared", "skills");
 }
+
+export function defaultRegistryPath(): string {
+  return resolve(packageRoot(), "registry", "skills-index.json");
+}
