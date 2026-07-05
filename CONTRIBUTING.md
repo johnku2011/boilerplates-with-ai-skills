@@ -111,14 +111,16 @@ See [`docs/superpowers-upstream.md`](./docs/superpowers-upstream.md).
 
 ## Publishing `bwai` to npm
 
-Maintainers only (requires `NPM_TOKEN`):
+Maintainers only — requires an npm **Automation** or **Granular** token with
+**Publish** permission and **bypass 2FA for automation** enabled:
+
+1. https://www.npmjs.com/settings/~your-user~/tokens → Generate token
+2. Add repo secret `NPM_TOKEN`
+3. Run **Actions → Publish to npm**, or locally:
 
 ```bash
-npm run build && npm test
 npm publish --access public
 ```
-
-Or trigger **Actions → Publish to npm** (workflow dispatch). The package name on npm is **`bwai`**.
 
 ## Code of conduct
 
