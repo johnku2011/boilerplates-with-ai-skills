@@ -10,7 +10,7 @@ runnable project plus a curated `SKILL.md` skill set wired for Claude, Cursor,
 Codex, and Copilot, with NVIDIA SkillSpector gating and a `skills.lock`
 provenance file.
 
-Contributing: see [`CONTRIBUTING.md`](./CONTRIBUTING.md). Published on npm as **`bwai-cli`** (`npx bwai-cli`). Landing page: [`site/`](../site/) → GitHub Pages.
+Contributing: see [`CONTRIBUTING.md`](./CONTRIBUTING.md). Published on npm as **`bwai-cli`** (`npx bwai-cli`; after install use **`bwai-cli`** or alias **`bwai`**). Landing page: [`site/`](../site/) → Vercel / GitHub Pages.
 
 ## Commands (this repo)
 

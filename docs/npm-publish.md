@@ -4,6 +4,15 @@
 >
 > An earlier scoped publish (`@johnku2011/bwai@0.2.0`) remains on npm but is deprecated in favor of `bwai-cli`.
 
+## Quick reference
+
+| What | Name |
+| --- | --- |
+| Product / repo | **bwai** |
+| npm package | **`bwai-cli`** |
+| `npx` (no install) | `npx bwai-cli …` |
+| Shell commands (global install) | `bwai-cli …` or `bwai …` |
+
 ## Quick publish (maintainer, interactive)
 
 If you have 2FA on your account and are at a terminal:

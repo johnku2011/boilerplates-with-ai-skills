@@ -3,6 +3,8 @@
 Thank you for helping improve **bwai** — security-vetted, cross-agent project
 boilerplates with a SkillSpector safety gate.
 
+**npm:** install [`bwai-cli`](https://www.npmjs.com/package/bwai-cli). Run **`bwai-cli`** or the shorter alias **`bwai`** after a global install (`npm i -g bwai-cli`).
+
 ## What we accept
 
 | Change type | Where | Gate |

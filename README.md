@@ -20,12 +20,23 @@ for why this project focuses on *bundling starters with vetted skills* and a
 
 **From npm** (recommended):
 
+| | |
+| --- | --- |
+| **npm package** | [`bwai-cli`](https://www.npmjs.com/package/bwai-cli) |
+| **One-off run** | `npx bwai-cli …` |
+| **After global install** | `bwai-cli …` or `bwai …` (same CLI — `bwai` is a shorter alias) |
+
+npm blocks the package name `bwai` (too similar to existing packages). The product is still **bwai**; only the npm package name is `bwai-cli`.
+
 ```bash
 npx bwai-cli list-boilerplates
 npx bwai-cli new node-service ./my-app --agents claude,cursor
+
+npm i -g bwai-cli
+bwai list-boilerplates          # short alias works too
 ```
 
-**Landing page:** deploy [`site/`](../site/) to **Vercel** (root dir `site`, no build) or GitHub Pages — see [`docs/landing-deploy.md`](./landing-deploy.md).
+**Landing page:** deploy from repo root on **Vercel** (root `vercel.json` serves `site/`) or GitHub Pages — see [`docs/landing-deploy.md`](./docs/landing-deploy.md).
 
 **From source** (contributors):
 
@@ -39,6 +50,8 @@ npm run dev -- --help   # run the CLI from source (tsx)
 ```
 
 ## Usage
+
+Examples use the short alias **`bwai`**. After `npm i -g bwai-cli`, **`bwai-cli`** runs the same commands.
 
 ```bash
 # List available boilerplates

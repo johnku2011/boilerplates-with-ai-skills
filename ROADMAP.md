@@ -29,13 +29,15 @@ Deepened skills, `deploy-vercel`, `sync-upstream`, Superpowers alignment doc.
 
 | Item | Notes |
 | --- | --- |
-| First npm publish | Granular `NPM_TOKEN` with bypass 2FA — see [`docs/npm-publish.md`](./docs/npm-publish.md) |
-| Landing page | **`site/`** — deploy on **Vercel** (root `site`) or GitHub Pages — [`docs/landing-deploy.md`](./docs/landing-deploy.md) |
+| First npm publish | Done — [`bwai-cli`](https://www.npmjs.com/package/bwai-cli); see [`docs/npm-publish.md`](./docs/npm-publish.md) |
+| Landing page | **`site/`** — Vercel (repo root + `vercel.json`) or GitHub Pages — [`docs/landing-deploy.md`](./docs/landing-deploy.md) |
 | `remix-app` boilerplate | Deferred; Fastify + Python added in 2D |
 | Skill depth passes | Continue expanding shared skills on a schedule |
 | Upstream PRs to Superpowers | Contribute generic improvements back |
 
 ## Commands reference
+
+npm package: **`bwai-cli`**. Use `npx bwai-cli …` without a global install. After `npm i -g bwai-cli`, **`bwai-cli`** and **`bwai`** are equivalent.
 
 ```bash
 npx bwai-cli list-boilerplates
