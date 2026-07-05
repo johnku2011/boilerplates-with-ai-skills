@@ -1,9 +1,8 @@
-# Publishing `@johnku2011/bwai` to npm
+# Publishing `bwai-cli` to npm
 
-> **Package name:** npm blocks the unscoped name `bwai` (too similar to existing packages). Publish as **`@johnku2011/bwai`**. The CLI command remains **`bwai`** after install.
-
-> **Note (2025+):** npm removed **Classic** tokens. Use **Granular access tokens** only.
-> See [npm: About access tokens](https://docs.npmjs.com/about-access-tokens/).
+> **Package name:** npm blocks the short name `bwai` (too similar to existing packages). Publish as **`bwai-cli`**. The CLI commands are **`bwai-cli`** (primary) and **`bwai`** (alias).
+>
+> An earlier scoped publish (`@johnku2011/bwai@0.2.0`) remains on npm but is deprecated in favor of `bwai-cli`.
 
 ## Quick publish (maintainer, interactive)
 
@@ -25,7 +24,7 @@ Automated publish needs a **Granular access token** with **Bypass 2FA** enabled 
 2. **Generate New Token** → **Granular Access Token**  
 3. Configure:
    - **Permissions:** Read and write  
-   - **Packages and scopes:** All packages (or scope `@johnku2011` so `@johnku2011/bwai` can be created)  
+   - **Packages and scopes:** All packages  
    - **Expiration:** up to 90 days for write tokens  
    - **Bypass two-factor authentication (2FA):** **On** ← required for non-interactive publish  
 4. Copy the token (starts with `npm_`)  
@@ -42,13 +41,13 @@ Verify:
 
 ```bash
 npm whoami
-npm pack && npm install -g ./johnku2011-bwai-0.2.0.tgz && bwai list-boilerplates
+npm pack && npm install -g ./bwai-cli-0.2.1.tgz && bwai-cli list-boilerplates
 npm publish --access public
 ```
 
 ### Do you need an npm organization?
 
-**No.** Publish `@johnku2011/bwai` under your user account (`johnku2011`). You do not need an npm organization for a scoped user package.
+**No.** Publish `bwai-cli` under your user account (`johnku2011`).
 
 ## Common errors
 
@@ -58,7 +57,7 @@ npm publish --access public
 403 Forbidden - Package name too similar to existing packages ... try '@johnku2011/bwai'
 ```
 
-**Fix:** Use scoped name `@johnku2011/bwai` in `package.json` (already set in this repo).
+**Fix:** Use **`bwai-cli`** (unscoped) instead of `bwai`. Do not use `@johnku2011/bwai` for new installs.
 
 ### Two-factor / token (403)
 
@@ -84,8 +83,8 @@ Requires repo secret `NPM_TOKEN` = granular token with bypass 2FA.
 ## After publish
 
 ```bash
-npm view @johnku2011/bwai
-npx @johnku2011/bwai list-boilerplates
+npm view bwai-cli
+npx bwai-cli list-boilerplates
 ```
 
-Package page: https://www.npmjs.com/package/@johnku2011/bwai
+Package page: https://www.npmjs.com/package/bwai-cli

@@ -22,12 +22,12 @@ import {
 const program = new Command();
 
 program
-  .name("bwai")
+  .name("bwai-cli")
   .description(
     "boilerplates-with-ai-skills: scaffold projects pre-wired with curated, " +
       "security-vetted, cross-agent AI skills.",
   )
-  .version("0.1.0");
+  .version("0.2.1");
 
 program
   .command("list-boilerplates")

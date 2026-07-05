@@ -19,7 +19,7 @@ Deepened skills, `deploy-vercel`, `sync-upstream`, Superpowers alignment doc.
 
 | Item | Status |
 | --- | --- |
-| npm package **`@johnku2011/bwai`** (v0.2.0, `prepublishOnly`, publish workflow) | Done |
+| npm package **`bwai-cli`** (v0.2.1, `prepublishOnly`, publish workflow) | Done |
 | `fastify-api` boilerplate | Done |
 | `python-service` boilerplate (FastAPI + pytest) | Done |
 | `CONTRIBUTING.md` | Done |
@@ -38,8 +38,8 @@ Deepened skills, `deploy-vercel`, `sync-upstream`, Superpowers alignment doc.
 ## Commands reference
 
 ```bash
-npx @johnku2011/bwai list-boilerplates
-npx @johnku2011/bwai new <boilerplate> [dir] --agents claude,cursor
+npx bwai-cli list-boilerplates
+npx bwai-cli new <boilerplate> [dir] --agents claude,cursor
 bwai scan-catalog --threshold 30 --require-scanner
 bwai scan-project [dir] --threshold 50 --require-scanner
 bwai search-skills [query] --source all --scan 5

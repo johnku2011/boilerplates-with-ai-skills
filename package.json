@@ -1,9 +1,10 @@
 {
-  "name": "@johnku2011/bwai",
-  "version": "0.2.0",
+  "name": "bwai-cli",
+  "version": "0.2.1",
   "description": "Security-vetted, cross-agent project boilerplates. Scaffold a project pre-wired with curated, SkillSpector-gated agent skills.",
   "type": "module",
   "bin": {
+    "bwai-cli": "dist/cli.js",
     "bwai": "dist/cli.js"
   },
   "files": [
@@ -40,7 +41,8 @@
     "copilot",
     "skillspector",
     "security",
-    "bwai"
+    "bwai",
+    "bwai-cli"
   ],
   "license": "MIT",
   "repository": {
