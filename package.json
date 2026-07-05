@@ -27,8 +27,7 @@
     "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\"",
     "test": "vitest run",
     "test:watch": "vitest",
-    "prepublishOnly": "npm run build && npm test",
-    "prepare": "husky || true"
+    "prepublishOnly": "npm run build && npm test"
   },
   "keywords": [
     "ai",
