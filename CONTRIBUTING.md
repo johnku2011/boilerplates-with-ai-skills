@@ -111,12 +111,12 @@ See [`docs/superpowers-upstream.md`](./docs/superpowers-upstream.md).
 
 ## Publishing `bwai` to npm
 
-Maintainers only — requires an npm **Automation** or **Granular** token with
-**Publish** permission and **bypass 2FA for automation** enabled:
+Maintainers only — requires a **Granular access token** (Classic tokens were removed in 2025) with **Read and write** permission and **Bypass 2FA** enabled at creation. See [`docs/npm-publish.md`](./docs/npm-publish.md).
 
-1. https://www.npmjs.com/settings/~your-user~/tokens → Generate token
-2. Add repo secret `NPM_TOKEN`
-3. Run **Actions → Publish to npm**, or locally:
+1. https://www.npmjs.com/settings/~your-user~/tokens → **Granular Access Token**  
+2. Permissions: Read and write · **Bypass 2FA: On** · Packages: all (or sufficient scope for `bwai`)  
+3. Add repo secret `NPM_TOKEN` (token starts with `npm_`)  
+4. Run **Actions → Publish to npm**, or locally:
 
 ```bash
 npm publish --access public
