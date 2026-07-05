@@ -63,6 +63,7 @@ describe("catalog", () => {
       { name: "nextjs-app-router", source: "local" },
       { name: "code-review", source: "shared" },
       { name: "project-security", source: "shared" },
+      { name: "deploy-vercel", source: "shared" },
     ]);
   });
 

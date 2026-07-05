@@ -14,7 +14,7 @@ Goal: make the security gate real in CI and match the spec’s reporting shape.
 | Stricter catalog threshold in CI (default 30) | Done |
 | `LICENSE` (MIT) | Done |
 
-## Phase 2B — Discovery & promotion (current)
+## Phase 2B — Discovery & promotion (done)
 
 Goal: close the loop from `search-skills` to curated catalog skills.
 
@@ -22,24 +22,21 @@ Goal: close the loop from `search-skills` to curated catalog skills.
 | --- | --- |
 | `registry/skills-index.json` | Done |
 | Daily GitHub Action (`.github/workflows/skill-discovery.yml`) | Done |
-| `bwai promote` | Done |
-| `bwai sync-skills` | Done |
-| `bwai registry-refresh` | Done |
-| `search-skills --json` for CI | Done |
-| `project-security` shared skill (bundled in all boilerplates) | Done |
+| `bwai promote`, `sync-skills`, `registry-refresh` | Done |
+| `project-security` shared skill (all boilerplates) | Done |
 
-## Phase 2C — Depth & upstream (next)
+## Phase 2C — Depth & upstream (current)
 
 Goal: richer agent guidance and upstream alignment.
 
-| Item | Notes |
+| Item | Status |
 | --- | --- |
-| Superpowers upstream | Align with [obra/superpowers](https://github.com/obra/superpowers) workflows where applicable |
-| Deepen thin skills | Expand shared skills beyond ~30-line stubs |
-| `deploy-vercel` shared skill | Deployment guidance for Next/Express boilerplates |
-| Registry upstream sync | Pull pinned upstream refs into `shared/skills/` on schedule |
+| Superpowers upstream alignment (`docs/superpowers-upstream.md`) | Done |
+| Deepen shared + local skills | Done |
+| `deploy-vercel` shared skill (Next + Express boilerplates) | Done |
+| `bwai sync-upstream` + weekly workflow | Done |
 
-## Phase 2D — Distribution & community
+## Phase 2D — Distribution & community (next)
 
 | Item | Notes |
 | --- | --- |
@@ -56,10 +53,10 @@ bwai new <boilerplate> [dir] --agents claude,cursor
 bwai scan-catalog --threshold 30 --require-scanner
 bwai scan-project [dir] --threshold 50 --require-scanner
 bwai search-skills [query] --source all --scan 5
-bwai search-skills security --scan 5 --json   # CI / discovery
 bwai promote <name> --from ./path --target shared --require-scanner
-bwai sync-skills                              # apply registry bundle rules
-bwai registry-refresh                         # rebuild index from disk
+bwai sync-skills
+bwai sync-upstream [--apply] [--skill <name>] --require-scanner
+bwai registry-refresh
 ```
 
 SkillSpector install:
@@ -67,3 +64,5 @@ SkillSpector install:
 ```bash
 uv tool install git+https://github.com/NVIDIA/skillspector.git
 ```
+
+See also: [`docs/superpowers-upstream.md`](./docs/superpowers-upstream.md)

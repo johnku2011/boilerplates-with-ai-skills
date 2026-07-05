@@ -21,6 +21,10 @@
     {
       "name": "project-security",
       "source": "shared"
+    },
+    {
+      "name": "deploy-vercel",
+      "source": "shared"
     }
   ]
 }

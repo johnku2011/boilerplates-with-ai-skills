@@ -10,6 +10,8 @@ import type { ScanStatus } from "./schema.js";
 
 const upstreamSchema = z.object({
   url: z.string().url(),
+  /** Path within the upstream repo to the skill directory (contains SKILL.md). */
+  path: z.string().optional(),
   ref: z.string().optional(),
 });
 

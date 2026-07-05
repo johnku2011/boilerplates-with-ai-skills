@@ -22,6 +22,20 @@ testable logic into pure functions under `src/`.
    sufficient contrast.
 5. Verify with `npm run typecheck` and `npm test` before claiming completion.
 
+## Structure
+
+- Screens under `app/` or `src/screens/` (follow existing project layout).
+- Shared UI in small components; no mega-files.
+- Navigation: use Expo Router conventions if added later; document stack changes.
+
+## Testing Strategy
+
+- **Unit tests** for pure functions (formatting, validation, reducers) — required.
+- **Component tests** when logic is intertwined with rendering — optional in this
+  starter; prefer extracting logic first.
+- **Device/simulator** for layout, gestures, and platform-specific UI — manual
+  smoke test before release.
+
 ## Guidelines
 
 - Do not block the JS thread with heavy sync work; defer or chunk large tasks.
@@ -31,3 +45,10 @@ testable logic into pure functions under `src/`.
   document that before adding dependencies.
 - Test on at least one target (iOS simulator, Android emulator, or web) for UI
   changes; logic-only changes can rely on `npm test`.
+- Use `project-security` checks for auth tokens, deep links, and WebViews.
+
+## Anti-patterns
+
+- Copy-pasting web React patterns that assume DOM APIs.
+- Storing refresh tokens in AsyncStorage without encryption requirements documented.
+- Skipping tests because "it's just UI" while logic lives in the component.

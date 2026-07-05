@@ -7,6 +7,7 @@ import { scanCatalog } from "./catalog-scan.js";
 import { scanProject, SkillSpectorScanner } from "./scan.js";
 import { promoteSkill, parsePromoteTarget } from "./promote.js";
 import { syncSkills } from "./sync-skills.js";
+import { syncUpstreamSkills } from "./upstream-sync.js";
 import { buildRegistryFromCatalog, saveRegistry } from "./registry.js";
 import { defaultRegistryPath } from "./paths.js";
 import { getBoilerplate } from "./catalog.js";
@@ -324,6 +325,55 @@ program
       process.exitCode = 1;
     }
   });
+
+program
+  .command("sync-upstream")
+  .description("Check or pull shared skills from pinned upstream refs in the registry")
+  .option("--skill <name>", "sync a single skill by name")
+  .option(
+    "--apply",
+    "pull upstream changes after SkillSpector scan (default: report drift only)",
+    false,
+  )
+  .option("--threshold <n>", "block apply when risk score exceeds this", "30")
+  .option("--require-scanner", "fail if SkillSpector is not installed", false)
+  .option("--dry-run", "with --apply, validate without writing files", false)
+  .action(
+    async (opts: {
+      skill?: string;
+      apply?: boolean;
+      threshold: string;
+      requireScanner?: boolean;
+      dryRun?: boolean;
+    }) => {
+      try {
+        const result = await syncUpstreamSkills({
+          skillName: opts.skill,
+          apply: Boolean(opts.apply),
+          dryRun: Boolean(opts.dryRun),
+          threshold: Number(opts.threshold),
+          requireScanner: Boolean(opts.requireScanner),
+          scanner: new SkillSpectorScanner(),
+        });
+        for (const entry of result.entries) {
+          const sha =
+            entry.localSha256 && entry.upstreamSha256
+              ? ` local=${entry.localSha256.slice(0, 8)} upstream=${entry.upstreamSha256.slice(0, 8)}`
+              : "";
+          console.log(
+            `${entry.name}: ${entry.status}${sha}${entry.message ? ` — ${entry.message}` : ""}`,
+          );
+        }
+        if (result.entries.length === 0) {
+          console.log("No registry skills with upstream pins found.");
+        }
+        if (result.entries.some((e) => e.status === "failed")) process.exitCode = 1;
+      } catch (error) {
+        console.error(error instanceof Error ? error.message : error);
+        process.exitCode = 1;
+      }
+    },
+  );
 
 program
   .command("registry-refresh")

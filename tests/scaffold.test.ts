@@ -72,6 +72,7 @@ describe("scaffold", () => {
       "nextjs-app-router",
       "code-review",
       "project-security",
+      "deploy-vercel",
     ]);
     expect(lock.skills.find((s) => s.name === "nextjs-app-router")?.source).toBe(
       "boilerplate:nextjs-app/skills/nextjs-app-router",

@@ -21,6 +21,28 @@ exported `createApp()` factory so they can be tested without binding a port.
 5. Add a `test/` case that starts the app on an ephemeral port and asserts the
    response.
 
+## Route Design
+
+- Use nouns for resources (`/items`, `/items/:id`), verbs via HTTP methods.
+- Version breaking changes (`/v2/...`) or document compatibility in README.
+- Document request/response shapes in README or OpenAPI when the surface grows.
+
+## Middleware Order
+
+1. Security headers / CORS (if needed)
+2. Body parsers with size limits
+3. Authentication (if applicable)
+4. Routes
+5. 404 handler
+6. Error handler (last)
+
+## Testing
+
+- Integration tests: spin up `createApp()` on port `0`, use `fetch` against
+  `http://127.0.0.1:<port>/...`.
+- Unit tests: pure functions extracted from handlers.
+- Run `npm test` before every commit.
+
 ## Guidelines
 
 - Keep handlers thin; move non-trivial logic into small functions you can unit
@@ -29,3 +51,14 @@ exported `createApp()` factory so they can be tested without binding a port.
 - Do not read secrets from the request; read configuration from environment
   variables at startup.
 - Keep responses deterministic and documented in the README.
+- Assume stateless serverless when deployed to Vercel — no in-memory sessions.
+
+## Deployment
+
+See the shared `deploy-vercel` skill when shipping to Vercel.
+
+## Anti-patterns
+
+- Business logic embedded in anonymous middleware chains.
+- Returning raw `error.message` or stacks to clients.
+- Global mutable state shared across requests in serverless.

@@ -32,13 +32,15 @@ node dist/cli.js new node-service /tmp/demo --agents claude
 node dist/cli.js scan-catalog --threshold 30 --require-scanner
 node dist/cli.js scan-project /tmp/demo --threshold 50
 node dist/cli.js sync-skills
+node dist/cli.js sync-upstream
 node dist/cli.js search-skills testing --limit 5
 ```
 
 ## Layout
 
-- `src/` — `bwai` CLI (`list-boilerplates`, `new`, `scan-catalog`, `scan-project`, `search-skills`, `promote`, `sync-skills`)
-- `registry/skills-index.json` — promoted skill metadata + bundle rules
+- `src/` — `bwai` CLI (`list-boilerplates`, `new`, `scan-catalog`, `scan-project`, `search-skills`, `promote`, `sync-skills`, `sync-upstream`)
+- `registry/skills-index.json` — promoted skill metadata, upstream pins, bundle rules
+- `docs/superpowers-upstream.md` — Superpowers alignment and upstream sync
 - `shared/skills/` — catalog-wide skills (`source: "shared"` in manifests)
 - `boilerplates/` — catalog (`<name>/boilerplate.json`, `template/`, local `skills/`)
 - `tests/` — vitest unit/integration tests

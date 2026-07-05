@@ -1,0 +1,47 @@
+name: Upstream skill sync
+
+on:
+  schedule:
+    # Weekly Monday 07:00 UTC
+    - cron: "0 7 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - uses: astral-sh/setup-uv@v5
+      - run: npm ci
+      - run: npm run build
+      - name: Install SkillSpector
+        run: uv tool install git+https://github.com/NVIDIA/skillspector.git
+      - name: Add uv tools to PATH
+        run: echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Sync upstream skills
+        run: |
+          node dist/cli.js sync-upstream --apply --require-scanner --threshold 30
+          node dist/cli.js scan-catalog --require-scanner --threshold 30
+      - name: Create pull request if changed
+        uses: peter-evans/create-pull-request@v7
+        with:
+          commit-message: "chore: sync upstream shared skills"
+          title: "Upstream skill sync"
+          body: |
+            Automated weekly sync from pinned Superpowers upstream refs.
+
+            - [ ] Review SKILL.md diffs for intent, not just risk scores
+            - [ ] Confirm catalog scan passed in CI
+            - [ ] Run `bwai sync-skills` if bundle rules changed
+
+            See `docs/superpowers-upstream.md`.
+          branch: automation/upstream-skill-sync
+          delete-branch: true

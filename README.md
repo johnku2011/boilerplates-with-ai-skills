@@ -10,8 +10,8 @@ See [`requirements.md`](./requirements.md) for the full spec and
 for why this project focuses on *bundling starters with vetted skills* and a
 *security gate* rather than reinventing skill formats, installers, or directories.
 
-> Status: Phase 2B — promotion loop (`registry/`, `promote`, `sync-skills`, daily discovery).
-> See [`ROADMAP.md`](./ROADMAP.md) for Phase 2C (depth/upstream) and beyond.
+> Status: Phase 2C — deepened skills, `deploy-vercel`, Superpowers upstream sync.
+> See [`ROADMAP.md`](./ROADMAP.md) for Phase 2D (npm publish, CONTRIBUTING).
 >
 > Boilerplates: `nextjs-app` (Next.js App Router + React + TS), `express-api`
 > (Express.js on Vercel), `react-native-app` (Expo / React Native + TS), and
@@ -51,6 +51,7 @@ bwai search-skills "code review" --scan 3
 # Promote a vetted skill into the catalog after manual review
 bwai promote my-skill --from ./path/to/skill --target shared --require-scanner
 bwai sync-skills   # apply registry bundle rules to boilerplate manifests
+bwai sync-upstream # check pinned Superpowers refs; add --apply to pull
 ```
 
 `bwai new` copies the boilerplate template, installs the curated skills into a
