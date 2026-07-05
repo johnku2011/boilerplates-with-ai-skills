@@ -8,6 +8,7 @@ export interface ScanResult {
   riskScore: number;
   scanMode: "static" | "llm";
   findings: number;
+  sarif?: string;
 }
 
 export interface SkillScanner {
@@ -21,6 +22,8 @@ interface CommandResult {
   stdout: string;
   stderr: string;
 }
+
+const SKILLSPECTOR_INSTALL = "uv tool install git+https://github.com/NVIDIA/skillspector.git";
 
 function runCommand(command: string, args: string[]): Promise<CommandResult> {
   return new Promise((resolve) => {
@@ -40,6 +43,18 @@ function runCommand(command: string, args: string[]): Promise<CommandResult> {
   });
 }
 
+function parseSarifOutput(text: string): string | undefined {
+  const trimmed = text.trim();
+  if (!trimmed.startsWith("{")) return undefined;
+  try {
+    const parsed = JSON.parse(trimmed) as { version?: string };
+    if (parsed.version?.startsWith("2.")) return trimmed;
+  } catch {
+    // not SARIF JSON
+  }
+  return trimmed.length > 0 ? trimmed : undefined;
+}
+
 /** Adapter around the NVIDIA SkillSpector CLI (`skillspector`). */
 export class SkillSpectorScanner implements SkillScanner {
   readonly name = "skillspector";
@@ -54,12 +69,29 @@ export class SkillSpectorScanner implements SkillScanner {
     if (!opts.useLlm) args.push("--no-llm");
     const { stdout } = await runCommand("skillspector", args);
     const parsed = extractJson(stdout);
-    return {
+    const result: ScanResult = {
       riskScore: readRiskScore(parsed),
       scanMode: readLlmUsed(parsed) ? "llm" : "static",
       findings: readFindings(parsed),
     };
+
+    const sarifArgs = ["scan", skillDir, "--format", "sarif"];
+    if (!opts.useLlm) sarifArgs.push("--no-llm");
+    const { stdout: sarifStdout } = await runCommand("skillspector", sarifArgs);
+    const sarif = parseSarifOutput(sarifStdout);
+    if (sarif) result.sarif = sarif;
+
+    return result;
   }
+}
+
+/** Scan one skill directory with the provided scanner (used by catalog scan). */
+export async function scanSkillDirectory(
+  scanner: SkillScanner,
+  skillDir: string,
+  opts: { useLlm: boolean },
+): Promise<ScanResult> {
+  return scanner.scan(skillDir, opts);
 }
 
 /**
@@ -151,7 +183,7 @@ export async function scanProject(options: ScanProjectOptions): Promise<ScanProj
     if (requireScanner) {
       throw new Error(
         `Security scanner "${scanner.name}" is not installed, but --require-scanner was set. ` +
-          `Install it (e.g. pip install skillspector) and retry.`,
+          `Install with: ${SKILLSPECTOR_INSTALL}`,
       );
     }
     for (const skill of lock.skills) {
@@ -186,9 +218,12 @@ export async function scanProject(options: ScanProjectOptions): Promise<ScanProj
 
     await writeFile(
       join(reportsDir, `${skill.name}.json`),
-      `${JSON.stringify({ skill: skill.name, threshold, ...result }, null, 2)}\n`,
+      `${JSON.stringify({ skill: skill.name, threshold, ...result, sarif: undefined }, null, 2)}\n`,
       "utf8",
     );
+    if (result.sarif) {
+      await writeFile(join(reportsDir, `${skill.name}.sarif`), `${result.sarif}\n`, "utf8");
+    }
   }
 
   await persist(projectDir, lock, reportsDir, {
@@ -227,7 +262,7 @@ async function persist(
   if (!summary.scannerAvailable) {
     lines.push(
       "> SkillSpector was not found on PATH, so skills were not scanned. " +
-        "Install it with `pip install skillspector` and re-run `bwai scan-project`, " +
+        `Install it with \`${SKILLSPECTOR_INSTALL}\` and re-run \`bwai scan-project\`, ` +
         "or pass `--require-scanner` to make a missing scanner fail the gate.",
     );
   }

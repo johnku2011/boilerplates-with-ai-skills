@@ -28,14 +28,16 @@ jobs:
         with:
           node-version: 20
           cache: npm
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
+      - uses: astral-sh/setup-uv@v5
       - run: npm ci
       - run: npm run build
-      # Install the NVIDIA SkillSpector security scanner for the gate.
-      - run: pip install skillspector || echo "skillspector install failed; gate will report scanner unavailable"
-      # Scaffold a throwaway project and run the safety gate over its skills.
-      - run: |
+      - name: Install SkillSpector
+        run: uv tool install git+https://github.com/NVIDIA/skillspector.git
+      - name: Add uv tools to PATH
+        run: echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Scan catalog skills
+        run: node dist/cli.js scan-catalog --threshold 30 --require-scanner
+      - name: Scaffold and scan a demo project
+        run: |
           node dist/cli.js new node-service /tmp/ci-demo --agents claude
-          node dist/cli.js scan-project /tmp/ci-demo --threshold 50
+          node dist/cli.js scan-project /tmp/ci-demo --threshold 50 --require-scanner

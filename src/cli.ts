@@ -3,6 +3,7 @@ import { resolve } from "node:path";
 import { listBoilerplates } from "./catalog.js";
 import { scaffold } from "./scaffold.js";
 import { parseAgents, type AgentId } from "./agents.js";
+import { scanCatalog } from "./catalog-scan.js";
 import { scanProject, SkillSpectorScanner } from "./scan.js";
 import { getBoilerplate } from "./catalog.js";
 import {
@@ -72,6 +73,30 @@ program
   });
 
 program
+  .command("scan-catalog")
+  .description("Scan all shared and boilerplate-local skills in the repo catalog")
+  .option("--threshold <n>", "Maximum acceptable risk score", "30")
+  .option("--require-scanner", "Fail if SkillSpector is not installed", false)
+  .option("--llm", "Enable LLM-assisted scanning when supported", false)
+  .action(async (options: { threshold: string; requireScanner?: boolean; llm?: boolean }) => {
+    try {
+      const result = await scanCatalog({
+        scanner: new SkillSpectorScanner(),
+        threshold: Number(options.threshold),
+        requireScanner: Boolean(options.requireScanner),
+        useLlm: Boolean(options.llm),
+      });
+      console.log(`Catalog scan complete. Reports: ${result.reportsDir}`);
+      console.log(`Skills scanned: ${result.results.length}`);
+      console.log(`Passed: ${result.passed ? "yes" : "no"}`);
+      if (!result.passed) process.exitCode = 1;
+    } catch (error) {
+      console.error(error instanceof Error ? error.message : error);
+      process.exitCode = 1;
+    }
+  });
+
+program
   .command("scan-project")
   .alias("scan")
   .argument("[dir]", "project directory to scan", ".")
@@ -98,7 +123,7 @@ program
       if (!report.scannerAvailable) {
         console.log(
           "SkillSpector not found on PATH; skills were recorded as 'skipped'. " +
-            "Install with `pip install skillspector` for a real scan.",
+            "Install with `uv tool install git+https://github.com/NVIDIA/skillspector.git`.",
         );
       }
       for (const r of report.results) {

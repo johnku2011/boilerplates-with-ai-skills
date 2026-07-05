@@ -18,7 +18,12 @@ function fakeScanner(opts: {
     async scan(skillDir) {
       const name = skillDir.split("/").pop() ?? "";
       const riskScore = opts.riskByName?.[name] ?? 0;
-      return { riskScore, scanMode: "static", findings: riskScore > 0 ? 1 : 0 };
+      return {
+        riskScore,
+        scanMode: "static",
+        findings: riskScore > 0 ? 1 : 0,
+        sarif: JSON.stringify({ version: "2.1.0", runs: [{ tool: { driver: { name: "fake" } } }] }),
+      };
     },
   };
 }
@@ -56,6 +61,7 @@ describe("scanProject", () => {
     expect(report.scannerAvailable).toBe(true);
     expect(await exists(join(project, "safety-reports", "summary.md"))).toBe(true);
     expect(await exists(join(project, "safety-reports", "code-review.json"))).toBe(true);
+    expect(await exists(join(project, "safety-reports", "code-review.sarif"))).toBe(true);
 
     const lock = await readLock(project);
     const cr = lock.skills.find((s) => s.name === "code-review");

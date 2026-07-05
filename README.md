@@ -10,8 +10,9 @@ See [`requirements.md`](./requirements.md) for the full spec and
 for why this project focuses on *bundling starters with vetted skills* and a
 *security gate* rather than reinventing skill formats, installers, or directories.
 
-> Status: Phase 1 foundation — the `bwai` CLI (`list-boilerplates`, `new`,
-> `search-skills`, `scan-project`), a `skills.lock` provenance file, and a
+> Status: Phase 2A — catalog scan + SARIF reports in CI. See [`ROADMAP.md`](./ROADMAP.md)
+> for Phase 2B (promotion loop) and beyond. The `bwai` CLI (`list-boilerplates`, `new`,
+> `scan-catalog`, `search-skills`, `scan-project`), a `skills.lock` provenance file, and a
 > SkillSpector safety gate wired into CI.
 >
 > Boilerplates: `nextjs-app` (Next.js App Router + React + TS), `express-api`
@@ -40,6 +41,9 @@ bwai new node-service ./my-app --agents claude,cursor
 
 # Run the SkillSpector safety gate over the project's skills
 bwai scan-project ./my-app --threshold 50
+
+# Scan all skills shipped in this repo (shared + boilerplate-local)
+bwai scan-catalog --threshold 30 --require-scanner
 
 # Discover recently-updated skills from public hubs (GitHub + SkillsMP)
 bwai search-skills testing --limit 10
@@ -72,7 +76,7 @@ promoting any into a boilerplate. Use `--source github|skillsmp|all` and
 
 `bwai scan-project` runs the [NVIDIA SkillSpector](https://github.com/NVIDIA/SkillSpector)
 scanner over each installed skill, records the risk score in `skills.lock`,
-writes reports to `safety-reports/`, and **fails (exit 1) when any skill exceeds
+writes reports to `safety-reports/` (JSON + SARIF when the scanner supports it), and **fails (exit 1) when any skill exceeds
 the risk threshold**.
 
 - Install the scanner: `uv tool install git+https://github.com/NVIDIA/skillspector.git`

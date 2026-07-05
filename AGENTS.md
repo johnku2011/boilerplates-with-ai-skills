@@ -29,17 +29,18 @@ CLI smoke checks:
 ```bash
 node dist/cli.js list-boilerplates
 node dist/cli.js new node-service /tmp/demo --agents claude
+node dist/cli.js scan-catalog --threshold 30 --require-scanner
 node dist/cli.js scan-project /tmp/demo --threshold 50
 node dist/cli.js search-skills testing --limit 5
 ```
 
 ## Layout
 
-- `src/` — `bwai` CLI (`list-boilerplates`, `new`, `scan-project`, `search-skills`)
+- `src/` — `bwai` CLI (`list-boilerplates`, `new`, `scan-catalog`, `scan-project`, `search-skills`)
 - `shared/skills/` — catalog-wide skills (`source: "shared"` in manifests)
 - `boilerplates/` — catalog (`<name>/boilerplate.json`, `template/`, local `skills/`)
 - `tests/` — vitest unit/integration tests
-- `.github/workflows/ci.yml` — build/test + SkillSpector safety-gate job
+- `.github/workflows/ci.yml` — build/test + catalog scan + SkillSpector safety-gate job
 
 `bwai new` resolves `local` + `shared` skills into one `.bwai/skills/` bundle in the
 generated project; end users only pick a boilerplate name.
@@ -54,6 +55,6 @@ generated project; end users only pick a boilerplate name.
 ## Cursor Cloud specific instructions
 
 - **Update script:** `npm ci` (or `npm install` if no lockfile) — see Cloud VM startup config.
-- **SkillSpector (optional locally):** `uv tool install git+https://github.com/NVIDIA/skillspector.git` — not on PyPI as `skillspector`. CI installs via git; without it, `scan-project` records skills as `skipped` unless `--require-scanner`.
+- **SkillSpector (optional locally):** `uv tool install git+https://github.com/NVIDIA/skillspector.git` — not on PyPI as `skillspector`. CI runs `scan-catalog --require-scanner` and `scan-project --require-scanner`; without SkillSpector locally, scans record skills as `skipped` unless `--require-scanner`.
 - **Boilerplate template tests** under `boilerplates/**/template/` use `node:test`, not vitest — excluded in `vitest.config.ts`.
 - Do not merge stale branches `cursor/document-spec-only-env-9690` or `cursor/landscape-and-differentiation-9690`; their PRs predate the full implementation (PR #2 content is already on `main`).
