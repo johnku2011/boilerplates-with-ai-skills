@@ -8,7 +8,8 @@
   },
   "files": [
     "dist",
-    "boilerplates"
+    "boilerplates",
+    "shared"
   ],
   "engines": {
     "node": ">=20"

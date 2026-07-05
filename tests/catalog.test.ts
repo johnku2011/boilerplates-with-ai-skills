@@ -2,6 +2,8 @@ import { describe, it, expect } from "vitest";
 import { stat } from "node:fs/promises";
 import { join } from "node:path";
 import { listBoilerplates, getBoilerplate } from "../src/catalog.js";
+import { resolveSkillDirectory } from "../src/skills.js";
+import { defaultSharedSkillsDir } from "../src/paths.js";
 
 async function exists(path: string): Promise<boolean> {
   try {
@@ -26,24 +28,39 @@ describe("catalog", () => {
     );
   });
 
-  it("every boilerplate has a template dir and all declared skills on disk", async () => {
+  it("every declared skill resolves to a SKILL.md (local or shared)", async () => {
+    const sharedDir = defaultSharedSkillsDir();
     const all = await listBoilerplates();
     expect(all.length).toBeGreaterThan(0);
     for (const b of all) {
       expect(await exists(b.templateDir), `${b.manifest.name} template`).toBe(true);
       for (const skill of b.manifest.skills) {
-        const skillMd = join(b.skillsDir, skill.name, "SKILL.md");
-        expect(await exists(skillMd), `${b.manifest.name} skill ${skill.name}`).toBe(true);
+        const skillDir = resolveSkillDirectory(skill, {
+          boilerplateName: b.manifest.name,
+          boilerplateSkillsDir: b.skillsDir,
+          sharedSkillsDir: sharedDir,
+        });
+        expect(
+          await exists(join(skillDir, "SKILL.md")),
+          `${b.manifest.name} skill ${skill.name} (${skill.source})`,
+        ).toBe(true);
       }
     }
   });
 
-  it("loads a valid manifest with skills", async () => {
+  it("loads node-service with shared-only skills", async () => {
     const b = await getBoilerplate("node-service");
-    expect(b.manifest.stack).toBe("node-esm");
-    expect(b.manifest.skills.map((s) => s.name)).toEqual([
-      "test-driven-development",
-      "code-review",
+    expect(b.manifest.skills).toEqual([
+      { name: "test-driven-development", source: "shared" },
+      { name: "code-review", source: "shared" },
+    ]);
+  });
+
+  it("loads nextjs-app with mixed local and shared skills", async () => {
+    const b = await getBoilerplate("nextjs-app");
+    expect(b.manifest.skills).toEqual([
+      { name: "nextjs-app-router", source: "local" },
+      { name: "code-review", source: "shared" },
     ]);
   });
 

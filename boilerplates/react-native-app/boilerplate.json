@@ -4,5 +4,8 @@
   "stack": "react-native-expo",
   "version": "0.1.0",
   "defaultAgents": ["claude", "cursor", "codex", "copilot"],
-  "skills": [{ "name": "react-native-development" }, { "name": "test-driven-development" }]
+  "skills": [
+    { "name": "react-native-development", "source": "local" },
+    { "name": "test-driven-development", "source": "shared" }
+  ]
 }

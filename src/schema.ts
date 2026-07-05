@@ -20,6 +20,8 @@ export const boilerplateManifestSchema = z.object({
         name: z
           .string()
           .regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, "skill name must be lowercase-hyphen-case"),
+        /** `local` = boilerplates/<name>/skills/; `shared` = shared/skills/ (catalog-only). */
+        source: z.enum(["local", "shared"]).default("local"),
       }),
     )
     .default([]),

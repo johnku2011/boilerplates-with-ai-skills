@@ -4,5 +4,8 @@
   "stack": "express",
   "version": "0.1.0",
   "defaultAgents": ["claude", "cursor", "codex", "copilot"],
-  "skills": [{ "name": "express-api-design" }, { "name": "test-driven-development" }]
+  "skills": [
+    { "name": "express-api-design", "source": "local" },
+    { "name": "test-driven-development", "source": "shared" }
+  ]
 }

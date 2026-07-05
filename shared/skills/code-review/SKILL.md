@@ -1,6 +1,6 @@
 ---
 name: code-review
-description: Use when reviewing a diff or pull request in this project, to check correctness, tests, readability, and safety before approving.
+description: Use when reviewing a diff or pull request — check correctness, tests, readability, security, and server/client boundaries before approving.
 ---
 
 # Code Review
@@ -16,11 +16,17 @@ optional suggestions.
 2. Check correctness: edge cases, error handling, and inputs that could break.
 3. Check tests: is the new behavior covered? Do existing tests still pass?
 4. Check readability: clear names, small functions, no dead code.
-5. Note any security concerns (untrusted input, secrets, unsafe file or process
-   use) as blocking.
+5. Note security concerns (untrusted input, secrets, unsafe file/process use,
+   leaking server-only data to the client) as blocking.
 
 ## Output
 
 - List blocking issues first, each with a concrete fix.
 - Then list non-blocking suggestions.
 - End with an explicit verdict: approve, approve-with-nits, or request-changes.
+
+## Anti-patterns
+
+- Approving without checking tests or security-sensitive paths.
+- Nitpicking style while missing missing error handling.
+- Vague feedback without a concrete fix.

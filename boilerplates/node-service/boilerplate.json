@@ -4,5 +4,8 @@
   "stack": "node-esm",
   "version": "0.1.0",
   "defaultAgents": ["claude", "cursor", "codex", "copilot"],
-  "skills": [{ "name": "test-driven-development" }, { "name": "code-review" }]
+  "skills": [
+    { "name": "test-driven-development", "source": "shared" },
+    { "name": "code-review", "source": "shared" }
+  ]
 }

@@ -85,21 +85,31 @@ the risk threshold**.
 
 ```
 src/                     # the bwai CLI (TypeScript, bundled with tsup)
+shared/skills/           # catalog-wide skills (resolved at scaffold; not picked separately)
 boilerplates/            # the boilerplate catalog
-  node-service/
-    boilerplate.json     # manifest (name, stack, default agents, skills)
+  <name>/
+    boilerplate.json     # manifest (skills declare source: local | shared)
     template/            # files copied into a new project
-    skills/              # curated, standard-compliant SKILL.md skills
+    skills/              # stack-specific local skills only
 tests/                   # vitest unit/integration tests
 .github/workflows/ci.yml # build/test + safety-gate jobs
 ```
 
+### Shared vs local skills
+
+- **`shared`** skills live once under `shared/skills/` (e.g. `test-driven-development`,
+  `code-review`). Each boilerplate references them in `boilerplate.json`; `bwai new`
+  copies them into the project automatically — users never install shared skills separately.
+- **`local`** skills live under `boilerplates/<name>/skills/` for stack-specific guidance
+  (e.g. `nextjs-app-router`, `express-api-design`).
+
 ## Adding a boilerplate
 
 Create `boilerplates/<name>/` with a `boilerplate.json` manifest, a `template/`
-directory (store `.gitignore` as `gitignore`; it is restored on scaffold), and a
-`skills/` directory of spec-compliant `SKILL.md` skills. Every bundled skill
-must pass the SkillSpector gate in CI.
+directory (store `.gitignore` as `gitignore`; it is restored on scaffold), and
+optional local `skills/` for stack-specific skills. Reference shared skills with
+`{ "name": "code-review", "source": "shared" }`. Every bundled skill must pass
+the SkillSpector gate in CI.
 
 ## License
 
