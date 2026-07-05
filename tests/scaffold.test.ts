@@ -53,8 +53,26 @@ describe("scaffold", () => {
     expect(lock.agents).toEqual(["claude", "cursor"]);
     const tdd = lock.skills.find((s) => s.name === "test-driven-development");
     expect(tdd?.sha256).toMatch(/^[a-f0-9]{64}$/);
+    expect(tdd?.source).toBe("shared:test-driven-development");
     expect(tdd?.scan.status).toBe("pending");
     expect(tdd?.installedTo).toContain(join(".claude", "skills", "test-driven-development"));
+    const review = lock.skills.find((s) => s.name === "code-review");
+    expect(review?.source).toBe("shared:code-review");
+  });
+
+  it("installs mixed local and shared skills for nextjs-app", async () => {
+    const target = join(dir, "next-proj");
+    await scaffold({
+      boilerplateName: "nextjs-app",
+      targetDir: target,
+      agents: ["claude"],
+    });
+    const lock = await readLock(target);
+    expect(lock.skills.map((s) => s.name)).toEqual(["nextjs-app-router", "code-review"]);
+    expect(lock.skills.find((s) => s.name === "nextjs-app-router")?.source).toBe(
+      "boilerplate:nextjs-app/skills/nextjs-app-router",
+    );
+    expect(lock.skills.find((s) => s.name === "code-review")?.source).toBe("shared:code-review");
   });
 
   it("dedupes shared agent targets (copilot + opencode share .agents/skills)", async () => {

@@ -14,3 +14,7 @@ export function packageRoot(): string {
 export function defaultBoilerplatesDir(): string {
   return resolve(packageRoot(), "boilerplates");
 }
+
+export function defaultSharedSkillsDir(): string {
+  return resolve(packageRoot(), "shared", "skills");
+}

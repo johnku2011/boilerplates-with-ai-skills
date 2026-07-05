@@ -36,9 +36,13 @@ node dist/cli.js search-skills testing --limit 5
 ## Layout
 
 - `src/` — `bwai` CLI (`list-boilerplates`, `new`, `scan-project`, `search-skills`)
-- `boilerplates/` — catalog (`<name>/boilerplate.json`, `template/`, `skills/`)
+- `shared/skills/` — catalog-wide skills (`source: "shared"` in manifests)
+- `boilerplates/` — catalog (`<name>/boilerplate.json`, `template/`, local `skills/`)
 - `tests/` — vitest unit/integration tests
 - `.github/workflows/ci.yml` — build/test + SkillSpector safety-gate job
+
+`bwai new` resolves `local` + `shared` skills into one `.bwai/skills/` bundle in the
+generated project; end users only pick a boilerplate name.
 
 ## Conventions
 

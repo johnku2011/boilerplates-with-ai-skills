@@ -4,5 +4,8 @@
   "stack": "nextjs",
   "version": "0.1.0",
   "defaultAgents": ["claude", "cursor", "codex", "copilot"],
-  "skills": [{ "name": "nextjs-app-router" }, { "name": "code-review" }]
+  "skills": [
+    { "name": "nextjs-app-router", "source": "local" },
+    { "name": "code-review", "source": "shared" }
+  ]
 }

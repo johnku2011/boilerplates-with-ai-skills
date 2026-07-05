@@ -4,7 +4,8 @@ import { getBoilerplate } from "./catalog.js";
 import { AGENT_TARGETS, type AgentId } from "./agents.js";
 import { sha256, writeLock } from "./provenance.js";
 import type { LockedSkill, SkillsLock } from "./schema.js";
-import { defaultBoilerplatesDir } from "./paths.js";
+import { defaultBoilerplatesDir, defaultSharedSkillsDir } from "./paths.js";
+import { assertSkillExists, resolveSkillDirectory, skillLockSource } from "./skills.js";
 
 export interface ScaffoldOptions {
   boilerplateName: string;
@@ -63,8 +64,15 @@ export async function scaffold(options: ScaffoldOptions): Promise<ScaffoldResult
 
   const lockedSkills: LockedSkill[] = [];
 
+  const catalogPaths = {
+    boilerplateName: boilerplate.manifest.name,
+    boilerplateSkillsDir: boilerplate.skillsDir,
+    sharedSkillsDir: defaultSharedSkillsDir(),
+  };
+
   for (const skill of boilerplate.manifest.skills) {
-    const sourceSkillDir = join(boilerplate.skillsDir, skill.name);
+    const sourceSkillDir = resolveSkillDirectory(skill, catalogPaths);
+    await assertSkillExists(sourceSkillDir, skill.name);
     const canonicalDir = join(canonicalRoot, skill.name);
     await cp(sourceSkillDir, canonicalDir, { recursive: true });
 
@@ -84,7 +92,7 @@ export async function scaffold(options: ScaffoldOptions): Promise<ScaffoldResult
 
     lockedSkills.push({
       name: skill.name,
-      source: `boilerplate:${boilerplate.manifest.name}/skills/${skill.name}`,
+      source: skillLockSource(skill, boilerplate.manifest.name),
       sha256: sha256(skillMd),
       installedTo,
       scan: {
