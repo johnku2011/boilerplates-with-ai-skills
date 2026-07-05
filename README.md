@@ -18,6 +18,8 @@ for why this project focuses on *bundling starters with vetted skills* and a
 
 ## Install
 
+## Install
+
 **From npm** (recommended):
 
 ```bash
@@ -25,7 +27,8 @@ npx bwai list-boilerplates
 npx bwai new node-service ./my-app --agents claude,cursor
 ```
 
-Landing page: **[johnku2011.github.io/boilerplates-with-ai-skills](https://johnku2011.github.io/boilerplates-with-ai-skills/)**
+**Landing page:** https://johnku2011.github.io/boilerplates-with-ai-skills/  
+*(Requires one-time enable: repo **Settings → Pages → Build and deployment → GitHub Actions**, then re-run the **Deploy landing page** workflow.)*
 
 **From source** (contributors):
 
