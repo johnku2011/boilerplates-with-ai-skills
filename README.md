@@ -36,12 +36,18 @@ npm i -g bwai-cli
 bwai list-boilerplates          # short alias works too
 ```
 
+See [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md) for how boilerplates, skills, and workflows fit together.
+
 ### bwai scaffold + GetSuperpower workflow
 
-Every `bwai-cli new` copies the **`bwai-delivery`** GetSuperpower workflow into
-`workflows/bwai-delivery/`. After scaffold:
+Boilerplates that declare a `workflow` in `boilerplate.json` copy it into
+`workflows/<name>/` on scaffold (most stacks use shared **`bwai-delivery`**).
+`react-native-app` is skills-only today — no workflow in its manifest.
 
 ```bash
+npx bwai-cli list-boilerplates    # shows workflow: shared:bwai-delivery when set
+npx bwai-cli new nextjs-app ./my-app --agents claude,cursor
+cd my-app
 npx getsuperpower install ./workflows/bwai-delivery --agents claude,cursor
 ```
 
@@ -128,13 +134,17 @@ the risk threshold**.
 
 ```
 src/                     # the bwai CLI (TypeScript, bundled with tsup)
-shared/skills/           # catalog-wide skills (resolved at scaffold; not picked separately)
+shared/
+  skills/                # catalog-wide skills (source: "shared" in manifests)
+  workflows/             # GetSuperpower bundles (source: "shared" in manifests)
 boilerplates/            # the boilerplate catalog
   <name>/
-    boilerplate.json     # manifest (skills declare source: local | shared)
+    boilerplate.json     # manifest (skills + optional workflow)
     template/            # files copied into a new project
     skills/              # stack-specific local skills only
+    workflow/            # optional stack-specific GetSuperpower bundle
 tests/                   # vitest unit/integration tests
+docs/ARCHITECTURE.md     # boilerplates vs skills vs workflows
 .github/workflows/ci.yml # build/test + safety-gate jobs
 ```
 

@@ -62,6 +62,10 @@ Rules:
 
 - **`shared/skills/`** — bundled across boilerplates via `boilerplate.json` (`"source": "shared"`) and registry bundle rules.
 - **`boilerplates/<name>/skills/`** — stack-specific (`"source": "local"`).
+- **`shared/workflows/`** — GetSuperpower bundles referenced by `"workflow": { "name": "...", "source": "shared" }`.
+- **`boilerplates/<name>/workflow/`** — optional stack-specific GetSuperpower bundle (`"source": "local"`).
+
+See [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md).
 
 ## Promotion criteria
 
@@ -84,10 +88,11 @@ bwai scan-catalog --require-scanner
 
 1. Create `boilerplates/<name>/boilerplate.json` (see existing manifests).
 2. Add `template/` (runnable starter) and optional local `skills/`.
-3. Declare shared skills in `boilerplate.json`; run `bwai sync-skills` for `bundleAll` rules.
-4. Add tests under `tests/` if CLI/catalog behavior changes.
-5. Run `bwai registry-refresh` and commit updated `registry/skills-index.json`.
-6. Run `bwai scan-catalog --require-scanner` and commit `safety-reports/catalog/` if scans pass.
+3. Optional: declare `"workflow"` (usually `{ "name": "bwai-delivery", "source": "shared" }`) or add `workflow/<name>/` for stack-specific GetSuperpower bundles.
+4. Declare shared skills in `boilerplate.json`; run `bwai sync-skills` for `bundleAll` rules.
+5. Add tests under `tests/` if CLI/catalog behavior changes.
+6. Run `bwai registry-refresh` and commit updated `registry/skills-index.json`.
+7. Run `bwai scan-catalog --require-scanner` and commit `safety-reports/catalog/` if scans pass.
 
 Template conventions:
 

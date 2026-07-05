@@ -26,5 +26,9 @@
       "name": "deploy-vercel",
       "source": "shared"
     }
-  ]
+  ],
+  "workflow": {
+    "name": "bwai-delivery",
+    "source": "shared"
+  }
 }

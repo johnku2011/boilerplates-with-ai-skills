@@ -4,36 +4,21 @@ import { getBoilerplate } from "./catalog.js";
 import { AGENT_TARGETS, type AgentId } from "./agents.js";
 import { sha256, writeLock } from "./provenance.js";
 import type { LockedSkill, SkillsLock } from "./schema.js";
-import {
-  defaultBoilerplatesDir,
-  defaultSharedSkillsDir,
-  defaultWorkflowsDir,
-} from "./paths.js";
+import { defaultBoilerplatesDir, defaultSharedSkillsDir } from "./paths.js";
 import { assertSkillExists, resolveSkillDirectory, skillLockSource } from "./skills.js";
-
-export const DEFAULT_WORKFLOW = "bwai-delivery";
-
-const WORKFLOW_AGENTS_SNIPPET = `
-
-## GetSuperpower workflow
-
-This project includes \`workflows/bwai-delivery/\` — a [GetSuperpower](https://github.com/0xroylee/getsuperpower) workflow (shape → plan → implement → review → security gate).
-
-\`\`\`bash
-npx getsuperpower install ./workflows/bwai-delivery --agents claude,cursor
-\`\`\`
-
-Restart your agent after install. Planning steps use Superpowers skills; implementation uses the bwai skills under \`.bwai/skills/\`.
-`;
+import {
+  assertWorkflowExists,
+  resolveWorkflowDirectory,
+  workflowAgentsSnippet,
+} from "./workflows.js";
 
 export interface ScaffoldOptions {
   boilerplateName: string;
   targetDir: string;
   agents: AgentId[];
   boilerplatesDir?: string;
-  /** GetSuperpower workflow name to copy into workflows/<name>/; false to skip. */
+  /** Override manifest workflow by name, or false to skip. */
   workflow?: string | false;
-  workflowsDir?: string;
 }
 
 export interface ScaffoldResult {
@@ -66,45 +51,56 @@ async function assertUsableTarget(targetDir: string): Promise<void> {
 async function installWorkflow(
   targetDir: string,
   workflowName: string,
-  workflowsDir: string,
+  sourceDir: string,
 ): Promise<string> {
-  const sourceDir = join(workflowsDir, workflowName);
-  if (!(await pathExists(sourceDir))) {
-    throw new Error(`Workflow not found: ${workflowName} (expected ${sourceDir})`);
-  }
-  const workflowJson = join(sourceDir, "workflow.json");
-  if (!(await pathExists(workflowJson))) {
-    throw new Error(`Invalid workflow ${workflowName}: missing workflow.json`);
-  }
-
+  await assertWorkflowExists(sourceDir, workflowName);
   const destDir = join(targetDir, "workflows", workflowName);
   await mkdir(join(targetDir, "workflows"), { recursive: true });
   await cp(sourceDir, destDir, { recursive: true });
   return relative(targetDir, destDir);
 }
 
+function resolveManifestWorkflow(
+  boilerplate: Awaited<ReturnType<typeof getBoilerplate>>,
+  workflowOverride: string | false | undefined,
+): { name: string; sourceDir: string } | undefined {
+  if (workflowOverride === false) return undefined;
+
+  const manifestWorkflow = boilerplate.manifest.workflow;
+  if (workflowOverride) {
+    const source = manifestWorkflow?.source ?? "shared";
+    const workflow = { name: workflowOverride, source };
+    const sourceDir = resolveWorkflowDirectory(workflow, {
+      boilerplateName: boilerplate.manifest.name,
+      boilerplateDir: boilerplate.dir,
+    });
+    return { name: workflowOverride, sourceDir };
+  }
+
+  if (!manifestWorkflow) return undefined;
+
+  const sourceDir = resolveWorkflowDirectory(manifestWorkflow, {
+    boilerplateName: boilerplate.manifest.name,
+    boilerplateDir: boilerplate.dir,
+  });
+  return { name: manifestWorkflow.name, sourceDir };
+}
+
 export async function scaffold(options: ScaffoldOptions): Promise<ScaffoldResult> {
   const { boilerplateName, targetDir, agents } = options;
   const boilerplatesDir = options.boilerplatesDir ?? defaultBoilerplatesDir();
   const boilerplate = await getBoilerplate(boilerplateName, boilerplatesDir);
-  const workflowName =
-    options.workflow === false ? undefined : (options.workflow ?? DEFAULT_WORKFLOW);
 
   await assertUsableTarget(targetDir);
   await mkdir(targetDir, { recursive: true });
 
-  // 1. Copy the template files into the new project.
   await cp(boilerplate.templateDir, targetDir, { recursive: true });
 
-  // Templates ship `.gitignore` as `gitignore` so it is not swallowed by
-  // tooling; restore the dotfile name in the generated project.
   const templatedGitignore = join(targetDir, "gitignore");
   if (await pathExists(templatedGitignore)) {
     await rename(templatedGitignore, join(targetDir, ".gitignore"));
   }
 
-  // 2. Install skills: keep a canonical copy under `.bwai/skills/` and mirror
-  //    into each requested agent's skill target.
   const canonicalRoot = join(targetDir, ".bwai", "skills");
   await mkdir(canonicalRoot, { recursive: true });
 
@@ -161,12 +157,14 @@ export async function scaffold(options: ScaffoldOptions): Promise<ScaffoldResult
   await writeLock(targetDir, lock);
 
   let workflowPath: string | undefined;
-  if (workflowName) {
-    const workflowsDir = options.workflowsDir ?? defaultWorkflowsDir();
-    workflowPath = await installWorkflow(targetDir, workflowName, workflowsDir);
+  let workflowName: string | undefined;
+  const resolved = resolveManifestWorkflow(boilerplate, options.workflow);
+  if (resolved) {
+    workflowName = resolved.name;
+    workflowPath = await installWorkflow(targetDir, resolved.name, resolved.sourceDir);
     const agentsPath = join(targetDir, "AGENTS.md");
     if (await pathExists(agentsPath)) {
-      await appendFile(agentsPath, WORKFLOW_AGENTS_SNIPPET);
+      await appendFile(agentsPath, workflowAgentsSnippet(resolved.name, workflowPath));
     }
   }
 

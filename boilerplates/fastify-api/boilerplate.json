@@ -8,5 +8,9 @@
     { "name": "fastify-api-design", "source": "local" },
     { "name": "test-driven-development", "source": "shared" },
     { "name": "project-security", "source": "shared" }
-  ]
+  ],
+  "workflow": {
+    "name": "bwai-delivery",
+    "source": "shared"
+  }
 }

@@ -25,6 +25,15 @@ export const boilerplateManifestSchema = z.object({
       }),
     )
     .default([]),
+  workflow: z
+    .object({
+      name: z
+        .string()
+        .regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, "workflow name must be lowercase-hyphen-case"),
+      /** `local` → boilerplates/<name>/workflow/; `shared` → shared/workflows/ (catalog-only). */
+      source: z.enum(["local", "shared"]).default("shared"),
+    })
+    .optional(),
 });
 
 export type BoilerplateManifest = z.infer<typeof boilerplateManifestSchema>;

@@ -9,5 +9,9 @@
     { "name": "test-driven-development", "source": "shared" },
     { "name": "code-review", "source": "shared" },
     { "name": "project-security", "source": "shared" }
-  ]
+  ],
+  "workflow": {
+    "name": "bwai-delivery",
+    "source": "shared"
+  }
 }

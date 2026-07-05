@@ -19,10 +19,15 @@ export function defaultSharedSkillsDir(): string {
   return resolve(packageRoot(), "shared", "skills");
 }
 
+export function defaultSharedWorkflowsDir(): string {
+  return resolve(packageRoot(), "shared", "workflows");
+}
+
 export function defaultRegistryPath(): string {
   return resolve(packageRoot(), "registry", "skills-index.json");
 }
 
+/** @deprecated Use defaultSharedWorkflowsDir */
 export function defaultWorkflowsDir(): string {
-  return resolve(packageRoot(), "workflows");
+  return defaultSharedWorkflowsDir();
 }

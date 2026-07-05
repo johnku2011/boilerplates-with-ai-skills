@@ -1,7 +1,7 @@
 import { Command } from "commander";
 import { resolve } from "node:path";
 import { listBoilerplates } from "./catalog.js";
-import { scaffold, DEFAULT_WORKFLOW } from "./scaffold.js";
+import { scaffold } from "./scaffold.js";
 import { parseAgents, type AgentId } from "./agents.js";
 import { scanCatalog } from "./catalog-scan.js";
 import { scanProject, SkillSpectorScanner } from "./scan.js";
@@ -9,7 +9,7 @@ import { promoteSkill, parsePromoteTarget } from "./promote.js";
 import { syncSkills } from "./sync-skills.js";
 import { syncUpstreamSkills } from "./upstream-sync.js";
 import { buildRegistryFromCatalog, saveRegistry } from "./registry.js";
-import { defaultRegistryPath, defaultWorkflowsDir } from "./paths.js";
+import { defaultRegistryPath, defaultSharedWorkflowsDir } from "./paths.js";
 import { getBoilerplate } from "./catalog.js";
 import {
   GitHubSkillSource,
@@ -27,7 +27,7 @@ program
     "boilerplates-with-ai-skills: scaffold projects pre-wired with curated, " +
       "security-vetted, cross-agent AI skills.",
   )
-  .version("0.2.2");
+  .version("0.2.3");
 
 program
   .command("list-boilerplates")
@@ -43,6 +43,9 @@ program
       console.log(`${b.manifest.name}  (${b.manifest.stack})`);
       console.log(`  ${b.manifest.description}`);
       console.log(`  skills: ${b.manifest.skills.map((s) => s.name).join(", ") || "(none)"}`);
+      if (b.manifest.workflow) {
+        console.log(`  workflow: ${b.manifest.workflow.source}:${b.manifest.workflow.name}`);
+      }
       console.log(`  default agents: ${b.manifest.defaultAgents.join(", ")}`);
     }
   });
@@ -57,12 +60,10 @@ program
   )
   .option(
     "-w, --workflow <name>",
-    `GetSuperpower workflow to copy into workflows/<name>/ (default: ${DEFAULT_WORKFLOW})`,
+    "Override GetSuperpower workflow copied into workflows/<name>/ (default: from boilerplate.json)",
   )
-  .option("--no-workflow", "Skip copying a GetSuperpower workflow bundle")
-  .description(
-    "Scaffold a new project with curated skills and an optional GetSuperpower delivery workflow.",
-  )
+  .option("--no-workflow", "Skip copying the boilerplate's GetSuperpower workflow")
+  .description("Scaffold a new project with curated skills and its declared delivery workflow.")
   .action(
     async (
       boilerplateName: string,
@@ -76,12 +77,12 @@ program
       );
       const targetDir = resolve(process.cwd(), dir);
 
-      const workflowOpt =
+      const workflowOpt: string | false | undefined =
         opts.workflow === false
           ? false
           : typeof opts.workflow === "string"
             ? opts.workflow
-            : DEFAULT_WORKFLOW;
+            : undefined;
 
       const result = await scaffold({
         boilerplateName,
@@ -117,7 +118,7 @@ program
   .action(async () => {
     const { readdir, readFile } = await import("node:fs/promises");
     const { join } = await import("node:path");
-    const workflowsDir = defaultWorkflowsDir();
+    const workflowsDir = defaultSharedWorkflowsDir();
     let entries: string[];
     try {
       entries = await readdir(workflowsDir, { withFileTypes: true });

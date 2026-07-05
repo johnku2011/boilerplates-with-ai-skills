@@ -5,10 +5,12 @@ SkillSpector-gated skills**. [GetSuperpower](https://github.com/0xroylee/getsupe
 installs **workflow skill trees** (`workflow.json`) across agents. Together they
 cover *what to build on* and *how to deliver features*.
 
+See [`ARCHITECTURE.md`](./ARCHITECTURE.md) for repo layout (boilerplates vs skills vs workflows).
+
 ## The combined flow
 
 ```bash
-# 1. Scaffold stack + vetted skills + delivery workflow
+# 1. Scaffold stack + vetted skills (+ workflow if declared in boilerplate.json)
 npx bwai-cli new nextjs-app ./my-app --agents claude,cursor
 
 cd my-app
@@ -29,13 +31,20 @@ bwai scan-project --threshold 50 --require-scanner
 | Project template | ✅ | — |
 | Curated stack skills in `.bwai/skills/` | ✅ | — |
 | `skills.lock` provenance + SkillSpector gate | ✅ | — |
+| Workflow declaration per boilerplate | ✅ (`boilerplate.json`) | — |
 | Shape / plan workflow steps | — | ✅ (Superpowers skills) |
 | One callable entry skill | — | ✅ (`bwai-delivery`) |
-| Cross-agent install paths | both (bwai at scaffold; getsuperpower for workflow) | ✅ |
+| Cross-agent install paths | both | ✅ |
 
-## Shipped workflow: `bwai-delivery`
+## Shared workflow: `bwai-delivery`
 
-Location: [`workflows/bwai-delivery/`](../workflows/bwai-delivery/)
+Location: [`shared/workflows/bwai-delivery/`](../shared/workflows/bwai-delivery/)
+
+Declared in most boilerplates:
+
+```json
+"workflow": { "name": "bwai-delivery", "source": "shared" }
+```
 
 | Step | Skill | Purpose |
 | --- | --- | --- |
@@ -51,13 +60,13 @@ List workflows:
 bwai-cli list-workflows
 ```
 
-Skip workflow on scaffold:
+Skip workflow on scaffold (even when manifest declares one):
 
 ```bash
 bwai-cli new node-service ./app --no-workflow
 ```
 
-Use a different bundled workflow (when added):
+Override workflow name:
 
 ```bash
 bwai-cli new node-service ./app --workflow bwai-delivery
@@ -67,7 +76,7 @@ bwai-cli new node-service ./app --workflow bwai-delivery
 
 ```bash
 npx getsuperpower install \
-  'https://github.com/johnku2011/boilerplates-with-ai-skills.git#workflows/bwai-delivery' \
+  'https://github.com/johnku2011/boilerplates-with-ai-skills.git#shared/workflows/bwai-delivery' \
   --agents claude,cursor
 ```
 
@@ -80,8 +89,8 @@ npx getsuperpower deps ./workflows/bwai-delivery
 
 ## Upstream collaboration
 
-See [`docs/getsuperpower-eval.md`](./getsuperpower-eval.md) and
-[`docs/landscape-and-differentiation.md`](./landscape-and-differentiation.md).
+See [`getsuperpower-eval.md`](./getsuperpower-eval.md) and
+[`landscape-and-differentiation.md`](./landscape-and-differentiation.md).
 Future upstream PR: SkillSpector hook in `getsuperpower validate`.
 
 ## References

@@ -25,7 +25,7 @@ describe("scaffold", () => {
     await rm(dir, { recursive: true, force: true });
   });
 
-  it("copies the bwai-delivery GetSuperpower workflow by default", async () => {
+  it("copies workflow when declared in boilerplate manifest", async () => {
     const target = join(dir, "proj-workflow");
     const result = await scaffold({
       boilerplateName: "node-service",
@@ -45,6 +45,18 @@ describe("scaffold", () => {
     const agentsMd = await readFile(join(target, "AGENTS.md"), "utf8");
     expect(agentsMd).toContain("GetSuperpower workflow");
     expect(agentsMd).toContain("npx getsuperpower install");
+  });
+
+  it("does not copy workflow when boilerplate omits workflow in manifest", async () => {
+    const target = join(dir, "rn-proj");
+    const result = await scaffold({
+      boilerplateName: "react-native-app",
+      targetDir: target,
+      agents: ["claude"],
+    });
+
+    expect(result.workflow).toBeUndefined();
+    expect(await exists(join(target, "workflows"))).toBe(false);
   });
 
   it("skips workflow copy when workflow is false", async () => {

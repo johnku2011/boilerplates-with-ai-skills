@@ -22,5 +22,9 @@
       "name": "project-security",
       "source": "shared"
     }
-  ]
+  ],
+  "workflow": {
+    "name": "bwai-delivery",
+    "source": "shared"
+  }
 }

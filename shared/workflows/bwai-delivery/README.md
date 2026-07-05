@@ -14,7 +14,7 @@ coordinates Superpowers planning skills with your bwai skill bundle.
 
 ## Install in a scaffolded project
 
-After `bwai-cli new`, the workflow is copied to `workflows/bwai-delivery/`:
+After `bwai-cli new`, the workflow is copied to `workflows/bwai-delivery/` when the boilerplate declares it in `boilerplate.json`:
 
 ```bash
 npx getsuperpower install ./workflows/bwai-delivery --agents claude,cursor
@@ -25,7 +25,7 @@ Restart your agent, then invoke the entry skill **`bwai-delivery`**.
 ## Install from GitHub (without local copy)
 
 ```bash
-npx getsuperpower install 'https://github.com/johnku2011/boilerplates-with-ai-skills.git#workflows/bwai-delivery' --agents claude,cursor
+npx getsuperpower install 'https://github.com/johnku2011/boilerplates-with-ai-skills.git#shared/workflows/bwai-delivery' --agents claude,cursor
 ```
 
 ## Validate
@@ -45,4 +45,4 @@ npx getsuperpower deps ./workflows/bwai-delivery
 | Review | `superpowers:requesting-code-review` | Against approved plan |
 | Security | `bwai-security-gate` | Runs `bwai scan-project` |
 
-See [`docs/getsuperpower-integration.md`](../../docs/getsuperpower-integration.md) in the bwai repo.
+See [`docs/getsuperpower-integration.md`](../../../docs/getsuperpower-integration.md) in the bwai repo.

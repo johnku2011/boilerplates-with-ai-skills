@@ -40,11 +40,11 @@ node dist/cli.js search-skills testing --limit 5
 
 - `src/` — `bwai` CLI (`list-boilerplates`, `list-workflows`, `new`, `scan-catalog`, `scan-project`, `search-skills`, `promote`, `sync-skills`, `sync-upstream`)
 - `registry/skills-index.json` — promoted skill metadata, upstream pins, bundle rules
-- `workflows/` — GetSuperpower workflow bundles (e.g. `bwai-delivery` copied on `bwai new`)
+- `shared/skills/` — catalog-wide skills (`source: "shared"` in manifests)
+- `shared/workflows/` — GetSuperpower bundles (`workflow.source: "shared"`)
+- `boilerplates/` — catalog (`boilerplate.json`, `template/`, local `skills/`, optional `workflow/`)
 - `docs/getsuperpower-integration.md` — bwai scaffold + GetSuperpower workflow guide
 - `docs/superpowers-upstream.md` — Superpowers alignment and upstream sync
-- `shared/skills/` — catalog-wide skills (`source: "shared"` in manifests)
-- `boilerplates/` — catalog (`<name>/boilerplate.json`, `template/`, local `skills/`)
 - `tests/` — vitest unit/integration tests
 - `.github/workflows/ci.yml` — build/test + catalog scan + SkillSpector safety-gate job
 

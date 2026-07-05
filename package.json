@@ -1,6 +1,6 @@
 {
   "name": "bwai-cli",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Security-vetted, cross-agent project boilerplates. Scaffold a project pre-wired with curated, SkillSpector-gated agent skills.",
   "type": "module",
   "bin": {
@@ -12,7 +12,6 @@
     "boilerplates",
     "shared",
     "registry",
-    "workflows",
     "LICENSE",
     "README.md"
   ],
