@@ -36,6 +36,18 @@ npm i -g bwai-cli
 bwai list-boilerplates          # short alias works too
 ```
 
+### bwai scaffold + GetSuperpower workflow
+
+Every `bwai-cli new` copies the **`bwai-delivery`** GetSuperpower workflow into
+`workflows/bwai-delivery/`. After scaffold:
+
+```bash
+npx getsuperpower install ./workflows/bwai-delivery --agents claude,cursor
+```
+
+See [`docs/getsuperpower-integration.md`](./docs/getsuperpower-integration.md).
+Skip with `--no-workflow`. List bundles with `bwai-cli list-workflows`.
+
 **Landing page:** deploy from repo root on **Vercel** (root `vercel.json` serves `site/`) or GitHub Pages — see [`docs/landing-deploy.md`](./docs/landing-deploy.md).
 
 **From source** (contributors):
@@ -75,6 +87,7 @@ bwai search-skills "code review" --scan 3
 bwai promote my-skill --from ./path/to/skill --target shared --require-scanner
 bwai sync-skills   # apply registry bundle rules to boilerplate manifests
 bwai sync-upstream # check pinned Superpowers refs; add --apply to pull
+bwai list-workflows # GetSuperpower workflow bundles shipped with bwai-cli
 ```
 
 `bwai new` copies the boilerplate template, installs the curated skills into a

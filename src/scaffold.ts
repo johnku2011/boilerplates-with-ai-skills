@@ -1,17 +1,39 @@
-import { cp, mkdir, readdir, rename, readFile, stat } from "node:fs/promises";
+import { cp, mkdir, readdir, rename, readFile, stat, appendFile } from "node:fs/promises";
 import { join, relative } from "node:path";
 import { getBoilerplate } from "./catalog.js";
 import { AGENT_TARGETS, type AgentId } from "./agents.js";
 import { sha256, writeLock } from "./provenance.js";
 import type { LockedSkill, SkillsLock } from "./schema.js";
-import { defaultBoilerplatesDir, defaultSharedSkillsDir } from "./paths.js";
+import {
+  defaultBoilerplatesDir,
+  defaultSharedSkillsDir,
+  defaultWorkflowsDir,
+} from "./paths.js";
 import { assertSkillExists, resolveSkillDirectory, skillLockSource } from "./skills.js";
+
+export const DEFAULT_WORKFLOW = "bwai-delivery";
+
+const WORKFLOW_AGENTS_SNIPPET = `
+
+## GetSuperpower workflow
+
+This project includes \`workflows/bwai-delivery/\` — a [GetSuperpower](https://github.com/0xroylee/getsuperpower) workflow (shape → plan → implement → review → security gate).
+
+\`\`\`bash
+npx getsuperpower install ./workflows/bwai-delivery --agents claude,cursor
+\`\`\`
+
+Restart your agent after install. Planning steps use Superpowers skills; implementation uses the bwai skills under \`.bwai/skills/\`.
+`;
 
 export interface ScaffoldOptions {
   boilerplateName: string;
   targetDir: string;
   agents: AgentId[];
   boilerplatesDir?: string;
+  /** GetSuperpower workflow name to copy into workflows/<name>/; false to skip. */
+  workflow?: string | false;
+  workflowsDir?: string;
 }
 
 export interface ScaffoldResult {
@@ -20,6 +42,8 @@ export interface ScaffoldResult {
   agents: AgentId[];
   skills: string[];
   lock: SkillsLock;
+  workflow?: string;
+  workflowPath?: string;
 }
 
 async function pathExists(path: string): Promise<boolean> {
@@ -39,10 +63,32 @@ async function assertUsableTarget(targetDir: string): Promise<void> {
   }
 }
 
+async function installWorkflow(
+  targetDir: string,
+  workflowName: string,
+  workflowsDir: string,
+): Promise<string> {
+  const sourceDir = join(workflowsDir, workflowName);
+  if (!(await pathExists(sourceDir))) {
+    throw new Error(`Workflow not found: ${workflowName} (expected ${sourceDir})`);
+  }
+  const workflowJson = join(sourceDir, "workflow.json");
+  if (!(await pathExists(workflowJson))) {
+    throw new Error(`Invalid workflow ${workflowName}: missing workflow.json`);
+  }
+
+  const destDir = join(targetDir, "workflows", workflowName);
+  await mkdir(join(targetDir, "workflows"), { recursive: true });
+  await cp(sourceDir, destDir, { recursive: true });
+  return relative(targetDir, destDir);
+}
+
 export async function scaffold(options: ScaffoldOptions): Promise<ScaffoldResult> {
   const { boilerplateName, targetDir, agents } = options;
   const boilerplatesDir = options.boilerplatesDir ?? defaultBoilerplatesDir();
   const boilerplate = await getBoilerplate(boilerplateName, boilerplatesDir);
+  const workflowName =
+    options.workflow === false ? undefined : (options.workflow ?? DEFAULT_WORKFLOW);
 
   await assertUsableTarget(targetDir);
   await mkdir(targetDir, { recursive: true });
@@ -114,11 +160,23 @@ export async function scaffold(options: ScaffoldOptions): Promise<ScaffoldResult
   };
   await writeLock(targetDir, lock);
 
+  let workflowPath: string | undefined;
+  if (workflowName) {
+    const workflowsDir = options.workflowsDir ?? defaultWorkflowsDir();
+    workflowPath = await installWorkflow(targetDir, workflowName, workflowsDir);
+    const agentsPath = join(targetDir, "AGENTS.md");
+    if (await pathExists(agentsPath)) {
+      await appendFile(agentsPath, WORKFLOW_AGENTS_SNIPPET);
+    }
+  }
+
   return {
     targetDir,
     boilerplate: boilerplate.manifest.name,
     agents,
     skills: lockedSkills.map((s) => s.name),
     lock,
+    workflow: workflowName,
+    workflowPath,
   };
 }

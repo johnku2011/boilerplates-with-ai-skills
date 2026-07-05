@@ -25,6 +25,43 @@ describe("scaffold", () => {
     await rm(dir, { recursive: true, force: true });
   });
 
+  it("copies the bwai-delivery GetSuperpower workflow by default", async () => {
+    const target = join(dir, "proj-workflow");
+    const result = await scaffold({
+      boilerplateName: "node-service",
+      targetDir: target,
+      agents: ["claude"],
+    });
+
+    expect(result.workflow).toBe("bwai-delivery");
+    expect(result.workflowPath).toBe(join("workflows", "bwai-delivery"));
+    expect(await exists(join(target, "workflows", "bwai-delivery", "workflow.json"))).toBe(
+      true,
+    );
+    expect(
+      await exists(join(target, "workflows", "bwai-delivery", "skills", "bwai-delivery", "SKILL.md")),
+    ).toBe(true);
+
+    const agentsMd = await readFile(join(target, "AGENTS.md"), "utf8");
+    expect(agentsMd).toContain("GetSuperpower workflow");
+    expect(agentsMd).toContain("npx getsuperpower install");
+  });
+
+  it("skips workflow copy when workflow is false", async () => {
+    const target = join(dir, "proj-no-workflow");
+    const result = await scaffold({
+      boilerplateName: "node-service",
+      targetDir: target,
+      agents: ["claude"],
+      workflow: false,
+    });
+
+    expect(result.workflow).toBeUndefined();
+    expect(await exists(join(target, "workflows"))).toBe(false);
+    const agentsMd = await readFile(join(target, "AGENTS.md"), "utf8");
+    expect(agentsMd).not.toContain("GetSuperpower workflow");
+  });
+
   it("copies the template, restores .gitignore, and installs skills per agent", async () => {
     const target = join(dir, "proj");
     const result = await scaffold({

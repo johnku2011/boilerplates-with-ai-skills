@@ -22,3 +22,7 @@ export function defaultSharedSkillsDir(): string {
 export function defaultRegistryPath(): string {
   return resolve(packageRoot(), "registry", "skills-index.json");
 }
+
+export function defaultWorkflowsDir(): string {
+  return resolve(packageRoot(), "workflows");
+}

@@ -1,0 +1,41 @@
+{
+  "schemaVersion": "0.1",
+  "name": "bwai-delivery",
+  "version": "0.1.0",
+  "description": "Shape, plan, build with bwai vetted stack skills, review, and run the SkillSpector security gate.",
+  "skills": [
+    { "source": "./skills/bwai-delivery" },
+    { "source": "./skills/bwai-security-gate" },
+    { "source": "superpowers:brainstorming", "repo": "obra/superpowers" },
+    { "source": "superpowers:writing-plans", "repo": "obra/superpowers" },
+    { "source": "superpowers:requesting-code-review", "repo": "obra/superpowers" }
+  ],
+  "steps": [
+    {
+      "id": "shape",
+      "title": "Shape the request and success criteria",
+      "skill": "superpowers:brainstorming",
+      "gate": "human_approval"
+    },
+    {
+      "id": "plan",
+      "title": "Write the task-by-task implementation plan",
+      "skill": "superpowers:writing-plans"
+    },
+    {
+      "id": "deliver",
+      "title": "Implement using bwai stack skills and TDD",
+      "skill": "bwai-delivery"
+    },
+    {
+      "id": "review",
+      "title": "Request code review against the approved plan",
+      "skill": "superpowers:requesting-code-review"
+    },
+    {
+      "id": "security",
+      "title": "Run SkillSpector on installed project skills",
+      "skill": "bwai-security-gate"
+    }
+  ]
+}

@@ -33,7 +33,8 @@ Deepened skills, `deploy-vercel`, `sync-upstream`, Superpowers alignment doc.
 | Landing page | **`site/`** — Vercel (repo root + `vercel.json`) or GitHub Pages — [`docs/landing-deploy.md`](./docs/landing-deploy.md) |
 | `remix-app` boilerplate | Deferred; Fastify + Python added in 2D |
 | Skill depth passes | Continue expanding shared skills on a schedule |
-| Upstream PRs to Superpowers | Contribute generic improvements back |
+| GetSuperpower **`bwai-delivery`** workflow bundled on `bwai new` | Done — [`docs/getsuperpower-integration.md`](./docs/getsuperpower-integration.md) |
+| Upstream PRs to Superpowers / getsuperpower | SkillSpector hook in getsuperpower `validate` (future) |
 
 ## Commands reference
 

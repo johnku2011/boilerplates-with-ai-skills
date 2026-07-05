@@ -1,7 +1,7 @@
 import { Command } from "commander";
 import { resolve } from "node:path";
 import { listBoilerplates } from "./catalog.js";
-import { scaffold } from "./scaffold.js";
+import { scaffold, DEFAULT_WORKFLOW } from "./scaffold.js";
 import { parseAgents, type AgentId } from "./agents.js";
 import { scanCatalog } from "./catalog-scan.js";
 import { scanProject, SkillSpectorScanner } from "./scan.js";
@@ -9,7 +9,7 @@ import { promoteSkill, parsePromoteTarget } from "./promote.js";
 import { syncSkills } from "./sync-skills.js";
 import { syncUpstreamSkills } from "./upstream-sync.js";
 import { buildRegistryFromCatalog, saveRegistry } from "./registry.js";
-import { defaultRegistryPath } from "./paths.js";
+import { defaultRegistryPath, defaultWorkflowsDir } from "./paths.js";
 import { getBoilerplate } from "./catalog.js";
 import {
   GitHubSkillSource,
@@ -27,7 +27,7 @@ program
     "boilerplates-with-ai-skills: scaffold projects pre-wired with curated, " +
       "security-vetted, cross-agent AI skills.",
   )
-  .version("0.2.1");
+  .version("0.2.2");
 
 program
   .command("list-boilerplates")
@@ -55,26 +55,92 @@ program
     "-a, --agents <agents>",
     "comma-separated agents to wire skills for (claude,cursor,codex,copilot,opencode)",
   )
-  .description("Scaffold a new project with its curated, cross-agent skill set.")
-  .action(async (boilerplateName: string, dir: string, opts: { agents?: string }) => {
-    const boilerplate = await getBoilerplate(boilerplateName);
-    const agents: AgentId[] = parseAgents(
-      opts.agents,
-      boilerplate.manifest.defaultAgents as AgentId[],
-    );
-    const targetDir = resolve(process.cwd(), dir);
+  .option(
+    "-w, --workflow <name>",
+    `GetSuperpower workflow to copy into workflows/<name>/ (default: ${DEFAULT_WORKFLOW})`,
+  )
+  .option("--no-workflow", "Skip copying a GetSuperpower workflow bundle")
+  .description(
+    "Scaffold a new project with curated skills and an optional GetSuperpower delivery workflow.",
+  )
+  .action(
+    async (
+      boilerplateName: string,
+      dir: string,
+      opts: { agents?: string; workflow?: string | boolean },
+    ) => {
+      const boilerplate = await getBoilerplate(boilerplateName);
+      const agents: AgentId[] = parseAgents(
+        opts.agents,
+        boilerplate.manifest.defaultAgents as AgentId[],
+      );
+      const targetDir = resolve(process.cwd(), dir);
 
-    const result = await scaffold({ boilerplateName, targetDir, agents });
+      const workflowOpt =
+        opts.workflow === false
+          ? false
+          : typeof opts.workflow === "string"
+            ? opts.workflow
+            : DEFAULT_WORKFLOW;
 
-    console.log(`Created project: ${result.targetDir}`);
-    console.log(`Boilerplate: ${result.boilerplate}`);
-    console.log(`Agents wired: ${result.agents.join(", ")}`);
-    console.log(`Skills installed: ${result.skills.join(", ") || "(none)"}`);
-    console.log(`Provenance: skills.lock`);
-    console.log("");
-    console.log("Next steps:");
-    console.log(`  cd ${dir}`);
-    console.log(`  bwai scan-project        # run the SkillSpector safety gate`);
+      const result = await scaffold({
+        boilerplateName,
+        targetDir,
+        agents,
+        workflow: workflowOpt,
+      });
+
+      console.log(`Created project: ${result.targetDir}`);
+      console.log(`Boilerplate: ${result.boilerplate}`);
+      console.log(`Agents wired: ${result.agents.join(", ")}`);
+      console.log(`Skills installed: ${result.skills.join(", ") || "(none)"}`);
+      if (result.workflow && result.workflowPath) {
+        console.log(`GetSuperpower workflow: ${result.workflowPath}/`);
+      }
+      console.log(`Provenance: skills.lock`);
+      console.log("");
+      console.log("Next steps:");
+      console.log(`  cd ${dir}`);
+      if (result.workflowPath) {
+        const agentsFlag = result.agents.join(",");
+        console.log(
+          `  npx getsuperpower install ./${result.workflowPath} --agents ${agentsFlag}`,
+        );
+      }
+      console.log(`  bwai scan-project        # run the SkillSpector safety gate`);
+    },
+  );
+
+program
+  .command("list-workflows")
+  .description("List GetSuperpower workflow bundles shipped with bwai-cli.")
+  .action(async () => {
+    const { readdir, readFile } = await import("node:fs/promises");
+    const { join } = await import("node:path");
+    const workflowsDir = defaultWorkflowsDir();
+    let entries: string[];
+    try {
+      entries = await readdir(workflowsDir, { withFileTypes: true });
+    } catch {
+      console.log("No workflows found.");
+      return;
+    }
+    const dirs = entries.filter((e) => e.isDirectory()).map((e) => e.name);
+    if (dirs.length === 0) {
+      console.log("No workflows found.");
+      return;
+    }
+    for (const name of dirs) {
+      const workflowJson = join(workflowsDir, name, "workflow.json");
+      try {
+        const raw = await readFile(workflowJson, "utf8");
+        const parsed = JSON.parse(raw) as { description?: string; version?: string };
+        console.log(`${name}  (v${parsed.version ?? "?"})`);
+        if (parsed.description) console.log(`  ${parsed.description}`);
+      } catch {
+        console.log(`${name}  (invalid or missing workflow.json)`);
+      }
+    }
   });
 
 program
