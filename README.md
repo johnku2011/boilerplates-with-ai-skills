@@ -10,14 +10,22 @@ See [`requirements.md`](./requirements.md) for the full spec and
 for why this project focuses on *bundling starters with vetted skills* and a
 *security gate* rather than reinventing skill formats, installers, or directories.
 
-> Status: Phase 2C — deepened skills, `deploy-vercel`, Superpowers upstream sync.
-> See [`ROADMAP.md`](./ROADMAP.md) for Phase 2D (npm publish, CONTRIBUTING).
+> Status: Phase 2D — npm package **`bwai`**, `CONTRIBUTING.md`, `fastify-api` and
+> `python-service` boilerplates. See [`ROADMAP.md`](./ROADMAP.md).
 >
-> Boilerplates: `nextjs-app` (Next.js App Router + React + TS), `express-api`
-> (Express.js on Vercel), `react-native-app` (Expo / React Native + TS), and
-> `node-service` (minimal Node ESM).
+> Boilerplates: `nextjs-app`, `express-api`, `fastify-api`, `python-service`,
+> `react-native-app`, `node-service`.
 
-## Install / develop
+## Install
+
+**From npm** (recommended):
+
+```bash
+npx bwai list-boilerplates
+npx bwai new node-service ./my-app --agents claude,cursor
+```
+
+**From source** (contributors):
 
 ```bash
 npm install       # install dependencies

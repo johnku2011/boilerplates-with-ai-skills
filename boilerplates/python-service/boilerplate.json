@@ -1,0 +1,13 @@
+{
+  "name": "python-service",
+  "description": "FastAPI + pytest service starter with a curated, security-vetted skill set for AI agents.",
+  "stack": "python-fastapi",
+  "version": "0.1.0",
+  "defaultAgents": ["claude", "cursor", "codex", "copilot"],
+  "skills": [
+    { "name": "python-api-design", "source": "local" },
+    { "name": "test-driven-development", "source": "shared" },
+    { "name": "code-review", "source": "shared" },
+    { "name": "project-security", "source": "shared" }
+  ]
+}

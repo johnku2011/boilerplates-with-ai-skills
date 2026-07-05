@@ -1,6 +1,6 @@
 {
   "indexVersion": 1,
-  "updatedAt": "2026-07-05T07:17:52.632Z",
+  "updatedAt": "2026-07-05T08:05:39.279Z",
   "skills": [
     {
       "name": "code-review",
@@ -23,7 +23,8 @@
       "bundleAll": false,
       "bundledIn": [
         "nextjs-app",
-        "node-service"
+        "node-service",
+        "python-service"
       ]
     },
     {
@@ -64,6 +65,24 @@
       ]
     },
     {
+      "name": "fastify-api-design",
+      "catalogLocation": "local",
+      "catalogPath": "boilerplates/fastify-api/skills/fastify-api-design",
+      "description": "Use when adding or changing routes, schemas, or plugins in this Fastify API — keep endpoints validated, typed, and testable.",
+      "promotedAt": "2026-07-05T07:17:52.632Z",
+      "sha256": "1b59e5bba47e15fba93b750eaf29da78edc503b12e20cab2b6d56b9f09fe5953",
+      "scan": {
+        "status": "pending",
+        "riskScore": null,
+        "scannedAt": null,
+        "threshold": 30
+      },
+      "bundleAll": false,
+      "bundledIn": [
+        "fastify-api"
+      ]
+    },
+    {
       "name": "nextjs-app-router",
       "catalogLocation": "local",
       "catalogPath": "boilerplates/nextjs-app/skills/nextjs-app-router",
@@ -97,9 +116,29 @@
       "bundleAll": true,
       "bundledIn": [
         "express-api",
+        "fastify-api",
         "nextjs-app",
         "node-service",
+        "python-service",
         "react-native-app"
+      ]
+    },
+    {
+      "name": "python-api-design",
+      "catalogLocation": "local",
+      "catalogPath": "boilerplates/python-service/skills/python-api-design",
+      "description": "Use when adding or changing FastAPI routes, dependencies, or tests in this Python service — keep endpoints typed, validated, and covered by pytest.",
+      "promotedAt": "2026-07-05T07:17:52.632Z",
+      "sha256": "ceeada1f4fa2158e0adb727d38c8ecb429d6647a8ef91e8cca5a216123ed9f64",
+      "scan": {
+        "status": "pending",
+        "riskScore": null,
+        "scannedAt": null,
+        "threshold": 30
+      },
+      "bundleAll": false,
+      "bundledIn": [
+        "python-service"
       ]
     },
     {
@@ -141,7 +180,9 @@
       "bundleAll": false,
       "bundledIn": [
         "express-api",
+        "fastify-api",
         "node-service",
+        "python-service",
         "react-native-app"
       ]
     }

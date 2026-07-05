@@ -10,8 +10,7 @@ runnable project plus a curated `SKILL.md` skill set wired for Claude, Cursor,
 Codex, and Copilot, with NVIDIA SkillSpector gating and a `skills.lock`
 provenance file.
 
-See `requirements.md` (v1.1) and `docs/landscape-and-differentiation.md` for
-product scope and positioning.
+Contributing: see [`CONTRIBUTING.md`](./CONTRIBUTING.md). Published on npm as **`bwai`** (`npx bwai`).
 
 ## Commands (this repo)
 

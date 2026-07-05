@@ -1,6 +1,6 @@
 {
-  "name": "boilerplates-with-ai-skills",
-  "version": "0.1.0",
+  "name": "bwai",
+  "version": "0.2.0",
   "description": "Security-vetted, cross-agent project boilerplates. Scaffold a project pre-wired with curated, SkillSpector-gated agent skills.",
   "type": "module",
   "bin": {
@@ -10,7 +10,9 @@
     "dist",
     "boilerplates",
     "shared",
-    "registry"
+    "registry",
+    "LICENSE",
+    "README.md"
   ],
   "engines": {
     "node": ">=20"
@@ -24,6 +26,7 @@
     "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\"",
     "test": "vitest run",
     "test:watch": "vitest",
+    "prepublishOnly": "npm run build && npm test",
     "prepare": "husky || true"
   },
   "keywords": [
@@ -36,9 +39,21 @@
     "codex",
     "copilot",
     "skillspector",
-    "security"
+    "security",
+    "bwai"
   ],
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/johnku2011/boilerplates-with-ai-skills.git"
+  },
+  "homepage": "https://github.com/johnku2011/boilerplates-with-ai-skills#readme",
+  "bugs": {
+    "url": "https://github.com/johnku2011/boilerplates-with-ai-skills/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "commander": "^15.0.0",
     "zod": "^4.4.3"

@@ -1,55 +1,44 @@
 # Roadmap
 
-This document tracks what ships after each phase.
+All major phases through **2D** are complete. This file tracks what shipped and
+what could come next.
 
 ## Phase 2A — Trust & CI (done)
 
-Goal: make the security gate real in CI and match the spec’s reporting shape.
-
-| Item | Status |
-| --- | --- |
-| Fix SkillSpector install in CI (`uv tool install` from GitHub, not PyPI) | Done |
-| `bwai scan-catalog` — scan `shared/skills/` + `boilerplates/*/skills/` | Done |
-| SARIF output in `scan-project` and catalog scans (`safety-reports/*.sarif`) | Done |
-| Stricter catalog threshold in CI (default 30) | Done |
-| `LICENSE` (MIT) | Done |
+SkillSpector in CI, SARIF reports, `scan-catalog`, MIT LICENSE.
 
 ## Phase 2B — Discovery & promotion (done)
 
-Goal: close the loop from `search-skills` to curated catalog skills.
+Registry, `promote`, `sync-skills`, daily discovery workflow, `project-security`.
+
+## Phase 2C — Depth & upstream (done)
+
+Deepened skills, `deploy-vercel`, `sync-upstream`, Superpowers alignment doc.
+
+## Phase 2D — Distribution & community (done)
 
 | Item | Status |
 | --- | --- |
-| `registry/skills-index.json` | Done |
-| Daily GitHub Action (`.github/workflows/skill-discovery.yml`) | Done |
-| `bwai promote`, `sync-skills`, `registry-refresh` | Done |
-| `project-security` shared skill (all boilerplates) | Done |
+| npm package **`bwai`** (v0.2.0, `prepublishOnly`, publish workflow) | Done |
+| `fastify-api` boilerplate | Done |
+| `python-service` boilerplate (FastAPI + pytest) | Done |
+| `CONTRIBUTING.md` | Done |
+| Close stale PRs #1, #2 | Done (superseded by main) |
 
-## Phase 2C — Depth & upstream (current)
-
-Goal: richer agent guidance and upstream alignment.
-
-| Item | Status |
-| --- | --- |
-| Superpowers upstream alignment (`docs/superpowers-upstream.md`) | Done |
-| Deepen shared + local skills | Done |
-| `deploy-vercel` shared skill (Next + Express boilerplates) | Done |
-| `bwai sync-upstream` + weekly workflow | Done |
-
-## Phase 2D — Distribution & community (next)
+## Possible follow-ups
 
 | Item | Notes |
 | --- | --- |
-| npm publish `bwai` | Public CLI on npm |
-| More boilerplates | e.g. Fastify, Remix, Python service |
-| `CONTRIBUTING.md` | Promotion criteria, scan thresholds, skill authoring |
-| Close stale PRs | #1 (spec-only AGENTS), #2 (landscape — already on main) |
+| First npm publish | Maintainer runs `npm publish` or Actions workflow with `NPM_TOKEN` |
+| `remix-app` boilerplate | Deferred; Fastify + Python added in 2D |
+| Skill depth passes | Continue expanding shared skills on a schedule |
+| Upstream PRs to Superpowers | Contribute generic improvements back |
 
 ## Commands reference
 
 ```bash
-bwai list-boilerplates
-bwai new <boilerplate> [dir] --agents claude,cursor
+npx bwai list-boilerplates
+npx bwai new <boilerplate> [dir] --agents claude,cursor
 bwai scan-catalog --threshold 30 --require-scanner
 bwai scan-project [dir] --threshold 50 --require-scanner
 bwai search-skills [query] --source all --scan 5
@@ -59,10 +48,6 @@ bwai sync-upstream [--apply] [--skill <name>] --require-scanner
 bwai registry-refresh
 ```
 
-SkillSpector install:
+SkillSpector: `uv tool install git+https://github.com/NVIDIA/skillspector.git`
 
-```bash
-uv tool install git+https://github.com/NVIDIA/skillspector.git
-```
-
-See also: [`docs/superpowers-upstream.md`](./docs/superpowers-upstream.md)
+See [`CONTRIBUTING.md`](./CONTRIBUTING.md) and [`docs/superpowers-upstream.md`](./docs/superpowers-upstream.md).

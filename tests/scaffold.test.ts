@@ -93,6 +93,23 @@ describe("scaffold", () => {
     expect(agentsPaths).toEqual([join(".agents", "skills", "test-driven-development")]);
   });
 
+  it("scaffolds fastify-api with local and shared skills", async () => {
+    const target = join(dir, "fastify-proj");
+    const result = await scaffold({
+      boilerplateName: "fastify-api",
+      targetDir: target,
+      agents: ["claude"],
+    });
+    expect(result.skills).toEqual([
+      "fastify-api-design",
+      "test-driven-development",
+      "project-security",
+    ]);
+    expect(await exists(join(target, ".bwai", "skills", "fastify-api-design", "SKILL.md"))).toBe(
+      true,
+    );
+  });
+
   it("refuses a non-empty target directory", async () => {
     const target = join(dir, "proj");
     await scaffold({ boilerplateName: "node-service", targetDir: target, agents: ["claude"] });
