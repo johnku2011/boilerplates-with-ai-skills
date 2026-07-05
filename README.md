@@ -1,168 +1,130 @@
 # boilerplates-with-ai-skills
 
-**Security-vetted, cross-agent project boilerplates.** Scaffold a project for
-your stack and get a working starter *plus* a small, curated set of AI-agent
-skills that are wired for Claude, Cursor, Codex, and GitHub Copilot — with a
-visible SkillSpector safety gate and a reproducible provenance lockfile.
+**`npx` a stack starter that ships with curated, scanned agent skills** — wired for
+Claude, Cursor, Codex, and Copilot, with NVIDIA SkillSpector gating and a
+`skills.lock` provenance file.
 
-See [`requirements.md`](./requirements.md) for the full spec and
-[`docs/landscape-and-differentiation.md`](./docs/landscape-and-differentiation.md)
-for why this project focuses on *bundling starters with vetted skills* and a
-*security gate* rather than reinventing skill formats, installers, or directories.
+Not a skills marketplace. Not a replacement for [Superpowers](https://github.com/obra/superpowers) or
+[getsuperpower](https://github.com/0xroylee/getsuperpower) — we bundle **runnable
+projects + a small vetted skill set + a visible security gate**.
 
-> Status: Phase 2D — npm package **`bwai-cli`**, `CONTRIBUTING.md`, `fastify-api` and
-> `python-service` boilerplates. See [`ROADMAP.md`](./ROADMAP.md).
->
-> Boilerplates: `nextjs-app`, `express-api`, `fastify-api`, `python-service`,
-> `react-native-app`, `node-service`.
+**npm:** [`bwai-cli`](https://www.npmjs.com/package/bwai-cli) · **Try it:**
 
-## Install
+```bash
+npx bwai-cli list-boilerplates
+npx bwai-cli new node-service ./my-app --agents claude,cursor
+cd my-app && bwai scan-project --threshold 50
+```
 
-**From npm** (recommended):
+After global install, `bwai-cli` and the shorter alias `bwai` are the same CLI.
+(npm blocks the package name `bwai` — too similar to existing packages.)
+
+## Quick start
 
 | | |
 | --- | --- |
-| **npm package** | [`bwai-cli`](https://www.npmjs.com/package/bwai-cli) |
-| **One-off run** | `npx bwai-cli …` |
-| **After global install** | `bwai-cli …` or `bwai …` (same CLI — `bwai` is a shorter alias) |
+| **List starters** | `npx bwai-cli list-boilerplates` |
+| **Scaffold** | `npx bwai-cli new nextjs-app ./app --agents claude,cursor` |
+| **Scan skills** | `bwai scan-project ./app --threshold 50` |
+| **Optional workflow** | `npx getsuperpower install ./workflows/bwai-delivery --agents claude,cursor` |
 
-npm blocks the package name `bwai` (too similar to existing packages). The product is still **bwai**; only the npm package name is `bwai-cli`.
+**Six boilerplates today:** `nextjs-app`, `express-api`, `fastify-api`,
+`python-service`, `node-service`, `react-native-app`.
+
+Most include a [GetSuperpower](https://github.com/0xroylee/getsuperpower) delivery
+workflow (`shared:bwai-delivery` in the manifest). `react-native-app` is skills-only.
+
+## What you get on scaffold
+
+```
+my-app/
+  src/ or app/              # runnable template for your stack
+  .bwai/skills/             # canonical curated skills
+  .claude/skills/ …         # mirrored for each --agents target
+  skills.lock               # SHA-256 + scan status per skill
+  workflows/bwai-delivery/  # when declared in boilerplate.json
+```
+
+Each skill is a spec-compliant [`SKILL.md`](https://agentskills.io/specification).
+Catalog skills are scanned in CI with [SkillSpector](https://github.com/NVIDIA/SkillSpector)
+(threshold 30); `scan-project` re-runs the gate in your repo.
+
+## Install
 
 ```bash
 npx bwai-cli list-boilerplates
 npx bwai-cli new node-service ./my-app --agents claude,cursor
 
 npm i -g bwai-cli
-bwai list-boilerplates          # short alias works too
+bwai list-boilerplates          # short alias
 ```
 
-See [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md) for how boilerplates, skills, and workflows fit together.
+See [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md) — boilerplates vs skills vs workflows.
 
-### bwai scaffold + GetSuperpower workflow
-
-Boilerplates that declare a `workflow` in `boilerplate.json` copy it into
-`workflows/<name>/` on scaffold (most stacks use shared **`bwai-delivery`**).
-`react-native-app` is skills-only today — no workflow in its manifest.
+### bwai + GetSuperpower (optional)
 
 ```bash
-npx bwai-cli list-boilerplates    # shows workflow: shared:bwai-delivery when set
 npx bwai-cli new nextjs-app ./my-app --agents claude,cursor
 cd my-app
 npx getsuperpower install ./workflows/bwai-delivery --agents claude,cursor
 ```
 
-See [`docs/getsuperpower-integration.md`](./docs/getsuperpower-integration.md).
-Skip with `--no-workflow`. List bundles with `bwai-cli list-workflows`.
+Details: [`docs/getsuperpower-integration.md`](./docs/getsuperpower-integration.md).
+Skip workflow: `--no-workflow`. List bundles: `bwai-cli list-workflows`.
 
-**Landing page:** deploy from repo root on **Vercel** (root `vercel.json` serves `site/`) or GitHub Pages — see [`docs/landing-deploy.md`](./docs/landing-deploy.md).
+**Contributors:** clone, `npm install`, `npm run build`, `npm test` — see [`CONTRIBUTING.md`](./CONTRIBUTING.md).
 
-**From source** (contributors):
-
-```bash
-npm install       # install dependencies
-npm run build     # bundle the CLI to dist/cli.js
-npm test          # run the vitest suite
-npm run lint      # prettier --check
-npm run typecheck # tsc --noEmit
-npm run dev -- --help   # run the CLI from source (tsx)
-```
+**Landing page:** [`site/`](./site/) — deploy via Vercel (root `vercel.json`) or GitHub Pages
+([`docs/landing-deploy.md`](./docs/landing-deploy.md)).
 
 ## Usage
 
-Examples use the short alias **`bwai`**. After `npm i -g bwai-cli`, **`bwai-cli`** runs the same commands.
-
 ```bash
-# List available boilerplates
 bwai list-boilerplates
-
-# Scaffold a new project with skills wired for specific agents
 bwai new node-service ./my-app --agents claude,cursor
-
-# Run the SkillSpector safety gate over the project's skills
 bwai scan-project ./my-app --threshold 50
-
-# Scan all skills shipped in this repo (shared + boilerplate-local)
 bwai scan-catalog --threshold 30 --require-scanner
-
-# Discover recently-updated skills from public hubs (GitHub + SkillsMP)
-bwai search-skills testing --limit 10
-# ...and score the top results with SkillSpector while you browse
 bwai search-skills "code review" --scan 3
-
-# Promote a vetted skill into the catalog after manual review
 bwai promote my-skill --from ./path/to/skill --target shared --require-scanner
-bwai sync-skills   # apply registry bundle rules to boilerplate manifests
-bwai sync-upstream # check pinned Superpowers refs; add --apply to pull
-bwai list-workflows # GetSuperpower workflow bundles shipped with bwai-cli
+bwai sync-skills
+bwai sync-upstream
+bwai list-workflows
 ```
-
-`bwai new` copies the boilerplate template, installs the curated skills into a
-canonical `.bwai/skills/` plus each agent's skill directory
-(`.claude/skills/`, `.cursor/rules/`, `.codex/skills/`, `.agents/skills/`), and
-writes `skills.lock` with each skill's source, SHA-256, install targets, and
-scan status.
-
-## Discovering skills
-
-`bwai search-skills <query>` queries public hubs for recently-updated agent
-skills and merges the results (newest first):
-
-- **GitHub** repo search filtered by the `claude-skill` topic (works
-  unauthenticated; set `GITHUB_TOKEN` for a higher rate limit).
-- **SkillsMP** marketplace REST API (`sortBy=recent`; set `SKILLSMP_API_KEY`
-  for higher limits).
-
-Pass `--scan <n>` to run the SkillSpector scanner over the top `n` results and
-print each one's risk score — useful for triaging newly-discovered skills before
-promoting any into a boilerplate. Use `--source github|skillsmp|all` and
-`--sort recent|stars` to tune the query.
 
 ## The safety gate
 
-`bwai scan-project` runs the [NVIDIA SkillSpector](https://github.com/NVIDIA/SkillSpector)
-scanner over each installed skill, records the risk score in `skills.lock`,
-writes reports to `safety-reports/` (JSON + SARIF when the scanner supports it), and **fails (exit 1) when any skill exceeds
-the risk threshold**.
+`bwai scan-project` runs SkillSpector over each installed skill, updates
+`skills.lock`, writes `safety-reports/` (JSON + SARIF), and **exits 1** when any
+skill exceeds the threshold.
 
-- Install the scanner: `uv tool install git+https://github.com/NVIDIA/skillspector.git`
-- If the scanner is not installed, skills are recorded as `skipped` and the gate
-  passes unless you pass `--require-scanner`.
-- Use `--llm` to enable SkillSpector's semantic analysis and `--threshold <n>`
-  to tune strictness (the spec suggests `<30` for high-assurance bundles).
+```bash
+uv tool install git+https://github.com/NVIDIA/skillspector.git
+bwai scan-project --threshold 50 --require-scanner
+```
+
+Without SkillSpector locally, scans record `skipped` unless you pass `--require-scanner`.
 
 ## Repository layout
 
 ```
-src/                     # the bwai CLI (TypeScript, bundled with tsup)
-shared/
-  skills/                # catalog-wide skills (source: "shared" in manifests)
-  workflows/             # GetSuperpower bundles (source: "shared" in manifests)
-boilerplates/            # the boilerplate catalog
-  <name>/
-    boilerplate.json     # manifest (skills + optional workflow)
-    template/            # files copied into a new project
-    skills/              # stack-specific local skills only
-    workflow/            # optional stack-specific GetSuperpower bundle
-tests/                   # vitest unit/integration tests
-docs/ARCHITECTURE.md     # boilerplates vs skills vs workflows
-.github/workflows/ci.yml # build/test + safety-gate jobs
+src/                     # bwai-cli (TypeScript)
+shared/skills/           # catalog skills (source: "shared")
+shared/workflows/        # GetSuperpower bundles (e.g. bwai-delivery)
+boilerplates/<name>/     # boilerplate.json, template/, skills/, optional workflow/
+docs/ARCHITECTURE.md
+tests/
 ```
 
-### Shared vs local skills
-
-- **`shared`** skills live once under `shared/skills/` (e.g. `test-driven-development`,
-  `code-review`). Each boilerplate references them in `boilerplate.json`; `bwai new`
-  copies them into the project automatically — users never install shared skills separately.
-- **`local`** skills live under `boilerplates/<name>/skills/` for stack-specific guidance
-  (e.g. `nextjs-app-router`, `express-api-design`).
+Deep dives: [`requirements.md`](./requirements.md),
+[`docs/landscape-and-differentiation.md`](./docs/landscape-and-differentiation.md),
+[`ROADMAP.md`](./ROADMAP.md).
 
 ## Adding a boilerplate
 
-Create `boilerplates/<name>/` with a `boilerplate.json` manifest, a `template/`
-directory (store `.gitignore` as `gitignore`; it is restored on scaffold), and
-optional local `skills/` for stack-specific skills. Reference shared skills with
-`{ "name": "code-review", "source": "shared" }`. Every bundled skill must pass
-the SkillSpector gate in CI.
+Create `boilerplates/<name>/` with `boilerplate.json`, `template/` (ship `.gitignore`
+as `gitignore`), optional local `skills/` and `workflow/`. Reference shared skills
+with `{ "name": "code-review", "source": "shared" }`. Bundled skills must pass
+SkillSpector in CI.
 
 ## License
 
