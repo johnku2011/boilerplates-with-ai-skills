@@ -35,11 +35,11 @@ describe("scaffold", () => {
 
     expect(result.workflow).toBe("bwai-delivery");
     expect(result.workflowPath).toBe(join("workflows", "bwai-delivery"));
-    expect(await exists(join(target, "workflows", "bwai-delivery", "workflow.json"))).toBe(
-      true,
-    );
+    expect(await exists(join(target, "workflows", "bwai-delivery", "workflow.json"))).toBe(true);
     expect(
-      await exists(join(target, "workflows", "bwai-delivery", "skills", "bwai-delivery", "SKILL.md")),
+      await exists(
+        join(target, "workflows", "bwai-delivery", "skills", "bwai-delivery", "SKILL.md"),
+      ),
     ).toBe(true);
 
     const agentsMd = await readFile(join(target, "AGENTS.md"), "utf8");

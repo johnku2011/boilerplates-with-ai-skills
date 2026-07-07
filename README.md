@@ -1,5 +1,10 @@
 # boilerplates-with-ai-skills
 
+[![npm version](https://img.shields.io/npm/v/bwai-cli)](https://www.npmjs.com/package/bwai-cli)
+[![CI](https://github.com/johnku2011/boilerplates-with-ai-skills/actions/workflows/ci.yml/badge.svg)](https://github.com/johnku2011/boilerplates-with-ai-skills/actions/workflows/ci.yml)
+[![catalog: SkillSpector ≤30](https://img.shields.io/badge/catalog%20skills-SkillSpector%20%E2%89%A430-green)](./safety-reports/catalog/summary.md)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
+
 **`npx` a stack starter that ships with curated, scanned agent skills** — wired for
 Claude, Cursor, Codex, and Copilot, with NVIDIA SkillSpector gating and a
 `skills.lock` provenance file.
@@ -74,8 +79,7 @@ Skip workflow: `--no-workflow`. List bundles: `bwai-cli list-workflows`.
 
 **Contributors:** clone, `npm install`, `npm run build`, `npm test` — see [`CONTRIBUTING.md`](./CONTRIBUTING.md).
 
-**Landing page:** [`site/`](./site/) — deploy via Vercel (root `vercel.json`) or GitHub Pages
-([`docs/landing-deploy.md`](./docs/landing-deploy.md)).
+**Landing page:** https://boilerplates-with-ai-skills.vercel.app ([`site/`](./site/) — deploy via [`docs/landing-deploy.md`](./docs/landing-deploy.md)).
 
 ## Usage
 

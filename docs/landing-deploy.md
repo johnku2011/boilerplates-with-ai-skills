@@ -13,6 +13,8 @@ This repo includes a root [`vercel.json`](../vercel.json) that:
 
 Import the repo at [vercel.com/new](https://vercel.com/new), leave **Root Directory** empty (repo root), Framework Preset **Other**, and deploy.
 
+**Live site:** https://boilerplates-with-ai-skills.vercel.app — `package.json` `homepage` points here.
+
 ### Option B — `site/` subfolder
 
 1. Import the repo at [vercel.com/new](https://vercel.com/new)
@@ -21,8 +23,6 @@ Import the repo at [vercel.com/new](https://vercel.com/new), leave **Root Direct
 4. Deploy
 
 Optional custom domain in Vercel project settings.
-
-After deploy, update `package.json` `homepage` to your Vercel URL if desired.
 
 ### Troubleshooting
 

@@ -1,7 +1,6 @@
 # Roadmap
 
-All major phases through **2D** are complete. This file tracks what shipped and
-what could come next.
+Phases **2A–2D** shipped the core product. **2E** is polish and ops hygiene.
 
 ## Phase 2A — Trust & CI (done)
 
@@ -19,22 +18,34 @@ Deepened skills, `deploy-vercel`, `sync-upstream`, Superpowers alignment doc.
 
 | Item | Status |
 | --- | --- |
-| npm package **`bwai-cli`** (v0.2.1, `prepublishOnly`, publish workflow) | Done |
-| `fastify-api` boilerplate | Done |
-| `python-service` boilerplate (FastAPI + pytest) | Done |
+| npm package **`bwai-cli`** (`prepublishOnly`, publish workflow) | Done |
+| `fastify-api` + `python-service` boilerplates | Done |
 | `CONTRIBUTING.md` | Done |
-| Close stale PRs #1, #2 | Done (superseded by main) |
+| GetSuperpower **`bwai-delivery`** workflow (manifest-driven) | Done — [`docs/getsuperpower-integration.md`](./docs/getsuperpower-integration.md) |
+| npm publish [`bwai-cli`](https://www.npmjs.com/package/bwai-cli) | Done — [`docs/npm-publish.md`](./docs/npm-publish.md) |
+
+## Phase 2E — Polish (in progress)
+
+| Item | Status |
+| --- | --- |
+| README badges (npm, CI, SkillSpector) | Done |
+| Landing live on Vercel + `package.json` homepage | Done — https://boilerplates-with-ai-skills.vercel.app |
+| Skill-discovery rolling queue (no duplicate issues) | Done |
+| Prettier / lint clean | Done |
+| CI matrix: all boilerplates | Planned |
+| `bwai doctor` first-run checks | Planned |
+| Upstream: SkillSpector in getsuperpower `validate` | Planned |
+
+**Current npm release:** `bwai-cli@0.2.3`
 
 ## Possible follow-ups
 
 | Item | Notes |
 | --- | --- |
-| First npm publish | Done — [`bwai-cli`](https://www.npmjs.com/package/bwai-cli); see [`docs/npm-publish.md`](./docs/npm-publish.md) |
-| Landing page | **`site/`** — Vercel (repo root + `vercel.json`) or GitHub Pages — [`docs/landing-deploy.md`](./docs/landing-deploy.md) |
-| `remix-app` boilerplate | Deferred; Fastify + Python added in 2D |
-| Skill depth passes | Continue expanding shared skills on a schedule |
-| GetSuperpower **`bwai-delivery`** workflow bundled on `bwai new` | Done — [`docs/getsuperpower-integration.md`](./docs/getsuperpower-integration.md) |
-| Upstream PRs to Superpowers / getsuperpower | SkillSpector hook in getsuperpower `validate` (future) |
+| `remix-app` boilerplate | Deferred |
+| Stack-specific GetSuperpower workflows (`boilerplates/<name>/workflow/`) | Optional |
+| Skill depth passes | Expand shared skills on a schedule |
+| npm Trusted Publishing (OIDC) | Replace long-lived `NPM_TOKEN` |
 
 ## Commands reference
 
@@ -50,8 +61,9 @@ bwai promote <name> --from ./path --target shared --require-scanner
 bwai sync-skills
 bwai sync-upstream [--apply] [--skill <name>] --require-scanner
 bwai registry-refresh
+bwai list-workflows
 ```
 
 SkillSpector: `uv tool install git+https://github.com/NVIDIA/skillspector.git`
 
-See [`CONTRIBUTING.md`](./CONTRIBUTING.md) and [`docs/superpowers-upstream.md`](./docs/superpowers-upstream.md).
+See [`CONTRIBUTING.md`](./CONTRIBUTING.md), [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md), and [`docs/superpowers-upstream.md`](./docs/superpowers-upstream.md).

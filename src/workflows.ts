@@ -27,7 +27,10 @@ export function resolveWorkflowDirectory(
   return join(paths.boilerplateDir, "workflow", workflow.name);
 }
 
-export async function assertWorkflowExists(workflowDir: string, workflowName: string): Promise<void> {
+export async function assertWorkflowExists(
+  workflowDir: string,
+  workflowName: string,
+): Promise<void> {
   const workflowJson = join(workflowDir, "workflow.json");
   try {
     await stat(workflowJson);

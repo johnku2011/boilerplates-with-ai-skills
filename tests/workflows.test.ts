@@ -1,10 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { join } from "node:path";
 import { defaultSharedWorkflowsDir } from "../src/paths.js";
-import {
-  assertWorkflowExists,
-  resolveWorkflowDirectory,
-} from "../src/workflows.js";
+import { assertWorkflowExists, resolveWorkflowDirectory } from "../src/workflows.js";
 
 describe("workflows", () => {
   it("resolves shared workflow directory", () => {

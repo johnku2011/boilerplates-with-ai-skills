@@ -48,7 +48,7 @@
     "type": "git",
     "url": "git+https://github.com/johnku2011/boilerplates-with-ai-skills.git"
   },
-  "homepage": "https://johnku2011.github.io/boilerplates-with-ai-skills/",
+  "homepage": "https://boilerplates-with-ai-skills.vercel.app",
   "bugs": {
     "url": "https://github.com/johnku2011/boilerplates-with-ai-skills/issues"
   },

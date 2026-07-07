@@ -104,9 +104,7 @@ program
       console.log(`  cd ${dir}`);
       if (result.workflowPath) {
         const agentsFlag = result.agents.join(",");
-        console.log(
-          `  npx getsuperpower install ./${result.workflowPath} --agents ${agentsFlag}`,
-        );
+        console.log(`  npx getsuperpower install ./${result.workflowPath} --agents ${agentsFlag}`);
       }
       console.log(`  bwai scan-project        # run the SkillSpector safety gate`);
     },
