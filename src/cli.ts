@@ -18,6 +18,7 @@ import {
   type SkillSource,
   type SortOrder,
 } from "./discovery.js";
+import { formatDoctorReport, runDoctor } from "./doctor.js";
 
 const program = new Command();
 
@@ -27,7 +28,7 @@ program
     "boilerplates-with-ai-skills: scaffold projects pre-wired with curated, " +
       "security-vetted, cross-agent AI skills.",
   )
-  .version("0.2.3");
+  .version("0.2.4");
 
 program
   .command("list-boilerplates")
@@ -140,6 +141,20 @@ program
         console.log(`${name}  (invalid or missing workflow.json)`);
       }
     }
+  });
+
+program
+  .command("doctor")
+  .description("Check Node, catalog, SkillSpector, and optional project setup.")
+  .option("--json", "Print JSON report")
+  .action(async (opts: { json?: boolean }) => {
+    const report = await runDoctor(process.cwd());
+    if (opts.json) {
+      console.log(JSON.stringify(report, null, 2));
+    } else {
+      console.log(formatDoctorReport(report));
+    }
+    if (!report.ok) process.exitCode = 1;
   });
 
 program

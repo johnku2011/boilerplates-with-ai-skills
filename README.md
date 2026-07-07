@@ -29,6 +29,7 @@ After global install, `bwai-cli` and the shorter alias `bwai` are the same CLI.
 | | |
 | --- | --- |
 | **List starters** | `npx bwai-cli list-boilerplates` |
+| **Check setup** | `npx bwai-cli doctor` |
 | **Scaffold** | `npx bwai-cli new nextjs-app ./app --agents claude,cursor` |
 | **Scan skills** | `bwai scan-project ./app --threshold 50` |
 | **Optional workflow** | `npx getsuperpower install ./workflows/bwai-delivery --agents claude,cursor` |
@@ -85,6 +86,7 @@ Skip workflow: `--no-workflow`. List bundles: `bwai-cli list-workflows`.
 
 ```bash
 bwai list-boilerplates
+bwai doctor
 bwai new node-service ./my-app --agents claude,cursor
 bwai scan-project ./my-app --threshold 50
 bwai scan-catalog --threshold 30 --require-scanner

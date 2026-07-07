@@ -20,8 +20,49 @@ jobs:
       - run: npm run build
       - run: npm test
 
+  scaffold-matrix:
+    runs-on: ubuntu-latest
+    needs: build-test
+    strategy:
+      fail-fast: false
+      matrix:
+        boilerplate:
+          - node-service
+          - express-api
+          - fastify-api
+          - nextjs-app
+          - python-service
+          - react-native-app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Scaffold ${{ matrix.boilerplate }}
+        run: |
+          set -euo pipefail
+          TARGET="/tmp/ci-${{ matrix.boilerplate }}"
+          node dist/cli.js new "${{ matrix.boilerplate }}" "$TARGET" --agents claude,cursor
+          test -f "$TARGET/skills.lock"
+          test -d "$TARGET/.bwai/skills"
+          test -f "$TARGET/.claude/skills/test-driven-development/SKILL.md" || \
+            test -f "$TARGET/.claude/skills/code-review/SKILL.md" || \
+            test -f "$TARGET/.claude/skills/nextjs-app-router/SKILL.md" || \
+            test -f "$TARGET/.claude/skills/react-native-development/SKILL.md"
+          if [ "${{ matrix.boilerplate }}" = "react-native-app" ]; then
+            test ! -d "$TARGET/workflows"
+          else
+            test -f "$TARGET/workflows/bwai-delivery/workflow.json"
+          fi
+      - name: bwai doctor
+        run: node dist/cli.js doctor
+
   safety-gate:
     runs-on: ubuntu-latest
+    needs: build-test
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

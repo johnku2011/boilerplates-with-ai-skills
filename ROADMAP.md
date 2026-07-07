@@ -24,19 +24,19 @@ Deepened skills, `deploy-vercel`, `sync-upstream`, Superpowers alignment doc.
 | GetSuperpower **`bwai-delivery`** workflow (manifest-driven) | Done — [`docs/getsuperpower-integration.md`](./docs/getsuperpower-integration.md) |
 | npm publish [`bwai-cli`](https://www.npmjs.com/package/bwai-cli) | Done — [`docs/npm-publish.md`](./docs/npm-publish.md) |
 
-## Phase 2E — Polish (in progress)
+## Phase 2E — Polish (done)
 
 | Item | Status |
 | --- | --- |
 | README badges (npm, CI, SkillSpector) | Done |
 | Landing live on Vercel + `package.json` homepage | Done — https://boilerplates-with-ai-skills.vercel.app |
-| Skill-discovery rolling queue (no duplicate issues) | Done |
+| Skill-discovery rolling queue (no duplicate issues) | Done — triage issues #8, #11 closed |
 | Prettier / lint clean | Done |
-| CI matrix: all boilerplates | Planned |
-| `bwai doctor` first-run checks | Planned |
+| CI matrix: all boilerplates | Done |
+| `bwai doctor` first-run checks | Done |
 | Upstream: SkillSpector in getsuperpower `validate` | Planned |
 
-**Current npm release:** `bwai-cli@0.2.3`
+**Current npm release:** `bwai-cli@0.2.4`
 
 ## Possible follow-ups
 
@@ -46,6 +46,7 @@ Deepened skills, `deploy-vercel`, `sync-upstream`, Superpowers alignment doc.
 | Stack-specific GetSuperpower workflows (`boilerplates/<name>/workflow/`) | Optional |
 | Skill depth passes | Expand shared skills on a schedule |
 | npm Trusted Publishing (OIDC) | Replace long-lived `NPM_TOKEN` |
+| Scaffold template CI workflow | `.github/workflows/skill-scan.yml` in generated projects |
 
 ## Commands reference
 
@@ -53,6 +54,7 @@ npm package: **`bwai-cli`**. Use `npx bwai-cli …` without a global install. Af
 
 ```bash
 npx bwai-cli list-boilerplates
+npx bwai-cli doctor
 npx bwai-cli new <boilerplate> [dir] --agents claude,cursor
 bwai scan-catalog --threshold 30 --require-scanner
 bwai scan-project [dir] --threshold 50 --require-scanner
