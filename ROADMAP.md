@@ -36,7 +36,14 @@ Deepened skills, `deploy-vercel`, `sync-upstream`, Superpowers alignment doc.
 | `bwai doctor` first-run checks | Done |
 | Upstream: SkillSpector in getsuperpower `validate` | Planned |
 
-**Current npm release:** `bwai-cli@0.2.4`
+**Current npm release:** `bwai-cli@0.2.5`
+
+## Phase 2F — Scaffold CI (done)
+
+| Item | Status |
+| --- | --- |
+| `skill-scan.yml` in every boilerplate `template/` | Done — canonical in `shared/ci/skill-scan.yml` |
+| CI + tests assert workflow is scaffolded | Done |
 
 ## Possible follow-ups
 
@@ -46,7 +53,7 @@ Deepened skills, `deploy-vercel`, `sync-upstream`, Superpowers alignment doc.
 | Stack-specific GetSuperpower workflows (`boilerplates/<name>/workflow/`) | Optional |
 | Skill depth passes | Expand shared skills on a schedule |
 | npm Trusted Publishing (OIDC) | Replace long-lived `NPM_TOKEN` |
-| Scaffold template CI workflow | `.github/workflows/skill-scan.yml` in generated projects |
+| Upstream: SkillSpector in getsuperpower `validate` | Planned (from 2E) |
 
 ## Commands reference
 

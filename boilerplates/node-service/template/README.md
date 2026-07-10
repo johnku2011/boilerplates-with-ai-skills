@@ -25,4 +25,6 @@ Re-scan the skills at any time with the SkillSpector safety gate:
 bwai scan-project
 ```
 
+On GitHub, `.github/workflows/skill-scan.yml` runs the same gate on push and pull requests.
+
 Reports are written to `safety-reports/`.

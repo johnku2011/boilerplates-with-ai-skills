@@ -1,0 +1,24 @@
+# Re-scan curated agent skills with SkillSpector on every push/PR.
+# Scaffolded by https://www.npmjs.com/package/bwai-cli — edit threshold or triggers as needed.
+name: Skill scan
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  skill-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: astral-sh/setup-uv@v5
+      - name: Install SkillSpector
+        run: uv tool install git+https://github.com/NVIDIA/skillspector.git
+      - name: Add uv tools to PATH
+        run: echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Scan installed skills (bwai safety gate)
+        run: npx --yes bwai-cli scan-project --threshold 50 --require-scanner

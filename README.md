@@ -48,6 +48,7 @@ my-app/
   .bwai/skills/             # canonical curated skills
   .claude/skills/ …         # mirrored for each --agents target
   skills.lock               # SHA-256 + scan status per skill
+  .github/workflows/skill-scan.yml  # SkillSpector gate on push/PR
   workflows/bwai-delivery/  # when declared in boilerplate.json
 ```
 

@@ -91,6 +91,9 @@ describe("scaffold", () => {
     expect(await exists(join(target, ".gitignore"))).toBe(true);
     expect(await exists(join(target, "gitignore"))).toBe(false);
 
+    // Template CI workflow for SkillSpector gate.
+    expect(await exists(join(target, ".github", "workflows", "skill-scan.yml"))).toBe(true);
+
     // Canonical + per-agent skill copies.
     expect(await exists(join(target, ".bwai", "skills", "code-review", "SKILL.md"))).toBe(true);
     expect(await exists(join(target, ".claude", "skills", "code-review", "SKILL.md"))).toBe(true);
