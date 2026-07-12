@@ -82,7 +82,16 @@ describe("scaffold", () => {
       agents: ["claude", "cursor"],
     });
 
-    expect(result.skills).toEqual(["test-driven-development", "code-review", "project-security"]);
+    expect(result.skills).toEqual([
+      "test-driven-development",
+      "code-review",
+      "project-security",
+      "startup-goal",
+      "founding-engineer",
+      "qa-lead",
+      "cto",
+      "product-manager",
+    ]);
 
     // Template files copied.
     expect(await exists(join(target, "package.json"))).toBe(true);
