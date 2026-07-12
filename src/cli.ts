@@ -118,7 +118,7 @@ program
     const { readdir, readFile } = await import("node:fs/promises");
     const { join } = await import("node:path");
     const workflowsDir = defaultSharedWorkflowsDir();
-    let entries: string[];
+    let entries: import("node:fs").Dirent[];
     try {
       entries = await readdir(workflowsDir, { withFileTypes: true });
     } catch {
