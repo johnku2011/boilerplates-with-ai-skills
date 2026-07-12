@@ -46,7 +46,7 @@ my-app/
   .claude/skills/ …         # mirrored for each --agents target
   skills.lock               # SHA-256 + scan status per skill
   .github/workflows/skill-scan.yml  # SkillSpector gate on push/PR
-  workflows/bwai-delivery/  # delivery workflow (most boilerplates)
+  workflows/bwai-delivery/  # delivery workflow bundle
 ```
 
 Each skill is a spec-compliant [`SKILL.md`](https://agentskills.io/specification).
@@ -65,7 +65,6 @@ bwai search-skills "code review"
 bwai promote my-skill --from ./path/to/skill --target shared --require-scanner
 bwai sync-upstream          # pull latest omni-skills content
 bwai sync-skills
-bwai list-workflows
 ```
 
 ## The safety gate
@@ -80,17 +79,6 @@ bwai scan-project --threshold 50 --require-scanner
 ```
 
 Without SkillSpector locally, scans record `skipped` unless you pass `--require-scanner`.
-
-## Optional: GetSuperpower delivery workflow
-
-Most boilerplates include a `bwai-delivery` workflow bundle. After scaffolding:
-
-```bash
-npx getsuperpower install ./workflows/bwai-delivery --agents claude,cursor
-```
-
-Details: [`docs/getsuperpower-integration.md`](./docs/getsuperpower-integration.md).
-Skip: `--no-workflow`. List: `bwai list-workflows`.
 
 ## Repository layout
 
@@ -121,7 +109,6 @@ SkillSpector in CI.
 
 - **[Omni-Skills](https://github.com/devos-ing/omni-skills)** by devos-ing — startup role workflow bench bundled in every project.
 - **[NVIDIA SkillSpector](https://github.com/NVIDIA/SkillSpector)** — safety scanner that gates every bundled skill.
-- **[GetSuperpower](https://github.com/0xroylee/getsuperpower)** — optional delivery workflow runtime.
 
 ## License
 
