@@ -21,6 +21,26 @@
     {
       "name": "project-security",
       "source": "shared"
+    },
+    {
+      "name": "startup-goal",
+      "source": "shared"
+    },
+    {
+      "name": "founding-engineer",
+      "source": "shared"
+    },
+    {
+      "name": "qa-lead",
+      "source": "shared"
+    },
+    {
+      "name": "cto",
+      "source": "shared"
+    },
+    {
+      "name": "product-manager",
+      "source": "shared"
     }
   ]
 }

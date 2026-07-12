@@ -1,7 +1,147 @@
 {
   "indexVersion": 1,
-  "updatedAt": "2026-07-05T08:05:39.279Z",
+  "updatedAt": "2026-07-12T14:49:00.000Z",
   "skills": [
+    {
+      "name": "startup-goal",
+      "catalogLocation": "shared",
+      "catalogPath": "shared/skills/startup-goal",
+      "description": "Use when coordinating a startup goal across CEO, CTO, product manager, engineering manager, founding engineer, and QA lead role subagents.",
+      "upstream": {
+        "url": "https://github.com/devos-ing/omni-skills",
+        "path": "examples/workflows/startup-goal/skills/startup-goal",
+        "ref": "1b9aa8a58ed5486714986a29d0128abb82144640"
+      },
+      "promotedAt": "2026-07-12T14:49:00.000Z",
+      "sha256": "e2b96bb14aa166a736f6f08b73dfa80ea720f56f22396552fbfdb835422d0da7",
+      "scan": {
+        "status": "pending",
+        "riskScore": null,
+        "scannedAt": null,
+        "threshold": 30
+      },
+      "bundleAll": true,
+      "bundledIn": [
+        "express-api",
+        "fastify-api",
+        "nextjs-app",
+        "node-service",
+        "python-service",
+        "react-native-app"
+      ]
+    },
+    {
+      "name": "founding-engineer",
+      "catalogLocation": "shared",
+      "catalogPath": "shared/skills/founding-engineer",
+      "description": "Use when acting as a startup founding engineer for implementation, tests, debugging, review, and verification.",
+      "upstream": {
+        "url": "https://github.com/devos-ing/omni-skills",
+        "path": "examples/workflows/founding-engineer/skills/founding-engineer",
+        "ref": "1b9aa8a58ed5486714986a29d0128abb82144640"
+      },
+      "promotedAt": "2026-07-12T14:49:00.000Z",
+      "sha256": "5ad4b439b41d5acd83c46f5c9eb9f68f80cd3cb49bdbe4371b81e7a043a37712",
+      "scan": {
+        "status": "pending",
+        "riskScore": null,
+        "scannedAt": null,
+        "threshold": 30
+      },
+      "bundleAll": true,
+      "bundledIn": [
+        "express-api",
+        "fastify-api",
+        "nextjs-app",
+        "node-service",
+        "python-service",
+        "react-native-app"
+      ]
+    },
+    {
+      "name": "qa-lead",
+      "catalogLocation": "shared",
+      "catalogPath": "shared/skills/qa-lead",
+      "description": "Use when acting as a startup QA lead for acceptance checks, release risk, regression focus, and verification evidence.",
+      "upstream": {
+        "url": "https://github.com/devos-ing/omni-skills",
+        "path": "examples/workflows/qa-lead/skills/qa-lead",
+        "ref": "1b9aa8a58ed5486714986a29d0128abb82144640"
+      },
+      "promotedAt": "2026-07-12T14:49:00.000Z",
+      "sha256": "736ee0418c922c514b5b3b8e7bcba1ac3e9f04e1f5db791b11e49c10e31ce400",
+      "scan": {
+        "status": "pending",
+        "riskScore": null,
+        "scannedAt": null,
+        "threshold": 30
+      },
+      "bundleAll": true,
+      "bundledIn": [
+        "express-api",
+        "fastify-api",
+        "nextjs-app",
+        "node-service",
+        "python-service",
+        "react-native-app"
+      ]
+    },
+    {
+      "name": "cto",
+      "catalogLocation": "shared",
+      "catalogPath": "shared/skills/cto",
+      "description": "Use when acting as a startup CTO for architecture, technical risk, platform direction, codebase boundaries, or engineering strategy.",
+      "upstream": {
+        "url": "https://github.com/devos-ing/omni-skills",
+        "path": "examples/workflows/cto/skills/cto",
+        "ref": "1b9aa8a58ed5486714986a29d0128abb82144640"
+      },
+      "promotedAt": "2026-07-12T14:49:00.000Z",
+      "sha256": "bda6b80483547c9329b96c35a1bfe9371288586feeb8078a49782d5126b50ad0",
+      "scan": {
+        "status": "pending",
+        "riskScore": null,
+        "scannedAt": null,
+        "threshold": 30
+      },
+      "bundleAll": true,
+      "bundledIn": [
+        "express-api",
+        "fastify-api",
+        "nextjs-app",
+        "node-service",
+        "python-service",
+        "react-native-app"
+      ]
+    },
+    {
+      "name": "product-manager",
+      "catalogLocation": "shared",
+      "catalogPath": "shared/skills/product-manager",
+      "description": "Use when acting as a startup product manager for discovery, PRDs, issue slicing, roadmap tradeoffs, or customer-value sequencing.",
+      "upstream": {
+        "url": "https://github.com/devos-ing/omni-skills",
+        "path": "examples/workflows/product-manager/skills/product-manager",
+        "ref": "1b9aa8a58ed5486714986a29d0128abb82144640"
+      },
+      "promotedAt": "2026-07-12T14:49:00.000Z",
+      "sha256": "5fddf13ea59659f8053496d8dc2d47f54d8ce4f62baf984dc12d5d1b2b53e37d",
+      "scan": {
+        "status": "pending",
+        "riskScore": null,
+        "scannedAt": null,
+        "threshold": 30
+      },
+      "bundleAll": true,
+      "bundledIn": [
+        "express-api",
+        "fastify-api",
+        "nextjs-app",
+        "node-service",
+        "python-service",
+        "react-native-app"
+      ]
+    },
     {
       "name": "code-review",
       "catalogLocation": "shared",

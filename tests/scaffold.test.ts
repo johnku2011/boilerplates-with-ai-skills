@@ -125,6 +125,11 @@ describe("scaffold", () => {
       "code-review",
       "project-security",
       "deploy-vercel",
+      "startup-goal",
+      "founding-engineer",
+      "qa-lead",
+      "cto",
+      "product-manager",
     ]);
     expect(lock.skills.find((s) => s.name === "nextjs-app-router")?.source).toBe(
       "boilerplate:nextjs-app/skills/nextjs-app-router",
@@ -156,6 +161,11 @@ describe("scaffold", () => {
       "fastify-api-design",
       "test-driven-development",
       "project-security",
+      "startup-goal",
+      "founding-engineer",
+      "qa-lead",
+      "cto",
+      "product-manager",
     ]);
     expect(await exists(join(target, ".bwai", "skills", "fastify-api-design", "SKILL.md"))).toBe(
       true,

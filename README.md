@@ -13,6 +13,10 @@ Not a skills marketplace. Not a replacement for [Superpowers](https://github.com
 [getsuperpower](https://github.com/0xroylee/getsuperpower) — we bundle **runnable
 projects + a small vetted skill set + a visible security gate**.
 
+Every generated project ships with the [Omni-Skills](https://github.com/devos-ing/omni-skills)
+startup workflow bench: `$startup-goal`, `$founding-engineer`, `$qa-lead`, `$cto`, and
+`$product-manager` are ready to call the moment you scaffold.
+
 **npm:** [`bwai-cli`](https://www.npmjs.com/package/bwai-cli) · **Try it:**
 
 ```bash
@@ -46,6 +50,12 @@ workflow (`shared:bwai-delivery` in the manifest). `react-native-app` is skills-
 my-app/
   src/ or app/              # runnable template for your stack
   .bwai/skills/             # canonical curated skills
+    startup-goal/           # omni-skills: orchestrate a full startup workflow
+    founding-engineer/      # omni-skills: implement, test, debug, verify
+    qa-lead/                # omni-skills: acceptance checks + release risk
+    cto/                    # omni-skills: architecture + technical direction
+    product-manager/        # omni-skills: PRDs, issue slicing, roadmap
+    …                       # stack-specific skills (TDD, code-review, etc.)
   .claude/skills/ …         # mirrored for each --agents target
   skills.lock               # SHA-256 + scan status per skill
   .github/workflows/skill-scan.yml  # SkillSpector gate on push/PR
@@ -55,6 +65,9 @@ my-app/
 Each skill is a spec-compliant [`SKILL.md`](https://agentskills.io/specification).
 Catalog skills are scanned in CI with [SkillSpector](https://github.com/NVIDIA/SkillSpector)
 (threshold 30); `scan-project` re-runs the gate in your repo.
+
+The five role skills are vendored from [Omni-Skills](https://github.com/devos-ing/omni-skills)
+and kept current via `bwai sync-upstream`.
 
 ## Install
 
@@ -67,6 +80,15 @@ bwai list-boilerplates          # short alias
 ```
 
 See [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md) — boilerplates vs skills vs workflows.
+
+### bwai + Omni-Skills
+
+The role skills (`$startup-goal`, `$founding-engineer`, etc.) are pre-installed in every project.
+To keep them fresh as [Omni-Skills](https://github.com/devos-ing/omni-skills) ships updates:
+
+```bash
+bwai sync-upstream   # pull latest skill content from upstream pins
+```
 
 ### bwai + GetSuperpower (optional)
 
@@ -132,6 +154,13 @@ Create `boilerplates/<name>/` with `boilerplate.json`, `template/` (ship `.gitig
 as `gitignore`), optional local `skills/` and `workflow/`. Reference shared skills
 with `{ "name": "code-review", "source": "shared" }`. Bundled skills must pass
 SkillSpector in CI.
+
+## Credits
+
+- **[Omni-Skills](https://github.com/devos-ing/omni-skills)** by devos-ing — the startup role workflow bench (`startup-goal`, `founding-engineer`, `qa-lead`, `cto`, `product-manager`) vendored under MIT.
+- **[Superpowers](https://github.com/obra/superpowers)** — source of the `test-driven-development` and `code-review` shared skills.
+- **[NVIDIA SkillSpector](https://github.com/NVIDIA/SkillSpector)** — the safety scanner that gates every bundled skill.
+- **[GetSuperpower](https://github.com/0xroylee/getsuperpower)** — optional delivery workflow integration.
 
 ## License
 

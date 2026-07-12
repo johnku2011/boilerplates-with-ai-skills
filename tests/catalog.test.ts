@@ -61,6 +61,11 @@ describe("catalog", () => {
       { name: "test-driven-development", source: "shared" },
       { name: "code-review", source: "shared" },
       { name: "project-security", source: "shared" },
+      { name: "startup-goal", source: "shared" },
+      { name: "founding-engineer", source: "shared" },
+      { name: "qa-lead", source: "shared" },
+      { name: "cto", source: "shared" },
+      { name: "product-manager", source: "shared" },
     ]);
   });
 
@@ -71,6 +76,11 @@ describe("catalog", () => {
       { name: "code-review", source: "shared" },
       { name: "project-security", source: "shared" },
       { name: "deploy-vercel", source: "shared" },
+      { name: "startup-goal", source: "shared" },
+      { name: "founding-engineer", source: "shared" },
+      { name: "qa-lead", source: "shared" },
+      { name: "cto", source: "shared" },
+      { name: "product-manager", source: "shared" },
     ]);
   });
 
