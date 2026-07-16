@@ -17,6 +17,15 @@ startup workflow bench: `$startup-goal`, `$founding-engineer`, `$qa-lead`, `$cto
 full startup-goal intake and recommends the right boilerplate + the exact
 `bwai new` command at the end.
 
+Install it globally so it's available in any conversation, any folder:
+
+```bash
+# Claude
+mkdir -p ~/.claude/skills/bwai-advisor
+curl -fsSL https://raw.githubusercontent.com/johnku2011/boilerplates-with-ai-skills/main/shared/skills/bwai-advisor/SKILL.md \
+  -o ~/.claude/skills/bwai-advisor/SKILL.md
+```
+
 ```bash
 npx bwai-cli new node-service ./my-app --agents claude,cursor
 ```
