@@ -1,7 +1,23 @@
 {
   "indexVersion": 1,
-  "updatedAt": "2026-07-12T14:49:00.000Z",
+  "updatedAt": "2026-07-16T09:48:00.000Z",
   "skills": [
+    {
+      "name": "bwai-advisor",
+      "catalogLocation": "shared",
+      "catalogPath": "shared/skills/bwai-advisor",
+      "description": "Use before scaffolding a bwai project — runs the full startup-goal workflow then recommends the right boilerplate and outputs the exact bwai new command to run.",
+      "promotedAt": "2026-07-16T09:48:00.000Z",
+      "sha256": "488afe232de51b1c8a434c10dd2a89720f76378e67104717ec8443c8853be112",
+      "scan": {
+        "status": "pending",
+        "riskScore": null,
+        "scannedAt": null,
+        "threshold": 30
+      },
+      "bundleAll": false,
+      "bundledIn": []
+    },
     {
       "name": "startup-goal",
       "catalogLocation": "shared",

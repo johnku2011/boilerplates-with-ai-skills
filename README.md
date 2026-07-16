@@ -13,6 +13,10 @@ Every generated project includes the [Omni-Skills](https://github.com/devos-ing/
 startup workflow bench: `$startup-goal`, `$founding-engineer`, `$qa-lead`, `$cto`, and
 `$product-manager` are ready the moment you scaffold.
 
+**Don't know which boilerplate to pick?** Run `$bwai-advisor` — it runs the
+full startup-goal intake and recommends the right boilerplate + the exact
+`bwai new` command at the end.
+
 ```bash
 npx bwai-cli new node-service ./my-app --agents claude,cursor
 ```
