@@ -8,7 +8,7 @@
       "catalogPath": "shared/skills/bwai-advisor",
       "description": "Use before scaffolding a bwai project — runs the full startup-goal workflow then recommends the right boilerplate and outputs the exact bwai new command to run.",
       "promotedAt": "2026-07-16T09:48:00.000Z",
-      "sha256": "6efc1f33013ec6d6bc7a412362bd438fba730f37a6c2a885e15ea5639e0fe740",
+      "sha256": "575fee755d2d019e72cc0cc96b2da837e8c81206588f213f6ff847e1f7218a09",
       "scan": {
         "status": "pending",
         "riskScore": null,

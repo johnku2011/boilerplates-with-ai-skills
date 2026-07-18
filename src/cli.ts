@@ -20,6 +20,7 @@ import {
 } from "./discovery.js";
 import { formatDoctorReport, runDoctor } from "./doctor.js";
 import { installSkill, listInstallableSkills } from "./install-skill.js";
+import { formatScaffoldHandoff } from "./scaffold-handoff.js";
 
 const program = new Command();
 
@@ -102,13 +103,14 @@ program
       }
       console.log(`Provenance: skills.lock`);
       console.log("");
-      console.log("Next steps:");
-      console.log(`  cd ${dir}`);
-      if (result.workflowPath) {
-        const agentsFlag = result.agents.join(",");
-        console.log(`  npx getsuperpower install ./${result.workflowPath} --agents ${agentsFlag}`);
+      for (const line of formatScaffoldHandoff({
+        dir,
+        skills: result.skills,
+        agents: result.agents,
+        workflowPath: result.workflowPath,
+      })) {
+        console.log(line);
       }
-      console.log(`  bwai scan-project        # run the SkillSpector safety gate`);
     },
   );
 

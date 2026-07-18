@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { listBoilerplates } from "./catalog.js";
 import { SkillSpectorScanner } from "./scan.js";
 import { readLock } from "./provenance.js";
+import { checkGlobalAdvisorSkills } from "./global-skills-check.js";
 
 export type DoctorStatus = "ok" | "warn" | "fail";
 
@@ -131,6 +132,8 @@ export async function runDoctor(cwd = process.cwd()): Promise<DoctorReport> {
         "getsuperpower not on PATH — optional; use `npx getsuperpower install ./workflows/...` after scaffold",
     });
   }
+
+  checks.push(await checkGlobalAdvisorSkills());
 
   const ok = checks.every((c) => c.status !== "fail");
   return { checks, ok };

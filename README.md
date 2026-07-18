@@ -13,24 +13,30 @@ Every generated project includes the [Omni-Skills](https://github.com/devos-ing/
 startup workflow bench: `$startup-goal`, `$founding-engineer`, `$qa-lead`, `$cto`, and
 `$product-manager` are ready the moment you scaffold.
 
-**Don't know which boilerplate to pick?** Install `$bwai-advisor` globally, then
-run it in any chat — it runs the startup-goal intake (or reads your idea `.md`)
-and ends with the exact `bwai new` command.
+## Recommended flow: idea → advisor → scaffold
+
+1. **Install the advisor** (once, globally — also installs `startup-goal`):
 
 ```bash
-# Install advisor + companion startup-goal for Claude and Cursor
 npx bwai-cli install-skill bwai-advisor --global
-
-# Then in any agent chat:
-#   $bwai-advisor  I want to build …
-#   $bwai-advisor  Read @my-idea.md and recommend a boilerplate
 ```
 
-List other installable skills: `npx bwai-cli install-skill`
+2. **Shape the idea** in any agent chat (paste an idea or attach a `.md`):
+
+```text
+$bwai-advisor  I want to build …
+$bwai-advisor  Read @my-idea.md and recommend a boilerplate
+```
+
+3. **Run the command** the advisor prints:
 
 ```bash
-npx bwai-cli new node-service ./my-app --agents claude,cursor
+bwai new nextjs-app ./my-app --agents claude,cursor
 ```
+
+4. **Continue inside the project** with `$founding-engineer` / `$qa-lead`.
+
+Already know the boilerplate? Skip to step 3. Check setup anytime: `bwai doctor`.
 
 After global install, `bwai-cli` and the shorter alias `bwai` are the same CLI.
 
@@ -38,6 +44,7 @@ After global install, `bwai-cli` and the shorter alias `bwai` are the same CLI.
 
 | | |
 | --- | --- |
+| **Install advisor** | `npx bwai-cli install-skill bwai-advisor --global` |
 | **List starters** | `npx bwai-cli list-boilerplates` |
 | **Check setup** | `npx bwai-cli doctor` |
 | **Scaffold** | `npx bwai-cli new nextjs-app ./app --agents claude,cursor` |
@@ -71,9 +78,9 @@ and pinned in `registry/skills-index.json`. Run `bwai sync-upstream` to pull upd
 ## Usage
 
 ```bash
-bwai list-boilerplates
-bwai doctor
 bwai install-skill bwai-advisor --global   # also installs startup-goal
+bwai list-boilerplates
+bwai doctor                                # includes global advisor check
 bwai new node-service ./my-app --agents claude,cursor
 bwai scan-project ./my-app --threshold 50
 bwai scan-catalog --threshold 30 --require-scanner

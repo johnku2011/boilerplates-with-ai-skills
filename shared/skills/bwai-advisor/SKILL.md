@@ -24,27 +24,30 @@ npx bwai-cli install-skill bwai-advisor --global
 That command installs `bwai-advisor` and its companion `startup-goal` into the
 user's global agent skill directories.
 
+## Mode Choice
+
+At the start, pick a mode (ask once if unclear):
+
+| Mode | When | What you run |
+| --- | --- | --- |
+| **Full** (default) | Idea is fuzzy; need PRD + roles | Full `startup-goal`, then scaffold recommendation |
+| **Quick pick** | Stack/product type is already clear, or user asks only for a boilerplate | Skip role bench; recommend from signals + catalog |
+
+Also use **Quick pick** when the user says the idea doc is an approved brief.
+
 ## Idea Document Input
 
 If the user points at a markdown (or other) idea brief — via `@file.md`, a path,
-or "read this doc" — treat that file as the starting hypothesis for
-`startup-goal`:
+or "read this doc" — treat that file as the starting hypothesis:
 
 1. Read the file before asking intake questions.
 2. Skip questions the document already answers clearly.
 3. Only ask about missing or ambiguous high-risk unknowns.
 
-**Fast path:** if the user says the document is already an approved brief
-(e.g. "treat this as the approved brief and recommend a boilerplate"), skip the
-full startup-goal role bench and go straight to Scaffold Recommendation using
-signals from the document.
+## How to Run (Full mode)
 
-## How to Run
-
-1. Unless the user requested the fast path above, follow the `startup-goal`
-   skill in full — intake loop, role subagents, decision log.
-2. Once the decision log (or approved brief) is ready, continue to Scaffold
-   Recommendation.
+1. Follow the `startup-goal` skill — intake loop, role subagents, decision log.
+2. Once the decision log is ready, continue to Scaffold Recommendation.
 
 ## Scaffold Recommendation
 
@@ -78,30 +81,50 @@ Pick the **first row that matches**:
 **If no row matches:** say so explicitly. Name the closest boilerplate and
 explain what it covers and what it doesn't. Do not silently force a bad fit.
 
-When useful, name one **alternative** boilerplate and when the user would
-prefer it (e.g. API-only first vs full-stack UI).
+### Confidence
+
+Always state confidence for the primary pick:
+
+| Confidence | Meaning |
+| --- | --- |
+| **High** | Stack and product shape match one boilerplate clearly |
+| **Medium** | Two boilerplates could work; primary is a judgment call |
+| **Low** | Partial fit or missing catalog option; say what is missing |
+
+When confidence is Medium or Low, **always** include an Alternative with when
+to prefer it (e.g. API-only first vs full-stack UI).
 
 ## Output Format
 
-Append this block at the end of the startup-goal decision log (or after the
-fast-path brief summary):
+Append this block at the end of the decision log (or after the quick-pick summary):
 
 ---
 
 ### Recommended scaffold
 
+**Mode:** Full | Quick pick
+
 **Boilerplate:** `<name>` — `<one-line reason tied to the goal>`
 
-**Alternative (optional):** `<name>` — `<when to prefer this>`
+**Confidence:** High | Medium | Low — `<one-line why>`
+
+**Alternative:** `<name or "none">` — `<when to prefer this>`
 
 **Command:**
 ```bash
 bwai new <boilerplate-name> ./<project-folder> --agents claude,cursor
 ```
 
+**After scaffold, continue with:**
+```text
+cd <project-folder>
+$founding-engineer  implement the first slice from the decision log
+$qa-lead            verify acceptance before calling the slice done
+```
+
 **Keep fresh:**
 ```bash
-bwai sync-upstream   # pull latest omni-skills content into a scaffolded project
+bwai sync-upstream   # pull latest omni-skills content into the project
 ```
 
 > Once scaffolded, the project includes `$startup-goal`, `$founding-engineer`,

@@ -15,6 +15,7 @@
       <div class="container header-inner">
         <a class="logo" href="#">bwai</a>
         <nav>
+          <a href="#flow">Flow</a>
           <a href="#boilerplates">Boilerplates</a>
           <a href="#safety">Safety</a>
           <a href="https://www.npmjs.com/package/bwai-cli">npm</a>
@@ -34,14 +35,42 @@
             <code>skills.lock</code> provenance file.
           </p>
           <div class="install">
-            <pre><code>npx bwai-cli new node-service ./my-app --agents claude,cursor
-bwai scan-project ./my-app --threshold 50</code></pre>
+            <pre><code>npx bwai-cli install-skill bwai-advisor --global
+# then in any chat: $bwai-advisor  Read @my-idea.md
+bwai new nextjs-app ./my-app --agents claude,cursor</code></pre>
             <p class="install-note">npm package: <code>bwai-cli</code> · after <code>npm i -g bwai-cli</code>, run <code>bwai-cli</code> or <code>bwai</code> · Node.js 20+</p>
           </div>
         </div>
       </section>
 
-      <section id="boilerplates" class="section">
+      <section id="flow" class="section">
+        <div class="container">
+          <h2>Idea → advisor → scaffold</h2>
+          <p class="section-lead">
+            Not sure which starter fits? Install <code>$bwai-advisor</code> once, shape the goal
+            (or drop a markdown brief), then run the <code>bwai new</code> command it prints.
+          </p>
+          <ol class="features">
+            <li>
+              <strong>Install</strong> —
+              <code>npx bwai-cli install-skill bwai-advisor --global</code>
+              (also installs <code>startup-goal</code>)
+            </li>
+            <li>
+              <strong>Ask</strong> —
+              <code>$bwai-advisor</code> with your idea or <code>@brief.md</code>
+            </li>
+            <li>
+              <strong>Scaffold</strong> — run the recommended
+              <code>bwai new …</code> command, then continue with
+              <code>$founding-engineer</code> inside the project
+            </li>
+          </ol>
+          <p class="section-lead">Already know the stack? Skip the advisor and pick a boilerplate below.</p>
+        </div>
+      </section>
+
+      <section id="boilerplates" class="section section-alt">
         <div class="container">
           <h2>Boilerplates</h2>
           <p class="section-lead">Six opinionated starters. Each bundles a curated skill set for its stack.</p>
@@ -74,7 +103,7 @@ bwai scan-project ./my-app --threshold 50</code></pre>
         </div>
       </section>
 
-      <section id="safety" class="section section-alt">
+      <section id="safety" class="section">
         <div class="container">
           <h2>Visible safety gate</h2>
           <ul class="features">
@@ -97,7 +126,8 @@ bwai scan-project ./my-app --threshold 50</code></pre>
       <section class="section">
         <div class="container cta">
           <h2>Get started</h2>
-          <pre><code>npx bwai-cli list-boilerplates
+          <pre><code>npx bwai-cli install-skill bwai-advisor --global
+npx bwai-cli list-boilerplates
 npx bwai-cli new fastify-api ./api --agents claude,cursor,copilot</code></pre>
           <p>
             <a class="button" href="https://www.npmjs.com/package/bwai-cli">npm</a>
