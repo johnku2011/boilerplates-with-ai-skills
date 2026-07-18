@@ -30,7 +30,7 @@ program
     "boilerplates-with-ai-skills: scaffold projects pre-wired with curated, " +
       "security-vetted, cross-agent AI skills.",
   )
-  .version("0.2.5");
+  .version("0.2.6");
 
 program
   .command("list-boilerplates")

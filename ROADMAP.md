@@ -36,7 +36,7 @@ Deepened skills, `deploy-vercel`, `sync-upstream`, Superpowers alignment doc.
 | `bwai doctor` first-run checks | Done |
 | Upstream: SkillSpector in getsuperpower `validate` | Planned |
 
-**Current npm release:** `bwai-cli@0.2.5`
+**Current npm release:** `bwai-cli@0.2.6`
 
 ## Phase 2F — Scaffold CI (done)
 
