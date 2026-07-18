@@ -170,9 +170,7 @@ program
   )
   .option("--global", "Install into the user's home agent skill directories (required)", false)
   .option("--no-deps", "Do not install companion skills (e.g. startup-goal with bwai-advisor)")
-  .description(
-    "Install a shared catalog skill globally so it is available in any conversation.",
-  )
+  .description("Install a shared catalog skill globally so it is available in any conversation.")
   .action(
     async (
       skill: string | undefined,
@@ -213,7 +211,7 @@ program
         console.log("");
         console.log("Restart your agent (or start a new chat) so it reloads skills.");
         if (skill === "bwai-advisor") {
-          console.log('Then run: $bwai-advisor  <your idea or @path/to/brief.md>');
+          console.log("Then run: $bwai-advisor  <your idea or @path/to/brief.md>");
         }
       } catch (error) {
         console.error(error instanceof Error ? error.message : error);
