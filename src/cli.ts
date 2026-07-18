@@ -19,6 +19,7 @@ import {
   type SortOrder,
 } from "./discovery.js";
 import { formatDoctorReport, runDoctor } from "./doctor.js";
+import { installSkill, listInstallableSkills } from "./install-skill.js";
 
 const program = new Command();
 
@@ -156,6 +157,68 @@ program
     }
     if (!report.ok) process.exitCode = 1;
   });
+
+program
+  .command("install-skill")
+  .argument("[skill]", "shared skill name (omit to list installable skills)")
+  .option(
+    "-a, --agents <agents>",
+    "comma-separated agents to install for (default: claude,cursor)",
+    "claude,cursor",
+  )
+  .option("--global", "Install into the user's home agent skill directories (required)", false)
+  .option("--no-deps", "Do not install companion skills (e.g. startup-goal with bwai-advisor)")
+  .description(
+    "Install a shared catalog skill globally so it is available in any conversation.",
+  )
+  .action(
+    async (
+      skill: string | undefined,
+      opts: { agents?: string; global?: boolean; deps?: boolean },
+    ) => {
+      try {
+        if (!skill) {
+          const names = await listInstallableSkills();
+          if (names.length === 0) {
+            console.log("No installable shared skills found.");
+            return;
+          }
+          console.log("Installable shared skills:");
+          for (const name of names) console.log(`  ${name}`);
+          console.log("");
+          console.log("Example: bwai install-skill bwai-advisor --global");
+          return;
+        }
+
+        if (!opts.global) {
+          console.error("Global install is required. Pass --global.");
+          console.error(`Example: bwai install-skill ${skill} --global`);
+          process.exitCode = 1;
+          return;
+        }
+
+        const agents = parseAgents(opts.agents, ["claude", "cursor"]);
+        const result = await installSkill({
+          skillName: skill,
+          agents,
+          withDeps: opts.deps !== false,
+        });
+
+        console.log(`Installed ${skill}${opts.deps === false ? "" : " (+ companions if any)"}:`);
+        for (const item of result.installed) {
+          console.log(`  ${item.skill} → ${item.path} (${item.agent})`);
+        }
+        console.log("");
+        console.log("Restart your agent (or start a new chat) so it reloads skills.");
+        if (skill === "bwai-advisor") {
+          console.log('Then run: $bwai-advisor  <your idea or @path/to/brief.md>');
+        }
+      } catch (error) {
+        console.error(error instanceof Error ? error.message : error);
+        process.exitCode = 1;
+      }
+    },
+  );
 
 program
   .command("scan-catalog")

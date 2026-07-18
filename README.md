@@ -13,18 +13,20 @@ Every generated project includes the [Omni-Skills](https://github.com/devos-ing/
 startup workflow bench: `$startup-goal`, `$founding-engineer`, `$qa-lead`, `$cto`, and
 `$product-manager` are ready the moment you scaffold.
 
-**Don't know which boilerplate to pick?** Run `$bwai-advisor` — it runs the
-full startup-goal intake and recommends the right boilerplate + the exact
-`bwai new` command at the end.
-
-Install it globally so it's available in any conversation, any folder:
+**Don't know which boilerplate to pick?** Install `$bwai-advisor` globally, then
+run it in any chat — it runs the startup-goal intake (or reads your idea `.md`)
+and ends with the exact `bwai new` command.
 
 ```bash
-# Claude
-mkdir -p ~/.claude/skills/bwai-advisor
-curl -fsSL https://raw.githubusercontent.com/johnku2011/boilerplates-with-ai-skills/main/shared/skills/bwai-advisor/SKILL.md \
-  -o ~/.claude/skills/bwai-advisor/SKILL.md
+# Install advisor + companion startup-goal for Claude and Cursor
+npx bwai-cli install-skill bwai-advisor --global
+
+# Then in any agent chat:
+#   $bwai-advisor  I want to build …
+#   $bwai-advisor  Read @my-idea.md and recommend a boilerplate
 ```
+
+List other installable skills: `npx bwai-cli install-skill`
 
 ```bash
 npx bwai-cli new node-service ./my-app --agents claude,cursor
@@ -71,6 +73,7 @@ and pinned in `registry/skills-index.json`. Run `bwai sync-upstream` to pull upd
 ```bash
 bwai list-boilerplates
 bwai doctor
+bwai install-skill bwai-advisor --global   # also installs startup-goal
 bwai new node-service ./my-app --agents claude,cursor
 bwai scan-project ./my-app --threshold 50
 bwai scan-catalog --threshold 30 --require-scanner
