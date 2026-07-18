@@ -13,50 +13,50 @@
 | `npx` (no install) | `npx bwai-cli …` |
 | Shell commands (global install) | `bwai-cli …` or `bwai …` |
 
-## Quick publish (maintainer, interactive)
+## Recommended: publish from your laptop with OTP
 
-If you have 2FA on your account and are at a terminal:
+Do **not** rely on 2FA-bypass granular access tokens. npm is [deprecating bypass-2FA GATs](https://github.blog/changelog/2026-07-08-npm-install-time-security-and-gat-bypass2fa-deprecation/) (account ops ~Aug 2026; direct publish ~Jan 2027). Use an authenticator OTP instead:
 
 ```bash
 npm run build && npm test
-npm login          # complete 2FA when prompted
-npm publish --access public
+npm login          # if needed
+npm publish --access public --otp=123456   # code from your authenticator app
 ```
 
-## CI / Cloud Agent (granular token)
+If `npm publish` prompts for a one-time password, enter it interactively (same effect as `--otp=`).
 
-Automated publish needs a **Granular access token** with **Bypass 2FA** enabled at creation time.
+## Recommended for CI: Trusted Publishing (OIDC)
 
-### Create the token
+No long-lived `NPM_TOKEN`. GitHub Actions exchanges a short-lived OIDC token.
 
-1. Open https://www.npmjs.com/settings/johnku2011/tokens  
-2. **Generate New Token** → **Granular Access Token**  
-3. Configure:
-   - **Permissions:** Read and write  
-   - **Packages and scopes:** All packages  
-   - **Expiration:** up to 90 days for write tokens  
-   - **Bypass two-factor authentication (2FA):** **On** ← required for non-interactive publish  
-4. Copy the token (starts with `npm_`)  
-5. Set as `NPM_TOKEN` in Cursor Cloud secrets **and** GitHub repo secrets (for Actions)
+### 1. Configure on npmjs.com
 
-Configure npm to use it:
+1. Open https://www.npmjs.com/package/bwai-cli → **Settings** → **Trusted Publisher**
+2. Choose **GitHub Actions** and set:
+   - **Owner:** `johnku2011`
+   - **Repository:** `boilerplates-with-ai-skills`
+   - **Workflow filename:** `publish.yml` (filename only)
+   - **Allowed actions:** `npm publish`
+3. Save
 
-```bash
-# ~/.npmrc or CI env
-//registry.npmjs.org/:_authToken=${NPM_TOKEN}
-```
+Docs: [Trusted publishers](https://docs.npmjs.com/trusted-publishers)
 
-Verify:
+### 2. Publish via GitHub Actions
 
-```bash
-npm whoami
-npm pack && npm install -g ./bwai-cli-0.2.1.tgz && bwai-cli list-boilerplates
-npm publish --access public
-```
+Workflow: [`.github/workflows/publish.yml`](../.github/workflows/publish.yml)
 
-### Do you need an npm organization?
+1. Confirm `main` has the release version in `package.json` (e.g. `0.2.6`)
+2. GitHub → **Actions** → **Publish to npm** → **Run workflow**
+3. Verify: `npm view bwai-cli version`
 
-**No.** Publish `bwai-cli` under your user account (`johnku2011`).
+You can remove any old `NPM_TOKEN` repo secret after trusted publishing works.
+
+## Do not use (legacy)
+
+| Method | Why avoid |
+| --- | --- |
+| Granular token with **Bypass 2FA** | Being deprecated; loses account powers soon, then direct publish |
+| Long-lived write `NPM_TOKEN` in CI | Prefer OIDC trusted publishing |
 
 ## Common errors
 
@@ -66,34 +66,36 @@ npm publish --access public
 403 Forbidden - Package name too similar to existing packages ... try '@johnku2011/bwai'
 ```
 
-**Fix:** Use **`bwai-cli`** (unscoped) instead of `bwai`. Do not use `@johnku2011/bwai` for new installs.
+**Fix:** Use **`bwai-cli`** (unscoped) instead of `bwai`.
 
-### Two-factor / token (403)
+### Two-factor required (403)
 
 ```
 403 Forbidden - Two-factor authentication or granular access token with bypass 2fa enabled is required
 ```
 
-**Fix:** Create a **new** granular token with **Bypass 2FA turned on**. Tokens cannot enable bypass after creation.
+**Fix (preferred):** publish with OTP:
 
-Other causes:
+```bash
+npm publish --access public --otp=XXXXXX
+```
 
-- Package set to **“Require 2FA and disallow tokens”** — change at npm package settings or publish interactively once  
-- Token is **read-only** — use Read and write  
-- Token **expired** (write tokens max ~90 days) — rotate `NPM_TOKEN`
+**Or** use GitHub Actions trusted publishing after configuring the Trusted Publisher on npmjs.com.
 
-## GitHub Actions
+Do **not** create a new bypass-2FA token as the long-term plan — that path is going away.
 
-Workflow: **Publish to npm** (`.github/workflows/publish.yml`)  
-Requires repo secret `NPM_TOKEN` = granular token with bypass 2FA.
+### Trusted publish fails in Actions
 
-**Future:** [npm Trusted Publishing](https://docs.npmjs.com/trusted-publishers) (OIDC) avoids long-lived tokens on GitHub Actions.
+- Workflow filename on npmjs.com must be exactly `publish.yml`
+- Job must have `permissions: id-token: write`
+- Use Node **≥ 22.14** and npm **≥ 11.5.1** in the workflow
+- `package.json` `repository.url` must match `johnku2011/boilerplates-with-ai-skills`
 
 ## After publish
 
 ```bash
-npm view bwai-cli
-npx bwai-cli list-boilerplates
+npm view bwai-cli version
+npx bwai-cli@latest install-skill bwai-advisor --global
 ```
 
 Package page: https://www.npmjs.com/package/bwai-cli

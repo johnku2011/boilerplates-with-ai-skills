@@ -8,6 +8,13 @@ on:
         required: false
         default: latest
 
+# Trusted publishing (OIDC) — no long-lived NPM_TOKEN / bypass-2FA GAT required.
+# Configure once on npmjs.com → bwai-cli → Settings → Trusted Publisher:
+#   Owner: johnku2011
+#   Repo: boilerplates-with-ai-skills
+#   Workflow: publish.yml
+#   Allowed actions: npm publish
+# Docs: https://docs.npmjs.com/trusted-publishers
 permissions:
   contents: read
   id-token: write
@@ -19,13 +26,13 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          # Trusted publishing needs Node >= 22.14 and npm >= 11.5.1
+          node-version: 22
           cache: npm
           registry-url: https://registry.npmjs.org
       - run: npm ci
       - run: npm run build
       - run: npm test
-      - name: Publish bwai-cli
+      - name: Publish bwai-cli (OIDC trusted publisher)
         run: npm publish --access public --tag "${{ github.event.inputs.tag || 'latest' }}"
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        # No NODE_AUTH_TOKEN — npm exchanges the GitHub OIDC token automatically
