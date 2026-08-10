@@ -31,6 +31,7 @@ jobs:
           - express-api
           - fastify-api
           - nextjs-app
+          - nextjs-ai-app
           - python-service
           - react-native-app
     steps:
@@ -52,12 +53,9 @@ jobs:
           test -f "$TARGET/.claude/skills/test-driven-development/SKILL.md" || \
             test -f "$TARGET/.claude/skills/code-review/SKILL.md" || \
             test -f "$TARGET/.claude/skills/nextjs-app-router/SKILL.md" || \
+            test -f "$TARGET/.claude/skills/nextjs-ai-sdk/SKILL.md" || \
             test -f "$TARGET/.claude/skills/react-native-development/SKILL.md"
-          if [ "${{ matrix.boilerplate }}" = "react-native-app" ]; then
-            test ! -d "$TARGET/workflows"
-          else
-            test -f "$TARGET/workflows/bwai-delivery/workflow.json"
-          fi
+          test -f "$TARGET/workflows/bwai-delivery/workflow.json"
       - name: bwai doctor
         run: node dist/cli.js doctor
 
