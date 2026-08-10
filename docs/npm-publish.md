@@ -84,12 +84,20 @@ npm publish --access public --otp=XXXXXX
 
 Do **not** create a new bypass-2FA token as the long-term plan — that path is going away.
 
-### Trusted publish fails in Actions
+### Trusted publish fails in Actions (`E404` / `ENEEDAUTH`)
 
-- Workflow filename on npmjs.com must be exactly `publish.yml`
-- Job must have `permissions: id-token: write`
-- Use Node **≥ 22.14** and npm **≥ 11.5.1** in the workflow
-- `package.json` `repository.url` must match `johnku2011/boilerplates-with-ai-skills`
+```
+404 Not Found - PUT https://registry.npmjs.org/bwai-cli
+'bwai-cli@x.y.z' is not in this registry.
+```
+
+npm often returns **404** (not 401) when OIDC auth never ran. Checklist:
+
+1. **Trusted Publisher** on https://www.npmjs.com/package/bwai-cli → Settings must match exactly: owner `johnku2011`, repo `boilerplates-with-ai-skills`, workflow `publish.yml`
+2. Workflow has `permissions: id-token: write`
+3. Node **≥ 22.14** and npm **≥ 11.5.1** in the workflow
+4. Do **not** set `registry-url` on `actions/setup-node` for OIDC-only publishes — it writes an empty `_authToken` line that blocks the OIDC exchange ([setup-node#1551](https://github.com/actions/setup-node/issues/1551))
+5. `package.json` `repository.url` must match `johnku2011/boilerplates-with-ai-skills`
 
 ## After publish
 

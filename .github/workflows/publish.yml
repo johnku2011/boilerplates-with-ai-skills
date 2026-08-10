@@ -29,7 +29,9 @@ jobs:
           # Trusted publishing needs Node >= 22.14 and npm >= 11.5.1
           node-version: 22
           cache: npm
-          registry-url: https://registry.npmjs.org
+          # Do NOT set registry-url here — setup-node writes
+          # //registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN} which expands to
+          # empty and blocks OIDC (npm E404 / ENEEDAUTH). See actions/setup-node#1551.
       - run: npm ci
       - run: npm run build
       - run: npm test
