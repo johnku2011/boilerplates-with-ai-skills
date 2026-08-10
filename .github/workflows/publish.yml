@@ -12,7 +12,7 @@ on:
 # Configure once on npmjs.com → bwai-cli → Settings → Trusted Publisher:
 #   Owner: johnku2011
 #   Repo: boilerplates-with-ai-skills
-#   Workflow: publish.yml
+#   Workflow filename: publish.yml  (filename only, with .yml)
 #   Allowed actions: npm publish
 # Docs: https://docs.npmjs.com/trusted-publishers
 permissions:
@@ -27,11 +27,15 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           # Trusted publishing needs Node >= 22.14 and npm >= 11.5.1
-          node-version: 22
+          node-version: 24
           cache: npm
-          # Do NOT set registry-url here — setup-node writes
-          # //registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN} which expands to
-          # empty and blocks OIDC (npm E404 / ENEEDAUTH). See actions/setup-node#1551.
+          # Do NOT set registry-url — setup-node writes an empty _authToken that
+          # blocks OIDC (E404 / ENEEDAUTH). See actions/setup-node#1551.
+      - name: Ensure npm supports OIDC trusted publishing
+        run: |
+          npm install -g npm@latest
+          node -v
+          npm -v
       - run: npm ci
       - run: npm run build
       - run: npm test
