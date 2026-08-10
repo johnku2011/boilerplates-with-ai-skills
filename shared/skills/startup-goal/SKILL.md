@@ -1,6 +1,11 @@
 ---
 name: startup-goal
 description: "Use when coordinating a startup goal across CEO, CTO, product manager, engineering manager, founding engineer, and QA lead role subagents."
+license: MIT
+compatibility: Agent runtime that can dispatch role subagents/skills
+metadata:
+  suite: roles
+  role: coordinator
 ---
 
 # Startup Goal

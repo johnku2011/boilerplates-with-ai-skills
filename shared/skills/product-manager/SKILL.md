@@ -1,6 +1,11 @@
 ---
 name: product-manager
 description: "Use when acting as a startup product manager for discovery, PRDs, issue slicing, roadmap tradeoffs, or customer-value sequencing."
+license: MIT
+compatibility: Product discovery or issue-slicing conversation
+metadata:
+  suite: roles
+  role: product-manager
 ---
 
 # Product Manager

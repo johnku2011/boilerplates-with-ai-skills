@@ -12,7 +12,7 @@ import {
 } from "./registry.js";
 import { defaultBoilerplatesDir, defaultRegistryPath, defaultSharedSkillsDir } from "./paths.js";
 import { sha256 } from "./provenance.js";
-import { assertSkillExists } from "./skills.js";
+import { assertCatalogSkill, assertSkillExists } from "./skills.js";
 import { scanSkillDirectory, type SkillScanner } from "./scan.js";
 
 export type PromoteTarget = { kind: "shared" } | { kind: "boilerplate"; name: string };
@@ -122,6 +122,7 @@ export async function promoteSkill(opts: PromoteOptions): Promise<PromoteResult>
 
   const { dir: sourceDir, cleanup } = await resolveSourceDir(opts);
   try {
+    await assertCatalogSkill(sourceDir, opts.skillName);
     const available = await opts.scanner.isAvailable();
     if (!available && opts.requireScanner) {
       throw new Error(

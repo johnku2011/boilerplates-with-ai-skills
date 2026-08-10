@@ -50,8 +50,8 @@ After global install, `bwai-cli` and the shorter alias `bwai` are the same CLI.
 | **Scaffold** | `npx bwai-cli new nextjs-app ./app --agents claude,cursor` |
 | **Scan skills** | `bwai scan-project ./app --threshold 50` |
 
-**Six boilerplates:** `nextjs-app`, `express-api`, `fastify-api`,
-`python-service`, `node-service`, `react-native-app`.
+**Seven boilerplates:** `nextjs-app`, `nextjs-ai-app`, `express-api`,
+`fastify-api`, `python-service`, `node-service`, `react-native-app`.
 
 ## What you get on scaffold
 

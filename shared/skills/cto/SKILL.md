@@ -1,6 +1,11 @@
 ---
 name: cto
 description: "Use when acting as a startup CTO for architecture, technical risk, platform direction, codebase boundaries, or engineering strategy."
+license: MIT
+compatibility: Startup delivery context with architecture decisions
+metadata:
+  suite: roles
+  role: cto
 ---
 
 # CTO

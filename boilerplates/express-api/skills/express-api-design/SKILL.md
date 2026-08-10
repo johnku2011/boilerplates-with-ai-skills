@@ -1,6 +1,11 @@
 ---
 name: express-api-design
 description: Use when adding or changing routes, middleware, or error handling in this Express.js API, to keep endpoints consistent, validated, and testable.
+license: MIT
+compatibility: Express ESM API in this boilerplate
+allowed-tools: Read
+metadata:
+  stack: express
 ---
 
 # Express API Design

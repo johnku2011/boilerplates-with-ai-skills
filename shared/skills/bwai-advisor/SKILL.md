@@ -1,6 +1,10 @@
 ---
 name: bwai-advisor
 description: "Use before scaffolding a bwai project — runs the full startup-goal workflow then recommends the right boilerplate and outputs the exact bwai new command to run."
+license: MIT
+compatibility: bwai CLI + agent with skill install access
+metadata:
+  suite: advisor
 ---
 
 # bwai Advisor
@@ -71,7 +75,8 @@ Pick the **first row that matches**:
 
 | If the goal is… | Boilerplate |
 | --- | --- |
-| A web product that needs a UI — React, Next.js, full-stack | `nextjs-app` |
+| An AI product — chat, tools, structured LLM outputs on Next.js | `nextjs-ai-app` |
+| A web product that needs a UI — React, Next.js, full-stack (no AI SDK) | `nextjs-app` |
 | A REST or HTTP API in Node where raw performance matters | `fastify-api` |
 | A REST or HTTP API in Node where middleware and ecosystem matter | `express-api` |
 | A Python service, data pipeline, ML endpoint, or FastAPI project | `python-service` |

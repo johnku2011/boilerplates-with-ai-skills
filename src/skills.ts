@@ -1,7 +1,8 @@
 import { join } from "node:path";
-import { stat } from "node:fs/promises";
+import { readFile, stat } from "node:fs/promises";
 import type { BoilerplateManifest } from "./schema.js";
 import { defaultSharedSkillsDir } from "./paths.js";
+import { assertSkillCompliant } from "./skill-frontmatter.js";
 
 export type SkillRef = BoilerplateManifest["skills"][number];
 
@@ -33,10 +34,19 @@ export function skillLockSource(skill: SkillRef, boilerplateName: string): strin
 }
 
 export async function assertSkillExists(skillDir: string, skillName: string): Promise<void> {
-  const skillMd = join(skillDir, "SKILL.md");
+  const skillMdPath = join(skillDir, "SKILL.md");
   try {
-    await stat(skillMd);
+    await stat(skillMdPath);
   } catch {
-    throw new Error(`Skill not found: ${skillName} (expected ${skillMd})`);
+    throw new Error(`Skill not found: ${skillName} (expected ${skillMdPath})`);
   }
+  const skillMd = await readFile(skillMdPath, "utf8");
+  assertSkillCompliant(skillMd, { directoryName: skillName });
+}
+
+/** Catalog/promote gate: required fields plus at least one enrichment field. */
+export async function assertCatalogSkill(skillDir: string, skillName: string): Promise<void> {
+  await assertSkillExists(skillDir, skillName);
+  const skillMd = await readFile(join(skillDir, "SKILL.md"), "utf8");
+  assertSkillCompliant(skillMd, { directoryName: skillName, requireEnrichment: true });
 }

@@ -1,6 +1,11 @@
 ---
 name: qa-lead
 description: "Use when acting as a startup QA lead for acceptance checks, release risk, regression focus, and verification evidence."
+license: MIT
+compatibility: Runnable verification commands documented in AGENTS.md
+metadata:
+  suite: roles
+  role: qa-lead
 ---
 
 # QA Lead

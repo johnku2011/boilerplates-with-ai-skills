@@ -16,6 +16,12 @@ Guidance for AI coding agents working in this Next.js project.
 - TypeScript throughout; keep components small and typed.
 - Co-locate route segments and their UI under `app/`.
 
+## MCP
+
+Least-privilege Playwright MCP is configured in `.mcp.json` and
+`.cursor/mcp.json` for browser smoke checks. MCP is not a security boundary —
+approve tool calls carefully.
+
 ## Skills
 
 Curated skills live under `.bwai/skills/` (canonical) and are mirrored into each

@@ -1,6 +1,11 @@
 ---
 name: code-review
 description: Use when reviewing a diff or pull request — check correctness, tests, readability, security, and server/client boundaries before approving.
+license: MIT
+compatibility: Git working tree or PR diff available
+allowed-tools: Read Grep
+metadata:
+  suite: quality
 ---
 
 # Code Review

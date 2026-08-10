@@ -45,6 +45,16 @@ Deepened skills, `deploy-vercel`, `sync-upstream`, Superpowers alignment doc.
 | `skill-scan.yml` in every boilerplate `template/` | Done — canonical in `shared/ci/skill-scan.yml` |
 | CI + tests assert workflow is scaffolded | Done |
 
+## Phase 2G — 2026 agent-trend enhancements (done)
+
+| Item | Status |
+| --- | --- |
+| Cursor project skills path → `.cursor/skills` | Done |
+| Playwright MCP in UI templates | Done |
+| `nextjs-ai-app` boilerplate (AI SDK + Zod tools) | Done |
+| `bwai-delivery` on `react-native-app` | Done |
+| SKILL.md enrichment + frontmatter compliance gate | Done |
+
 ## Possible follow-ups
 
 | Item | Notes |

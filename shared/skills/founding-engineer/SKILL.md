@@ -1,6 +1,11 @@
 ---
 name: founding-engineer
 description: "Use when acting as a startup founding engineer for implementation, tests, debugging, review, and verification."
+license: MIT
+compatibility: Local repo with test/typecheck commands in AGENTS.md
+metadata:
+  suite: roles
+  role: founding-engineer
 ---
 
 # Founding Engineer

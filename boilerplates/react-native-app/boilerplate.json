@@ -42,5 +42,9 @@
       "name": "product-manager",
       "source": "shared"
     }
-  ]
+  ],
+  "workflow": {
+    "name": "bwai-delivery",
+    "source": "shared"
+  }
 }

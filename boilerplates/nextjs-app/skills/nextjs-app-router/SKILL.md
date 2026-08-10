@@ -1,6 +1,11 @@
 ---
 name: nextjs-app-router
 description: Use when adding pages, layouts, route handlers, or data fetching in this Next.js App Router project, to follow server-first conventions correctly.
+license: MIT
+compatibility: Next.js App Router TypeScript project
+allowed-tools: Read
+metadata:
+  stack: nextjs
 ---
 
 # Next.js App Router

@@ -1,6 +1,11 @@
 ---
 name: react-native-development
 description: Use when building screens, navigation, styling, or platform behavior in this Expo React Native app, to follow mobile-first conventions and keep logic testable.
+license: MIT
+compatibility: Expo React Native TypeScript app
+allowed-tools: Read
+metadata:
+  stack: react-native-expo
 ---
 
 # React Native Development (Expo)

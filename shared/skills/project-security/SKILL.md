@@ -1,6 +1,11 @@
 ---
 name: project-security
 description: Use when reviewing security-sensitive code paths — check auth, secrets, input validation, dependency risk, and data exposure before shipping.
+license: MIT
+compatibility: Application source under review
+allowed-tools: Read Grep
+metadata:
+  suite: security
 ---
 
 # Project Security
@@ -37,18 +42,8 @@ unless kept server-side.
 
 ## Stack-Specific Checks
 
-### Web / API (Node, Express, Next.js)
-
-- No `NEXT_PUBLIC_*` for secrets or internal URLs.
-- Server Components / route handlers for privileged operations.
-- CORS, rate limits, and body size limits on public endpoints.
-- No stack traces or internal paths in production error JSON.
-
-### Mobile (React Native / Expo)
-
-- No API keys in the JS bundle; use secure storage for tokens.
-- Deep links and WebViews: validate URLs before navigation.
-- Certificate pinning only when product requires it (document tradeoffs).
+When the stack matters, read [`references/stack-checks.md`](./references/stack-checks.md)
+for web/API and mobile notes (progressive disclosure — load only if needed).
 
 ## Severity Guide
 

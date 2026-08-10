@@ -1,6 +1,11 @@
 ---
 name: test-driven-development
 description: Use when implementing a feature or fixing a bug — TDD, red-green-refactor, failing test first, then minimal code, then refactor. Run npm test before claiming done.
+license: MIT
+compatibility: Project test runner available (see AGENTS.md)
+allowed-tools: Read Bash
+metadata:
+  suite: quality
 ---
 
 # Test-Driven Development

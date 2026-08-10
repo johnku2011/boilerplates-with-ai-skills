@@ -124,7 +124,7 @@ describe("promoteSkill", () => {
       await mkdir(source, { recursive: true });
       await writeFile(
         join(source, "SKILL.md"),
-        "---\nname: demo-skill\ndescription: demo\n---\n\n# Demo\n",
+        "---\nname: demo-skill\ndescription: Use when testing skill promotion into the shared catalog.\nlicense: MIT\n---\n\n# Demo\n",
       );
 
       const sharedDir = join(dir, "shared", "skills");
@@ -152,7 +152,10 @@ describe("promoteSkill", () => {
     try {
       const source = join(dir, "source", "risky-skill");
       await mkdir(source, { recursive: true });
-      await writeFile(join(source, "SKILL.md"), "---\nname: risky\ndescription: x\n---\n");
+      await writeFile(
+        join(source, "SKILL.md"),
+        "---\nname: risky-skill\ndescription: Use when testing promote risk threshold blocking.\nlicense: MIT\n---\n",
+      );
 
       await expect(
         promoteSkill({

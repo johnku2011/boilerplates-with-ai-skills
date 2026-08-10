@@ -1,6 +1,6 @@
 export const AGENT_TARGETS = {
   claude: ".claude/skills",
-  cursor: ".cursor/rules",
+  cursor: ".cursor/skills",
   codex: ".codex/skills",
   copilot: ".agents/skills",
   opencode: ".agents/skills",

@@ -1,0 +1,54 @@
+{
+  "name": "nextjs-ai-app",
+  "description": "Next.js (App Router) AI product starter with Vercel AI SDK chat, Zod tool schemas, and a curated, security-vetted skill set for AI agents.",
+  "stack": "nextjs-ai",
+  "version": "0.1.0",
+  "defaultAgents": [
+    "claude",
+    "cursor",
+    "codex",
+    "copilot"
+  ],
+  "skills": [
+    {
+      "name": "nextjs-ai-sdk",
+      "source": "local"
+    },
+    {
+      "name": "code-review",
+      "source": "shared"
+    },
+    {
+      "name": "project-security",
+      "source": "shared"
+    },
+    {
+      "name": "deploy-vercel",
+      "source": "shared"
+    },
+    {
+      "name": "startup-goal",
+      "source": "shared"
+    },
+    {
+      "name": "founding-engineer",
+      "source": "shared"
+    },
+    {
+      "name": "qa-lead",
+      "source": "shared"
+    },
+    {
+      "name": "cto",
+      "source": "shared"
+    },
+    {
+      "name": "product-manager",
+      "source": "shared"
+    }
+  ],
+  "workflow": {
+    "name": "bwai-delivery",
+    "source": "shared"
+  }
+}

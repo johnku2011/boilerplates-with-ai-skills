@@ -18,6 +18,12 @@ Guidance for AI coding agents working in this Expo / React Native project.
 - Platform-specific code: `Platform.OS` or `.ios.ts` / `.android.ts` suffixes.
 - Do not add native modules without documenting the Expo config plugin requirement.
 
+## MCP
+
+Least-privilege Playwright MCP is configured in `.mcp.json` and
+`.cursor/mcp.json` for web/Expo web smoke checks. MCP is not a security
+boundary — approve tool calls carefully; prefer headless local runs.
+
 ## Skills
 
 Curated skills live under `.bwai/skills/` (canonical) and are mirrored into each

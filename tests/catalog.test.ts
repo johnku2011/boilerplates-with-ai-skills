@@ -26,6 +26,7 @@ describe("catalog", () => {
     expect(names).toEqual(
       expect.arrayContaining([
         "nextjs-app",
+        "nextjs-ai-app",
         "express-api",
         "fastify-api",
         "python-service",
@@ -33,6 +34,17 @@ describe("catalog", () => {
         "react-native-app",
       ]),
     );
+  });
+
+  it("UI boilerplates ship Playwright MCP configs", async () => {
+    for (const name of ["nextjs-app", "nextjs-ai-app", "react-native-app"]) {
+      const b = await getBoilerplate(name);
+      expect(await exists(join(b.templateDir, ".mcp.json")), `${name} .mcp.json`).toBe(true);
+      expect(
+        await exists(join(b.templateDir, ".cursor", "mcp.json")),
+        `${name} .cursor/mcp.json`,
+      ).toBe(true);
+    }
   });
 
   it("every declared skill resolves to a SKILL.md (local or shared)", async () => {
@@ -82,6 +94,14 @@ describe("catalog", () => {
       { name: "cto", source: "shared" },
       { name: "product-manager", source: "shared" },
     ]);
+  });
+
+  it("loads nextjs-ai-app with AI SDK local skill and delivery workflow", async () => {
+    const b = await getBoilerplate("nextjs-ai-app");
+    expect(b.manifest.stack).toBe("nextjs-ai");
+    expect(b.manifest.workflow).toEqual({ name: "bwai-delivery", source: "shared" });
+    expect(b.manifest.skills[0]).toEqual({ name: "nextjs-ai-sdk", source: "local" });
+    expect(await exists(join(b.skillsDir, "nextjs-ai-sdk", "SKILL.md"))).toBe(true);
   });
 
   it("throws for an unknown boilerplate", async () => {

@@ -1,6 +1,11 @@
 ---
 name: deploy-vercel
 description: Use when deploying or configuring this project on Vercel — env vars, build settings, serverless limits, and production checks for Next.js or Express.
+license: MIT
+compatibility: Vercel project or CLI; Node/Next or Express app
+allowed-tools: Read Bash
+metadata:
+  suite: deploy
 ---
 
 # Deploy on Vercel

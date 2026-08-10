@@ -1,6 +1,11 @@
 ---
 name: python-api-design
 description: Use when adding or changing FastAPI routes, dependencies, or tests in this Python service — keep endpoints typed, validated, and covered by pytest.
+license: MIT
+compatibility: FastAPI + pytest service in this boilerplate
+allowed-tools: Read
+metadata:
+  stack: python-fastapi
 ---
 
 # Python API Design (FastAPI)

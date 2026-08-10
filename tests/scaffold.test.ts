@@ -47,7 +47,7 @@ describe("scaffold", () => {
     expect(agentsMd).toContain("npx getsuperpower install");
   });
 
-  it("does not copy workflow when boilerplate omits workflow in manifest", async () => {
+  it("copies bwai-delivery for react-native-app", async () => {
     const target = join(dir, "rn-proj");
     const result = await scaffold({
       boilerplateName: "react-native-app",
@@ -55,8 +55,8 @@ describe("scaffold", () => {
       agents: ["claude"],
     });
 
-    expect(result.workflow).toBeUndefined();
-    expect(await exists(join(target, "workflows"))).toBe(false);
+    expect(result.workflow).toBe("bwai-delivery");
+    expect(await exists(join(target, "workflows", "bwai-delivery", "workflow.json"))).toBe(true);
   });
 
   it("skips workflow copy when workflow is false", async () => {
@@ -106,7 +106,7 @@ describe("scaffold", () => {
     // Canonical + per-agent skill copies.
     expect(await exists(join(target, ".bwai", "skills", "code-review", "SKILL.md"))).toBe(true);
     expect(await exists(join(target, ".claude", "skills", "code-review", "SKILL.md"))).toBe(true);
-    expect(await exists(join(target, ".cursor", "rules", "code-review", "SKILL.md"))).toBe(true);
+    expect(await exists(join(target, ".cursor", "skills", "code-review", "SKILL.md"))).toBe(true);
 
     // Lockfile with provenance.
     const lock = await readLock(target);

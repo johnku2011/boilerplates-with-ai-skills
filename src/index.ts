@@ -7,5 +7,16 @@ export type { SkillScanner, ScanResult, ScanProjectOptions, ScanProjectReport } 
 export { AGENT_TARGETS, KNOWN_AGENTS, parseAgents } from "./agents.js";
 export type { AgentId } from "./agents.js";
 export { readLock, writeLock } from "./provenance.js";
-export { resolveSkillDirectory, skillLockSource, assertSkillExists } from "./skills.js";
+export {
+  resolveSkillDirectory,
+  skillLockSource,
+  assertSkillExists,
+  assertCatalogSkill,
+} from "./skills.js";
+export {
+  parseSkillFrontmatter,
+  assertSkillCompliant,
+  SkillFrontmatterError,
+} from "./skill-frontmatter.js";
+export type { SkillFrontmatter } from "./skill-frontmatter.js";
 export type { SkillsLock, LockedSkill, BoilerplateManifest } from "./schema.js";

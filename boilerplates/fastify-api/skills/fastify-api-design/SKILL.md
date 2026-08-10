@@ -1,6 +1,11 @@
 ---
 name: fastify-api-design
 description: Use when adding or changing routes, schemas, or plugins in this Fastify API — keep endpoints validated, typed, and testable.
+license: MIT
+compatibility: Fastify ESM API in this boilerplate
+allowed-tools: Read
+metadata:
+  stack: fastify
 ---
 
 # Fastify API Design

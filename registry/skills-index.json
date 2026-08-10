@@ -1,14 +1,14 @@
 {
   "indexVersion": 1,
-  "updatedAt": "2026-07-16T09:48:00.000Z",
+  "updatedAt": "2026-08-10T03:04:01.782Z",
   "skills": [
     {
       "name": "bwai-advisor",
       "catalogLocation": "shared",
       "catalogPath": "shared/skills/bwai-advisor",
-      "description": "Use before scaffolding a bwai project — runs the full startup-goal workflow then recommends the right boilerplate and outputs the exact bwai new command to run.",
+      "description": "\"Use before scaffolding a bwai project — runs the full startup-goal workflow then recommends the right boilerplate and outputs the exact bwai new command to run.\"",
       "promotedAt": "2026-07-16T09:48:00.000Z",
-      "sha256": "575fee755d2d019e72cc0cc96b2da837e8c81206588f213f6ff847e1f7218a09",
+      "sha256": "826e01dbfede82aacdbf761c541d036b3668e0dc1c8e834dbe769fdf13248a84",
       "scan": {
         "status": "pending",
         "riskScore": null,
@@ -17,146 +17,6 @@
       },
       "bundleAll": false,
       "bundledIn": []
-    },
-    {
-      "name": "startup-goal",
-      "catalogLocation": "shared",
-      "catalogPath": "shared/skills/startup-goal",
-      "description": "Use when coordinating a startup goal across CEO, CTO, product manager, engineering manager, founding engineer, and QA lead role subagents.",
-      "upstream": {
-        "url": "https://github.com/devos-ing/omni-skills",
-        "path": "examples/workflows/startup-goal/skills/startup-goal",
-        "ref": "1b9aa8a58ed5486714986a29d0128abb82144640"
-      },
-      "promotedAt": "2026-07-12T14:49:00.000Z",
-      "sha256": "e2b96bb14aa166a736f6f08b73dfa80ea720f56f22396552fbfdb835422d0da7",
-      "scan": {
-        "status": "pending",
-        "riskScore": null,
-        "scannedAt": null,
-        "threshold": 30
-      },
-      "bundleAll": true,
-      "bundledIn": [
-        "express-api",
-        "fastify-api",
-        "nextjs-app",
-        "node-service",
-        "python-service",
-        "react-native-app"
-      ]
-    },
-    {
-      "name": "founding-engineer",
-      "catalogLocation": "shared",
-      "catalogPath": "shared/skills/founding-engineer",
-      "description": "Use when acting as a startup founding engineer for implementation, tests, debugging, review, and verification.",
-      "upstream": {
-        "url": "https://github.com/devos-ing/omni-skills",
-        "path": "examples/workflows/founding-engineer/skills/founding-engineer",
-        "ref": "1b9aa8a58ed5486714986a29d0128abb82144640"
-      },
-      "promotedAt": "2026-07-12T14:49:00.000Z",
-      "sha256": "5ad4b439b41d5acd83c46f5c9eb9f68f80cd3cb49bdbe4371b81e7a043a37712",
-      "scan": {
-        "status": "pending",
-        "riskScore": null,
-        "scannedAt": null,
-        "threshold": 30
-      },
-      "bundleAll": true,
-      "bundledIn": [
-        "express-api",
-        "fastify-api",
-        "nextjs-app",
-        "node-service",
-        "python-service",
-        "react-native-app"
-      ]
-    },
-    {
-      "name": "qa-lead",
-      "catalogLocation": "shared",
-      "catalogPath": "shared/skills/qa-lead",
-      "description": "Use when acting as a startup QA lead for acceptance checks, release risk, regression focus, and verification evidence.",
-      "upstream": {
-        "url": "https://github.com/devos-ing/omni-skills",
-        "path": "examples/workflows/qa-lead/skills/qa-lead",
-        "ref": "1b9aa8a58ed5486714986a29d0128abb82144640"
-      },
-      "promotedAt": "2026-07-12T14:49:00.000Z",
-      "sha256": "736ee0418c922c514b5b3b8e7bcba1ac3e9f04e1f5db791b11e49c10e31ce400",
-      "scan": {
-        "status": "pending",
-        "riskScore": null,
-        "scannedAt": null,
-        "threshold": 30
-      },
-      "bundleAll": true,
-      "bundledIn": [
-        "express-api",
-        "fastify-api",
-        "nextjs-app",
-        "node-service",
-        "python-service",
-        "react-native-app"
-      ]
-    },
-    {
-      "name": "cto",
-      "catalogLocation": "shared",
-      "catalogPath": "shared/skills/cto",
-      "description": "Use when acting as a startup CTO for architecture, technical risk, platform direction, codebase boundaries, or engineering strategy.",
-      "upstream": {
-        "url": "https://github.com/devos-ing/omni-skills",
-        "path": "examples/workflows/cto/skills/cto",
-        "ref": "1b9aa8a58ed5486714986a29d0128abb82144640"
-      },
-      "promotedAt": "2026-07-12T14:49:00.000Z",
-      "sha256": "bda6b80483547c9329b96c35a1bfe9371288586feeb8078a49782d5126b50ad0",
-      "scan": {
-        "status": "pending",
-        "riskScore": null,
-        "scannedAt": null,
-        "threshold": 30
-      },
-      "bundleAll": true,
-      "bundledIn": [
-        "express-api",
-        "fastify-api",
-        "nextjs-app",
-        "node-service",
-        "python-service",
-        "react-native-app"
-      ]
-    },
-    {
-      "name": "product-manager",
-      "catalogLocation": "shared",
-      "catalogPath": "shared/skills/product-manager",
-      "description": "Use when acting as a startup product manager for discovery, PRDs, issue slicing, roadmap tradeoffs, or customer-value sequencing.",
-      "upstream": {
-        "url": "https://github.com/devos-ing/omni-skills",
-        "path": "examples/workflows/product-manager/skills/product-manager",
-        "ref": "1b9aa8a58ed5486714986a29d0128abb82144640"
-      },
-      "promotedAt": "2026-07-12T14:49:00.000Z",
-      "sha256": "5fddf13ea59659f8053496d8dc2d47f54d8ce4f62baf984dc12d5d1b2b53e37d",
-      "scan": {
-        "status": "pending",
-        "riskScore": null,
-        "scannedAt": null,
-        "threshold": 30
-      },
-      "bundleAll": true,
-      "bundledIn": [
-        "express-api",
-        "fastify-api",
-        "nextjs-app",
-        "node-service",
-        "python-service",
-        "react-native-app"
-      ]
     },
     {
       "name": "code-review",
@@ -169,7 +29,7 @@
         "ref": "c9144401a26cbe2549a0020c65c478a6a0bdfaee"
       },
       "promotedAt": "2026-07-05T03:00:00.000Z",
-      "sha256": "8baba620ff6dce1890216c9af887ea08116f08d007fe5f0075bd3e57445ad2be",
+      "sha256": "a6858b529dea9bfe76a372acca3e306c477f24992eba275e9e5691fed82c84ad",
       "scan": {
         "status": "passed",
         "riskScore": 0,
@@ -178,9 +38,39 @@
       },
       "bundleAll": false,
       "bundledIn": [
+        "nextjs-ai-app",
         "nextjs-app",
         "node-service",
         "python-service"
+      ]
+    },
+    {
+      "name": "cto",
+      "catalogLocation": "shared",
+      "catalogPath": "shared/skills/cto",
+      "description": "\"Use when acting as a startup CTO for architecture, technical risk, platform direction, codebase boundaries, or engineering strategy.\"",
+      "upstream": {
+        "url": "https://github.com/devos-ing/omni-skills",
+        "path": "examples/workflows/cto/skills/cto",
+        "ref": "1b9aa8a58ed5486714986a29d0128abb82144640"
+      },
+      "promotedAt": "2026-07-12T14:49:00.000Z",
+      "sha256": "61b6e130131cf9c54d7563a8bac9360262243f0f348c828291924e4273b80790",
+      "scan": {
+        "status": "pending",
+        "riskScore": null,
+        "scannedAt": null,
+        "threshold": 30
+      },
+      "bundleAll": true,
+      "bundledIn": [
+        "express-api",
+        "fastify-api",
+        "nextjs-ai-app",
+        "nextjs-app",
+        "node-service",
+        "python-service",
+        "react-native-app"
       ]
     },
     {
@@ -189,7 +79,7 @@
       "catalogPath": "shared/skills/deploy-vercel",
       "description": "Use when deploying or configuring this project on Vercel — env vars, build settings, serverless limits, and production checks for Next.js or Express.",
       "promotedAt": "2026-07-05T03:05:03.919Z",
-      "sha256": "710db8aabfe49ba797c3420c9ce0a50af0f6d5b474f164b52d40526feba0768f",
+      "sha256": "d51142c8c8ab819768e3598f6ac497f5ab3b4d72dd74e20d3be93f55eeddb0af",
       "scan": {
         "status": "pending",
         "riskScore": null,
@@ -199,6 +89,7 @@
       "bundleAll": false,
       "bundledIn": [
         "express-api",
+        "nextjs-ai-app",
         "nextjs-app"
       ]
     },
@@ -208,7 +99,7 @@
       "catalogPath": "boilerplates/express-api/skills/express-api-design",
       "description": "Use when adding or changing routes, middleware, or error handling in this Express.js API, to keep endpoints consistent, validated, and testable.",
       "promotedAt": "2026-07-05T03:00:00.000Z",
-      "sha256": "4aa233c4883caaa3c35f2dac2d74e7c52059f886072ae533ba52ce6d2cdd91c8",
+      "sha256": "843c10d094c1d26ae3820f360cbde519a1dbe5016b9c364067132e39de3af5d9",
       "scan": {
         "status": "passed",
         "riskScore": 0,
@@ -226,7 +117,7 @@
       "catalogPath": "boilerplates/fastify-api/skills/fastify-api-design",
       "description": "Use when adding or changing routes, schemas, or plugins in this Fastify API — keep endpoints validated, typed, and testable.",
       "promotedAt": "2026-07-05T07:17:52.632Z",
-      "sha256": "1b59e5bba47e15fba93b750eaf29da78edc503b12e20cab2b6d56b9f09fe5953",
+      "sha256": "7eccae8f243e123544d0309df5c8d18ddeef53757343c30af8c206da94a74c25",
       "scan": {
         "status": "pending",
         "riskScore": null,
@@ -239,12 +130,59 @@
       ]
     },
     {
+      "name": "founding-engineer",
+      "catalogLocation": "shared",
+      "catalogPath": "shared/skills/founding-engineer",
+      "description": "\"Use when acting as a startup founding engineer for implementation, tests, debugging, review, and verification.\"",
+      "upstream": {
+        "url": "https://github.com/devos-ing/omni-skills",
+        "path": "examples/workflows/founding-engineer/skills/founding-engineer",
+        "ref": "1b9aa8a58ed5486714986a29d0128abb82144640"
+      },
+      "promotedAt": "2026-07-12T14:49:00.000Z",
+      "sha256": "0a7b0f46414451e7fb13232e27bc9daf69173855e52691b0de4270fc4973ad33",
+      "scan": {
+        "status": "pending",
+        "riskScore": null,
+        "scannedAt": null,
+        "threshold": 30
+      },
+      "bundleAll": true,
+      "bundledIn": [
+        "express-api",
+        "fastify-api",
+        "nextjs-ai-app",
+        "nextjs-app",
+        "node-service",
+        "python-service",
+        "react-native-app"
+      ]
+    },
+    {
+      "name": "nextjs-ai-sdk",
+      "catalogLocation": "local",
+      "catalogPath": "boilerplates/nextjs-ai-app/skills/nextjs-ai-sdk",
+      "description": "Use when adding chat routes, LLM tools, structured outputs, or streaming UI with the Vercel AI SDK in this Next.js AI app.",
+      "promotedAt": "2026-07-16T09:48:00.000Z",
+      "sha256": "c7676103215e1ebccb25880461d5c9dae5fecee53b1abe35dfbe7a16d81523a4",
+      "scan": {
+        "status": "pending",
+        "riskScore": null,
+        "scannedAt": null,
+        "threshold": 30
+      },
+      "bundleAll": false,
+      "bundledIn": [
+        "nextjs-ai-app"
+      ]
+    },
+    {
       "name": "nextjs-app-router",
       "catalogLocation": "local",
       "catalogPath": "boilerplates/nextjs-app/skills/nextjs-app-router",
       "description": "Use when adding pages, layouts, route handlers, or data fetching in this Next.js App Router project, to follow server-first conventions correctly.",
       "promotedAt": "2026-07-05T03:00:00.000Z",
-      "sha256": "55cf9d4584fefc83bd924022b526d943a8b73243fa95b4b28bf9d430c2e6bba5",
+      "sha256": "766cefae14cb11b9e936c4447226d6fffac8b57e033afcea6dd73fc428656391",
       "scan": {
         "status": "passed",
         "riskScore": 0,
@@ -257,12 +195,17 @@
       ]
     },
     {
-      "name": "project-security",
+      "name": "product-manager",
       "catalogLocation": "shared",
-      "catalogPath": "shared/skills/project-security",
-      "description": "Use when reviewing security-sensitive code paths — check auth, secrets, input validation, dependency risk, and data exposure before shipping.",
-      "promotedAt": "2026-07-05T03:00:00.000Z",
-      "sha256": "da9dc272468712cb974f12ca0dd2ebc5fd89b5fad60341d186a4fea11659534f",
+      "catalogPath": "shared/skills/product-manager",
+      "description": "\"Use when acting as a startup product manager for discovery, PRDs, issue slicing, roadmap tradeoffs, or customer-value sequencing.\"",
+      "upstream": {
+        "url": "https://github.com/devos-ing/omni-skills",
+        "path": "examples/workflows/product-manager/skills/product-manager",
+        "ref": "1b9aa8a58ed5486714986a29d0128abb82144640"
+      },
+      "promotedAt": "2026-07-12T14:49:00.000Z",
+      "sha256": "5bdf127b9316a7fe4b2d768886449ea7a1d406f90ef2d3c41217a1553ed171d8",
       "scan": {
         "status": "pending",
         "riskScore": null,
@@ -273,6 +216,31 @@
       "bundledIn": [
         "express-api",
         "fastify-api",
+        "nextjs-ai-app",
+        "nextjs-app",
+        "node-service",
+        "python-service",
+        "react-native-app"
+      ]
+    },
+    {
+      "name": "project-security",
+      "catalogLocation": "shared",
+      "catalogPath": "shared/skills/project-security",
+      "description": "Use when reviewing security-sensitive code paths — check auth, secrets, input validation, dependency risk, and data exposure before shipping.",
+      "promotedAt": "2026-07-05T03:00:00.000Z",
+      "sha256": "895400ef4423ea769b7c7331b5d3998988007d14af659192fa9775b38c7ac519",
+      "scan": {
+        "status": "pending",
+        "riskScore": null,
+        "scannedAt": null,
+        "threshold": 30
+      },
+      "bundleAll": true,
+      "bundledIn": [
+        "express-api",
+        "fastify-api",
+        "nextjs-ai-app",
         "nextjs-app",
         "node-service",
         "python-service",
@@ -285,7 +253,7 @@
       "catalogPath": "boilerplates/python-service/skills/python-api-design",
       "description": "Use when adding or changing FastAPI routes, dependencies, or tests in this Python service — keep endpoints typed, validated, and covered by pytest.",
       "promotedAt": "2026-07-05T07:17:52.632Z",
-      "sha256": "ceeada1f4fa2158e0adb727d38c8ecb429d6647a8ef91e8cca5a216123ed9f64",
+      "sha256": "0290156bf22870208ea54dd861fcf3b0fa8a6dee5d83c9e2475fd7eb418b3b1a",
       "scan": {
         "status": "pending",
         "riskScore": null,
@@ -298,12 +266,41 @@
       ]
     },
     {
+      "name": "qa-lead",
+      "catalogLocation": "shared",
+      "catalogPath": "shared/skills/qa-lead",
+      "description": "\"Use when acting as a startup QA lead for acceptance checks, release risk, regression focus, and verification evidence.\"",
+      "upstream": {
+        "url": "https://github.com/devos-ing/omni-skills",
+        "path": "examples/workflows/qa-lead/skills/qa-lead",
+        "ref": "1b9aa8a58ed5486714986a29d0128abb82144640"
+      },
+      "promotedAt": "2026-07-12T14:49:00.000Z",
+      "sha256": "f577b6bef3e1f767e302e140929eef8307897750bb5d44660648954a1371af05",
+      "scan": {
+        "status": "pending",
+        "riskScore": null,
+        "scannedAt": null,
+        "threshold": 30
+      },
+      "bundleAll": true,
+      "bundledIn": [
+        "express-api",
+        "fastify-api",
+        "nextjs-ai-app",
+        "nextjs-app",
+        "node-service",
+        "python-service",
+        "react-native-app"
+      ]
+    },
+    {
       "name": "react-native-development",
       "catalogLocation": "local",
       "catalogPath": "boilerplates/react-native-app/skills/react-native-development",
       "description": "Use when building screens, navigation, styling, or platform behavior in this Expo React Native app, to follow mobile-first conventions and keep logic testable.",
       "promotedAt": "2026-07-05T03:00:00.000Z",
-      "sha256": "8832f48031a9cf61ca6f9e1ff488990ba671c421e9037abd9171cbfd0c057a76",
+      "sha256": "384107428604c954a4c132d4b4959a80653662f7ee7cc5354fa343c3b46046aa",
       "scan": {
         "status": "passed",
         "riskScore": 0,
@@ -312,6 +309,35 @@
       },
       "bundleAll": false,
       "bundledIn": [
+        "react-native-app"
+      ]
+    },
+    {
+      "name": "startup-goal",
+      "catalogLocation": "shared",
+      "catalogPath": "shared/skills/startup-goal",
+      "description": "\"Use when coordinating a startup goal across CEO, CTO, product manager, engineering manager, founding engineer, and QA lead role subagents.\"",
+      "upstream": {
+        "url": "https://github.com/devos-ing/omni-skills",
+        "path": "examples/workflows/startup-goal/skills/startup-goal",
+        "ref": "1b9aa8a58ed5486714986a29d0128abb82144640"
+      },
+      "promotedAt": "2026-07-12T14:49:00.000Z",
+      "sha256": "f166e2b47d77a68c1a194f411d89ac05c1a2719d2fd8df14656df6041b51ce92",
+      "scan": {
+        "status": "pending",
+        "riskScore": null,
+        "scannedAt": null,
+        "threshold": 30
+      },
+      "bundleAll": true,
+      "bundledIn": [
+        "express-api",
+        "fastify-api",
+        "nextjs-ai-app",
+        "nextjs-app",
+        "node-service",
+        "python-service",
         "react-native-app"
       ]
     },
@@ -326,7 +352,7 @@
         "ref": "61939b456845d75979423c855829d05cbf2c304d"
       },
       "promotedAt": "2026-07-05T03:00:00.000Z",
-      "sha256": "156365da7b4789ba21ac91dae7216ba6af9a8c9a6aa75ca128ba3739e0add098",
+      "sha256": "09198990dece4c2c1ef2234fe534b1c2e3137b84b2c76aaa18cbab04fe708217",
       "scan": {
         "status": "passed",
         "riskScore": 0,
