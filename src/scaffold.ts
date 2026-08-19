@@ -11,6 +11,15 @@ import {
   resolveWorkflowDirectory,
   workflowAgentsSnippet,
 } from "./workflows.js";
+import {
+  defaultPluginDir,
+  listSkillSources,
+  listWorkflowSkillSources,
+  pluginNameForBoilerplate,
+  readClientMcpFromProject,
+  writeAgentPlugin,
+  writeCopilotEnabledPlugins,
+} from "./plugin.js";
 
 export interface ScaffoldOptions {
   boilerplateName: string;
@@ -29,6 +38,8 @@ export interface ScaffoldResult {
   lock: SkillsLock;
   workflow?: string;
   workflowPath?: string;
+  pluginPath?: string;
+  copilotSettingsPath?: string;
 }
 
 async function pathExists(path: string): Promise<boolean> {
@@ -168,6 +179,49 @@ export async function scaffold(options: ScaffoldOptions): Promise<ScaffoldResult
     }
   }
 
+  // Portable Agent Plugins package (skills + typed MCP). Keeps .bwai/skills mirrors.
+  const pluginSkills = await listSkillSources(canonicalRoot);
+  if (workflowName) {
+    for (const s of await listWorkflowSkillSources(targetDir, workflowName)) {
+      if (!pluginSkills.some((x) => x.name === s.name)) pluginSkills.push(s);
+    }
+  }
+
+  let pluginPath: string | undefined;
+  let copilotSettingsPath: string | undefined;
+  if (pluginSkills.length > 0) {
+    const pluginDir = defaultPluginDir(targetDir);
+    const clientMcp = await readClientMcpFromProject(targetDir);
+    await writeAgentPlugin({
+      pluginDir,
+      name: pluginNameForBoilerplate(boilerplate.manifest.name),
+      version: boilerplate.manifest.version,
+      description: boilerplate.manifest.description,
+      license: "MIT",
+      keywords: ["bwai", boilerplate.manifest.stack, "agent-plugins"],
+      skills: pluginSkills,
+      clientMcp,
+    });
+    pluginPath = relative(targetDir, pluginDir);
+    copilotSettingsPath = await writeCopilotEnabledPlugins(targetDir, `./${pluginPath}`);
+
+    const agentsPath = join(targetDir, "AGENTS.md");
+    if (await pathExists(agentsPath)) {
+      const mcpNote = clientMcp ? " + `mcp.json`" : "";
+      await appendFile(
+        agentsPath,
+        `
+
+## Agent Plugins
+
+Portable package at \`${pluginPath}/\` (\`plugin.json\` + \`skills/\`${mcpNote}). Client-native MCP remains in \`.mcp.json\` / \`.cursor/mcp.json\` when present. Trust stays in \`skills.lock\` + SkillSpector — Agent Plugins does not define provenance.
+
+Copilot cloud/CLI can enable the local plugin via \`.github/copilot/settings.json\`. Maintainers can also drop the folder under \`~/.cursor/plugins/local/\` for a Cursor smoke path.
+`,
+      );
+    }
+  }
+
   return {
     targetDir,
     boilerplate: boilerplate.manifest.name,
@@ -176,5 +230,7 @@ export async function scaffold(options: ScaffoldOptions): Promise<ScaffoldResult
     lock,
     workflow: workflowName,
     workflowPath,
+    pluginPath,
+    copilotSettingsPath,
   };
 }

@@ -135,6 +135,34 @@ export async function runDoctor(cwd = process.cwd()): Promise<DoctorReport> {
 
   checks.push(await checkGlobalAdvisorSkills());
 
+  const pluginDir = join(cwd, ".bwai", "plugin");
+  if (await pathReadable(join(pluginDir, "plugin.json"))) {
+    const { validateAgentPlugin } = await import("./plugin.js");
+    const validation = await validateAgentPlugin(pluginDir);
+    if (validation.ok) {
+      const warnNote =
+        validation.warnings.length > 0 ? ` (${validation.warnings.length} warning(s))` : "";
+      checks.push({
+        name: "agent-plugin",
+        status: validation.warnings.length > 0 ? "warn" : "ok",
+        message: `Agent Plugins package at .bwai/plugin/ is valid${warnNote}`,
+      });
+    } else {
+      checks.push({
+        name: "agent-plugin",
+        status: "fail",
+        message: `Invalid Agent Plugins package: ${validation.errors.map((e) => e.message).join("; ")}`,
+      });
+    }
+  } else if (await pathReadable(join(cwd, "skills.lock"))) {
+    checks.push({
+      name: "agent-plugin",
+      status: "warn",
+      message:
+        "skills.lock present but no .bwai/plugin/ — re-scaffold or run `bwai export-plugin . .bwai/plugin`",
+    });
+  }
+
   const ok = checks.every((c) => c.status !== "fail");
   return { checks, ok };
 }

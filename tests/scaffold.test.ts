@@ -146,6 +146,38 @@ describe("scaffold", () => {
     expect(lock.skills.find((s) => s.name === "code-review")?.source).toBe("shared:code-review");
   });
 
+  it("writes Agent Plugins package and Copilot settings on scaffold", async () => {
+    const target = join(dir, "plugin-proj");
+    const result = await scaffold({
+      boilerplateName: "nextjs-app",
+      targetDir: target,
+      agents: ["claude"],
+    });
+
+    expect(result.pluginPath).toBe(join(".bwai", "plugin"));
+    expect(await exists(join(target, ".bwai", "plugin", "plugin.json"))).toBe(true);
+    expect(await exists(join(target, ".bwai", "plugin", "mcp.json"))).toBe(true);
+    expect(
+      await exists(join(target, ".bwai", "plugin", "skills", "nextjs-app-router", "SKILL.md")),
+    ).toBe(true);
+    expect(
+      await exists(join(target, ".bwai", "plugin", "skills", "bwai-delivery", "SKILL.md")),
+    ).toBe(true);
+
+    const mcp = JSON.parse(await readFile(join(target, ".bwai", "plugin", "mcp.json"), "utf8")) as {
+      mcpServers: { playwright: { type: string } };
+    };
+    expect(mcp.mcpServers.playwright.type).toBe("stdio");
+
+    const settings = JSON.parse(
+      await readFile(join(target, ".github", "copilot", "settings.json"), "utf8"),
+    ) as { enabledPlugins: Record<string, boolean> };
+    expect(settings.enabledPlugins["./.bwai/plugin"]).toBe(true);
+
+    const agentsMd = await readFile(join(target, "AGENTS.md"), "utf8");
+    expect(agentsMd).toContain("Agent Plugins");
+  });
+
   it("dedupes shared agent targets (copilot + opencode share .agents/skills)", async () => {
     const target = join(dir, "proj");
     await scaffold({

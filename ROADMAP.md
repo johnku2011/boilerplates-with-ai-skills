@@ -36,7 +36,7 @@ Deepened skills, `deploy-vercel`, `sync-upstream`, Superpowers alignment doc.
 | `bwai doctor` first-run checks | Done |
 | Upstream: SkillSpector in getsuperpower `validate` | Planned |
 
-**Current npm release:** `bwai-cli@0.2.7`
+**Current npm release:** `bwai-cli@0.2.7` (next: `0.2.8` Agent Plugins)
 
 ## Phase 2F — Scaffold CI (done)
 
@@ -55,6 +55,19 @@ Deepened skills, `deploy-vercel`, `sync-upstream`, Superpowers alignment doc.
 | `bwai-delivery` on `react-native-app` | Done |
 | SKILL.md enrichment + frontmatter compliance gate | Done |
 
+## Phase 2H — Agent Plugins (in progress)
+
+| Item | Status |
+| --- | --- |
+| Scaffold `.bwai/plugin/` (plugin.json + skills/ + typed mcp.json) | Done |
+| MCP translator (explicit `type` + `$schema`) | Done |
+| `bwai doctor` validates plugin package | Done |
+| Docs + maintainer smoke paths | Done — [`docs/agent-plugins.md`](./docs/agent-plugins.md) |
+| `bwai export-plugin` CLI | Done |
+| Copilot `.github/copilot/settings.json` `enabledPlugins` | Done |
+| Delivery workflow skills inside plugin | Done |
+| npm publish `0.2.8` | Pending |
+
 ## Possible follow-ups
 
 | Item | Notes |
@@ -62,7 +75,8 @@ Deepened skills, `deploy-vercel`, `sync-upstream`, Superpowers alignment doc.
 | `remix-app` boilerplate | Deferred |
 | Stack-specific GetSuperpower workflows (`boilerplates/<name>/workflow/`) | Optional |
 | Skill depth passes | Expand shared skills on a schedule |
-| npm Trusted Publishing (OIDC) | Replace long-lived `NPM_TOKEN` |
+| Client-extension namespaces (`com.*`) for hooks/agents | Only when needed |
+| ARD / AI Catalog discovery | Watch only |
 | Upstream: SkillSpector in getsuperpower `validate` | Planned (from 2E) |
 
 ## Commands reference
@@ -73,6 +87,7 @@ npm package: **`bwai-cli`**. Use `npx bwai-cli …` without a global install. Af
 npx bwai-cli list-boilerplates
 npx bwai-cli doctor
 npx bwai-cli new <boilerplate> [dir] --agents claude,cursor
+npx bwai-cli export-plugin <boilerplate|project> [out]
 bwai scan-catalog --threshold 30 --require-scanner
 bwai scan-project [dir] --threshold 50 --require-scanner
 bwai search-skills [query] --source all --scan 5
@@ -85,4 +100,4 @@ bwai list-workflows
 
 SkillSpector: `uv tool install git+https://github.com/NVIDIA/skillspector.git`
 
-See [`CONTRIBUTING.md`](./CONTRIBUTING.md), [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md), and [`docs/superpowers-upstream.md`](./docs/superpowers-upstream.md).
+See [`CONTRIBUTING.md`](./CONTRIBUTING.md), [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md), [`docs/agent-plugins.md`](./docs/agent-plugins.md), and [`docs/superpowers-upstream.md`](./docs/superpowers-upstream.md).

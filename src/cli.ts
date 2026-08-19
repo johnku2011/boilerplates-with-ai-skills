@@ -21,6 +21,8 @@ import {
 import { formatDoctorReport, runDoctor } from "./doctor.js";
 import { installSkill, listInstallableSkills } from "./install-skill.js";
 import { formatScaffoldHandoff } from "./scaffold-handoff.js";
+import { exportPlugin } from "./export-plugin.js";
+import { DEFAULT_PLUGIN_DIRNAME } from "./plugin.js";
 
 const program = new Command();
 
@@ -30,7 +32,7 @@ program
     "boilerplates-with-ai-skills: scaffold projects pre-wired with curated, " +
       "security-vetted, cross-agent AI skills.",
   )
-  .version("0.2.7");
+  .version("0.2.8");
 
 program
   .command("list-boilerplates")
@@ -101,6 +103,9 @@ program
       if (result.workflow && result.workflowPath) {
         console.log(`GetSuperpower workflow: ${result.workflowPath}/`);
       }
+      if (result.pluginPath) {
+        console.log(`Agent Plugins package: ${result.pluginPath}/`);
+      }
       console.log(`Provenance: skills.lock`);
       console.log("");
       for (const line of formatScaffoldHandoff({
@@ -147,8 +152,58 @@ program
   });
 
 program
+  .command("export-plugin")
+  .argument("<source>", "catalog boilerplate name, or path to a bwai-scaffolded project")
+  .argument(
+    "[out]",
+    `output plugin directory (default: ./${DEFAULT_PLUGIN_DIRNAME} for projects, ./<plugin-name> for boilerplates)`,
+  )
+  .option(
+    "--copilot-settings",
+    "When source is a project, also write .github/copilot/settings.json enabledPlugins",
+    false,
+  )
+  .description(
+    "Export a portable Agent Plugins 1.0 package (plugin.json + skills/ + typed mcp.json).",
+  )
+  .action(async (source: string, out: string | undefined, opts: { copilotSettings?: boolean }) => {
+    try {
+      let outDir = out;
+      if (!outDir) {
+        const { listBoilerplates } = await import("./catalog.js");
+        const names = (await listBoilerplates()).map((b) => b.manifest.name);
+        if (names.includes(source)) {
+          outDir = resolve(process.cwd(), `bwai.${source}`);
+        } else {
+          outDir = resolve(process.cwd(), source, DEFAULT_PLUGIN_DIRNAME);
+        }
+      } else {
+        outDir = resolve(process.cwd(), outDir);
+      }
+
+      const result = await exportPlugin({
+        source,
+        outDir,
+        writeCopilotSettings: Boolean(opts.copilotSettings),
+      });
+
+      console.log(`Exported Agent Plugins package: ${result.pluginDir}`);
+      console.log(`Source: ${result.sourceKind} (${result.sourceName})`);
+      console.log(`Name: ${result.manifest.name}`);
+      console.log(`Skills: ${result.skillNames.join(", ")}`);
+      console.log(`MCP: ${result.hasMcp ? "mcp.json included" : "none"}`);
+      if (result.copilotSettingsPath) {
+        console.log(`Copilot settings: ${result.copilotSettingsPath}`);
+      }
+    } catch (error) {
+      console.error(error instanceof Error ? error.message : error);
+      process.exitCode = 1;
+    }
+  });
+
+program
   .command("doctor")
-  .description("Check Node, catalog, SkillSpector, and optional project setup.")
+  .description("Check Node, catalog, SkillSpector, Agent Plugins, and optional project setup.")
   .option("--json", "Print JSON report")
   .action(async (opts: { json?: boolean }) => {
     const report = await runDoctor(process.cwd());

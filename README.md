@@ -65,13 +65,18 @@ my-app/
     cto/                    # architecture + technical direction
     product-manager/        # PRDs, issue slicing, roadmap
     …                       # stack-specific skills (TDD, code-review, etc.)
+  .bwai/plugin/             # Agent Plugins 1.0 package (skills + typed MCP)
   .claude/skills/ …         # mirrored for each --agents target
   skills.lock               # SHA-256 + scan status per skill
   .github/workflows/skill-scan.yml  # SkillSpector gate on push/PR
+  .github/copilot/settings.json     # optional Copilot enabledPlugins
   workflows/bwai-delivery/  # delivery workflow bundle
 ```
 
 Each skill is a spec-compliant [`SKILL.md`](https://agentskills.io/specification).
+Skills + MCP also ship as a portable [Agent Plugins](https://agent-plugins.org/) package
+under `.bwai/plugin/` — see [`docs/agent-plugins.md`](./docs/agent-plugins.md).
+Trust (SkillSpector + `skills.lock`) stays bwai’s layer; the plugin format does not define provenance.
 Role skills are vendored from [Omni-Skills](https://github.com/devos-ing/omni-skills)
 and pinned in `registry/skills-index.json`. Run `bwai sync-upstream` to pull updates.
 
@@ -82,6 +87,7 @@ bwai install-skill bwai-advisor --global   # also installs startup-goal
 bwai list-boilerplates
 bwai doctor                                # includes global advisor check
 bwai new node-service ./my-app --agents claude,cursor
+bwai export-plugin nextjs-app ./bwai.nextjs-app   # portable Agent Plugins package
 bwai scan-project ./my-app --threshold 50
 bwai scan-catalog --threshold 30 --require-scanner
 bwai search-skills "code review"

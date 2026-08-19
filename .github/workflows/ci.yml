@@ -56,6 +56,10 @@ jobs:
             test -f "$TARGET/.claude/skills/nextjs-ai-sdk/SKILL.md" || \
             test -f "$TARGET/.claude/skills/react-native-development/SKILL.md"
           test -f "$TARGET/workflows/bwai-delivery/workflow.json"
+          test -f "$TARGET/.bwai/plugin/plugin.json"
+          test -f "$TARGET/.github/copilot/settings.json"
+          node dist/cli.js export-plugin "${{ matrix.boilerplate }}" "/tmp/ci-plugin-${{ matrix.boilerplate }}"
+          test -f "/tmp/ci-plugin-${{ matrix.boilerplate }}/plugin.json"
       - name: bwai doctor
         run: node dist/cli.js doctor
 

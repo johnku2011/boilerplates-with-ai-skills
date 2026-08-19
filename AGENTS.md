@@ -29,6 +29,7 @@ CLI smoke checks:
 node dist/cli.js list-boilerplates
 node dist/cli.js doctor
 node dist/cli.js new node-service /tmp/demo --agents claude
+node dist/cli.js export-plugin nextjs-app /tmp/bwai.nextjs-app
 node dist/cli.js scan-catalog --threshold 30 --require-scanner
 node dist/cli.js scan-project /tmp/demo --threshold 50
 node dist/cli.js sync-skills
@@ -38,7 +39,7 @@ node dist/cli.js search-skills testing --limit 5
 
 ## Layout
 
-- `src/` — `bwai` CLI (`list-boilerplates`, `doctor`, `list-workflows`, `new`, `scan-catalog`, `scan-project`, `search-skills`, `promote`, `sync-skills`, `sync-upstream`)
+- `src/` — `bwai` CLI (`list-boilerplates`, `doctor`, `list-workflows`, `new`, `export-plugin`, `scan-catalog`, `scan-project`, `search-skills`, `promote`, `sync-skills`, `sync-upstream`)
 - `registry/skills-index.json` — promoted skill metadata, upstream pins, bundle rules
 - `shared/skills/` — catalog-wide skills (`source: "shared"` in manifests)
 - `shared/workflows/` — GetSuperpower bundles (`workflow.source: "shared"`)

@@ -20,3 +20,18 @@ export {
 } from "./skill-frontmatter.js";
 export type { SkillFrontmatter } from "./skill-frontmatter.js";
 export type { SkillsLock, LockedSkill, BoilerplateManifest } from "./schema.js";
+export { exportPlugin } from "./export-plugin.js";
+export type { ExportPluginOptions, ExportPluginResult } from "./export-plugin.js";
+export {
+  writeAgentPlugin,
+  validateAgentPlugin,
+  translateClientMcp,
+  pluginNameForBoilerplate,
+  DEFAULT_PLUGIN_DIRNAME,
+} from "./plugin.js";
+export type {
+  WriteAgentPluginOptions,
+  WriteAgentPluginResult,
+  PluginValidationResult,
+  AgentPluginManifest,
+} from "./plugin.js";
