@@ -70,8 +70,8 @@ function migrateSkillId(skill: z.infer<typeof registrySkillV1Schema>): string {
   if (skill.catalogLocation === "shared") return `shared:${skill.name}`;
 
   const pathMatch = skill.catalogPath.match(/^boilerplates[/\\]([^/\\]+)[/\\]skills[/\\]/);
-  const boilerplateName =
-    pathMatch?.[1] ?? (skill.bundledIn.length === 1 ? skill.bundledIn[0] : null);
+  const onlyBundledOwner = skill.bundledIn.length === 1 ? skill.bundledIn.at(0) : undefined;
+  const boilerplateName = pathMatch?.[1] ?? onlyBundledOwner;
   if (!boilerplateName) {
     throw new Error(
       `Cannot migrate local registry skill "${skill.name}": catalogPath does not identify a boilerplate and bundledIn is ambiguous`,
