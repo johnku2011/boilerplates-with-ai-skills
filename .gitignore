@@ -18,6 +18,7 @@ yarn-error.log*
 # Local runtime state written by the CLI in scaffolded projects
 .bwai/
 .getsuperpower/
+.worktrees/
 
 # Editor / OS
 .DS_Store
