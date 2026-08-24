@@ -1,4 +1,5 @@
 import { Command } from "commander";
+import { stat } from "node:fs/promises";
 import { resolve } from "node:path";
 import { assertValidCatalog, formatCatalogError, loadCatalogSnapshot } from "./catalog-snapshot.js";
 import { runListBoilerplates } from "./list-boilerplates-command.js";
@@ -152,12 +153,16 @@ program
     try {
       let outDir = out;
       if (!outDir) {
-        const { listBoilerplates } = await import("./catalog.js");
-        const names = (await listBoilerplates()).map((b) => b.manifest.name);
-        if (names.includes(source)) {
-          outDir = resolve(process.cwd(), `bwai.${source}`);
-        } else {
+        const projectDir = resolve(process.cwd(), source);
+        try {
+          await stat(projectDir);
           outDir = resolve(process.cwd(), source, DEFAULT_PLUGIN_DIRNAME);
+        } catch {
+          const { listBoilerplates } = await import("./catalog.js");
+          const names = (await listBoilerplates()).map((b) => b.manifest.name);
+          outDir = names.includes(source)
+            ? resolve(process.cwd(), `bwai.${source}`)
+            : resolve(process.cwd(), source, DEFAULT_PLUGIN_DIRNAME);
         }
       } else {
         outDir = resolve(process.cwd(), outDir);

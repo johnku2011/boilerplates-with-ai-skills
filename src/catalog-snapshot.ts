@@ -14,9 +14,9 @@ import {
 } from "./paths.js";
 
 export interface CatalogRoots {
-  boilerplatesDir: string;
-  sharedSkillsDir: string;
-  sharedWorkflowsDir: string;
+  readonly boilerplatesDir: string;
+  readonly sharedSkillsDir: string;
+  readonly sharedWorkflowsDir: string;
 }
 
 export interface CatalogRootOptions {
@@ -57,19 +57,19 @@ export type CatalogDiagnosticCode =
   | "MISSING_DECLARED_WORKFLOW";
 
 export interface CatalogDiagnostic {
-  code: CatalogDiagnosticCode;
-  severity: "error" | "warning";
-  kind: "catalog" | "boilerplate" | "skill" | "workflow";
-  path: string;
-  identity?: CatalogArtifactIdentity;
-  message: string;
+  readonly code: CatalogDiagnosticCode;
+  readonly severity: "error" | "warning";
+  readonly kind: "catalog" | "boilerplate" | "skill" | "workflow";
+  readonly path: string;
+  readonly identity?: CatalogArtifactIdentity;
+  readonly message: string;
 }
 
 export interface CatalogArtifactRecord {
-  kind: "boilerplate" | "skill" | "workflow";
-  path: string;
-  identity?: CatalogArtifactIdentity;
-  valid: boolean;
+  readonly kind: "boilerplate" | "skill" | "workflow";
+  readonly path: string;
+  readonly identity?: CatalogArtifactIdentity;
+  readonly valid: boolean;
 }
 
 export type DeepReadonly<T> = T extends (...args: never[]) => unknown
@@ -81,40 +81,46 @@ export type DeepReadonly<T> = T extends (...args: never[]) => unknown
       : T;
 
 export interface CatalogSkill {
-  id: CatalogArtifactIdentity;
-  name: string;
-  scope: "shared" | "local";
-  dir: string;
-  boilerplateName?: string;
+  readonly id: CatalogArtifactIdentity;
+  readonly name: string;
+  readonly scope: "shared" | "local";
+  readonly dir: string;
+  readonly boilerplateName?: string;
 }
 
 export interface CatalogWorkflow {
-  id: CatalogArtifactIdentity;
-  name: string;
-  scope: "shared" | "local";
-  dir: string;
-  manifest: DeepReadonly<WorkflowManifest>;
-  boilerplateName?: string;
+  readonly id: CatalogArtifactIdentity;
+  readonly name: string;
+  readonly scope: "shared" | "local";
+  readonly dir: string;
+  readonly manifest: DeepReadonly<WorkflowManifest>;
+  readonly boilerplateName?: string;
 }
 
 export interface CatalogBoilerplate {
-  id: CatalogArtifactIdentity;
-  manifest: DeepReadonly<BoilerplateManifest>;
-  dir: string;
-  templateDir: string;
-  skillsDir: string;
-  skills: CatalogSkill[];
-  workflow?: CatalogWorkflow;
+  readonly id: CatalogArtifactIdentity;
+  readonly manifest: DeepReadonly<BoilerplateManifest>;
+  readonly dir: string;
+  readonly templateDir: string;
+  readonly skillsDir: string;
+  readonly skills: readonly CatalogSkill[];
+  readonly workflow?: CatalogWorkflow;
 }
 
+type MutableCatalogArtifactRecord = Omit<CatalogArtifactRecord, "valid"> & { valid: boolean };
+type MutableCatalogBoilerplate = Omit<CatalogBoilerplate, "skills" | "workflow"> & {
+  skills: CatalogSkill[];
+  workflow?: CatalogWorkflow;
+};
+
 export interface CatalogSnapshot {
-  roots: Readonly<CatalogRoots>;
-  artifacts: readonly CatalogArtifactRecord[];
-  boilerplates: readonly CatalogBoilerplate[];
-  skills: readonly CatalogSkill[];
-  workflows: readonly CatalogWorkflow[];
-  diagnostics: readonly CatalogDiagnostic[];
-  valid: boolean;
+  readonly roots: Readonly<CatalogRoots>;
+  readonly artifacts: readonly CatalogArtifactRecord[];
+  readonly boilerplates: readonly CatalogBoilerplate[];
+  readonly skills: readonly CatalogSkill[];
+  readonly workflows: readonly CatalogWorkflow[];
+  readonly diagnostics: readonly CatalogDiagnostic[];
+  readonly valid: boolean;
 }
 
 export class CatalogValidationError extends Error {
@@ -168,7 +174,7 @@ async function loadSkill(
   scope: "shared" | "local",
   diagnostics: CatalogDiagnostic[],
   boilerplateName?: string,
-): Promise<{ skill?: CatalogSkill; artifact: CatalogArtifactRecord }> {
+): Promise<{ skill?: CatalogSkill; artifact: MutableCatalogArtifactRecord }> {
   const name = basename(dir);
   try {
     const content = await readFile(join(dir, "SKILL.md"), "utf8");
@@ -196,7 +202,7 @@ async function loadWorkflow(
   scope: "shared" | "local",
   diagnostics: CatalogDiagnostic[],
   boilerplateName?: string,
-): Promise<{ workflow?: CatalogWorkflow; artifact: CatalogArtifactRecord }> {
+): Promise<{ workflow?: CatalogWorkflow; artifact: MutableCatalogArtifactRecord }> {
   const directoryName = basename(dir);
   try {
     const raw = await readFile(join(dir, "workflow.json"), "utf8");
@@ -258,10 +264,10 @@ export async function loadCatalogSnapshot(
     sharedWorkflowsDir: options.sharedWorkflowsDir ?? defaultSharedWorkflowsDir(),
   };
   const diagnostics: CatalogDiagnostic[] = [];
-  const artifacts: CatalogArtifactRecord[] = [];
+  const artifacts: MutableCatalogArtifactRecord[] = [];
   const skills: CatalogSkill[] = [];
   const workflows: CatalogWorkflow[] = [];
-  const discoveredBoilerplates: CatalogBoilerplate[] = [];
+  const discoveredBoilerplates: MutableCatalogBoilerplate[] = [];
 
   for (const name of await directoryNames(roots.sharedSkillsDir, diagnostics)) {
     const dir = join(roots.sharedSkillsDir, name);
@@ -383,7 +389,7 @@ export async function loadCatalogSnapshot(
   }
 
   const duplicateIds = new Set<CatalogArtifactIdentity>();
-  const firstArtifactById = new Map<CatalogArtifactIdentity, CatalogArtifactRecord>();
+  const firstArtifactById = new Map<CatalogArtifactIdentity, MutableCatalogArtifactRecord>();
   for (const artifact of artifacts) {
     if (!artifact.identity) continue;
     const previous = firstArtifactById.get(artifact.identity);
