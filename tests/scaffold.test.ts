@@ -4,6 +4,8 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { scaffold } from "../src/scaffold.js";
 import { readLock } from "../src/provenance.js";
+import { CatalogValidationError } from "../src/catalog-snapshot.js";
+import { boilerplateManifest, createCatalogFixture, writeBoilerplate } from "./catalog-fixture.js";
 
 async function exists(path: string): Promise<boolean> {
   try {
@@ -219,6 +221,26 @@ describe("scaffold", () => {
     await expect(
       scaffold({ boilerplateName: "node-service", targetDir: target, agents: ["claude"] }),
     ).rejects.toThrow(/not empty/);
+  });
+
+  it("validates the catalog before creating the target", async () => {
+    const fixture = await createCatalogFixture(join(dir, "invalid-catalog"));
+    await writeBoilerplate(
+      fixture,
+      "demo",
+      boilerplateManifest("demo", [{ name: "missing", source: "shared" }]),
+    );
+    const target = join(dir, "invalid-target");
+
+    await expect(
+      scaffold({
+        boilerplateName: "demo",
+        targetDir: target,
+        agents: ["claude"],
+        catalogRoots: fixture,
+      }),
+    ).rejects.toBeInstanceOf(CatalogValidationError);
+    expect(await exists(target)).toBe(false);
   });
 
   it("produces a runnable project (SKILL.md content hashes are stable)", async () => {

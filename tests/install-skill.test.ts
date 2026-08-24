@@ -3,6 +3,13 @@ import { mkdtemp, rm, readFile, access } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { installSkill, listInstallableSkills, SKILL_DEPENDENCIES } from "../src/install-skill.js";
+import { CatalogValidationError } from "../src/catalog-snapshot.js";
+import {
+  boilerplateManifest,
+  createCatalogFixture,
+  writeBoilerplate,
+  writeSkill,
+} from "./catalog-fixture.js";
 
 describe("installSkill", () => {
   let home: string;
@@ -75,5 +82,14 @@ describe("installSkill", () => {
         withDeps: false,
       }),
     ).rejects.toThrow(/Unknown skill.*bwai-advisor/s);
+  });
+
+  it("rejects invalid catalog state before listing installable skills", async () => {
+    const fixture = await createCatalogFixture(join(home, "catalog"));
+    await writeSkill(join(fixture.sharedSkillsDir, "demo"), "demo");
+    await writeBoilerplate(fixture, "broken", boilerplateManifest("wrong"));
+    await expect(listInstallableSkills({ catalogRoots: fixture })).rejects.toBeInstanceOf(
+      CatalogValidationError,
+    );
   });
 });

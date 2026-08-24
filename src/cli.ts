@@ -1,6 +1,8 @@
 import { Command } from "commander";
+import { stat } from "node:fs/promises";
 import { resolve } from "node:path";
-import { listBoilerplates } from "./catalog.js";
+import { assertValidCatalog, formatCatalogError, loadCatalogSnapshot } from "./catalog-snapshot.js";
+import { runListBoilerplates } from "./list-boilerplates-command.js";
 import { scaffold } from "./scaffold.js";
 import { parseAgents, type AgentId } from "./agents.js";
 import { scanCatalog } from "./catalog-scan.js";
@@ -9,7 +11,7 @@ import { promoteSkill, parsePromoteTarget } from "./promote.js";
 import { syncSkills } from "./sync-skills.js";
 import { syncUpstreamSkills } from "./upstream-sync.js";
 import { buildRegistryFromCatalog, saveRegistry } from "./registry.js";
-import { defaultRegistryPath, defaultSharedWorkflowsDir } from "./paths.js";
+import { defaultRegistryPath } from "./paths.js";
 import { getBoilerplate } from "./catalog.js";
 import {
   GitHubSkillSource,
@@ -26,6 +28,10 @@ import { DEFAULT_PLUGIN_DIRNAME } from "./plugin.js";
 
 const program = new Command();
 
+function reportError(error: unknown): void {
+  for (const line of formatCatalogError(error)) console.error(line);
+}
+
 program
   .name("bwai-cli")
   .description(
@@ -39,20 +45,12 @@ program
   .alias("list")
   .description("List available boilerplates in the catalog.")
   .action(async () => {
-    const boilerplates = await listBoilerplates();
-    if (boilerplates.length === 0) {
-      console.log("No boilerplates found.");
-      return;
-    }
-    for (const b of boilerplates) {
-      console.log(`${b.manifest.name}  (${b.manifest.stack})`);
-      console.log(`  ${b.manifest.description}`);
-      console.log(`  skills: ${b.manifest.skills.map((s) => s.name).join(", ") || "(none)"}`);
-      if (b.manifest.workflow) {
-        console.log(`  workflow: ${b.manifest.workflow.source}:${b.manifest.workflow.name}`);
-      }
-      console.log(`  default agents: ${b.manifest.defaultAgents.join(", ")}`);
-    }
+    const exitCode = await runListBoilerplates({
+      loadSnapshot: () => loadCatalogSnapshot(),
+      stdout: (line) => console.log(line),
+      stderr: (line) => console.error(line),
+    });
+    if (exitCode !== 0) process.exitCode = exitCode;
   });
 
 program
@@ -123,31 +121,16 @@ program
   .command("list-workflows")
   .description("List GetSuperpower workflow bundles shipped with bwai-cli.")
   .action(async () => {
-    const { readdir, readFile } = await import("node:fs/promises");
-    const { join } = await import("node:path");
-    const workflowsDir = defaultSharedWorkflowsDir();
-    let entries: import("node:fs").Dirent[];
-    try {
-      entries = await readdir(workflowsDir, { withFileTypes: true });
-    } catch {
+    const snapshot = await loadCatalogSnapshot();
+    assertValidCatalog(snapshot);
+    const workflows = snapshot.workflows.filter((workflow) => workflow.scope === "shared");
+    if (workflows.length === 0) {
       console.log("No workflows found.");
       return;
     }
-    const dirs = entries.filter((e) => e.isDirectory()).map((e) => e.name);
-    if (dirs.length === 0) {
-      console.log("No workflows found.");
-      return;
-    }
-    for (const name of dirs) {
-      const workflowJson = join(workflowsDir, name, "workflow.json");
-      try {
-        const raw = await readFile(workflowJson, "utf8");
-        const parsed = JSON.parse(raw) as { description?: string; version?: string };
-        console.log(`${name}  (v${parsed.version ?? "?"})`);
-        if (parsed.description) console.log(`  ${parsed.description}`);
-      } catch {
-        console.log(`${name}  (invalid or missing workflow.json)`);
-      }
+    for (const workflow of workflows) {
+      console.log(`${workflow.name}  (v${workflow.manifest.version})`);
+      console.log(`  ${workflow.manifest.description}`);
     }
   });
 
@@ -170,12 +153,16 @@ program
     try {
       let outDir = out;
       if (!outDir) {
-        const { listBoilerplates } = await import("./catalog.js");
-        const names = (await listBoilerplates()).map((b) => b.manifest.name);
-        if (names.includes(source)) {
-          outDir = resolve(process.cwd(), `bwai.${source}`);
-        } else {
+        const projectDir = resolve(process.cwd(), source);
+        try {
+          await stat(projectDir);
           outDir = resolve(process.cwd(), source, DEFAULT_PLUGIN_DIRNAME);
+        } catch {
+          const { listBoilerplates } = await import("./catalog.js");
+          const names = (await listBoilerplates()).map((b) => b.manifest.name);
+          outDir = names.includes(source)
+            ? resolve(process.cwd(), `bwai.${source}`)
+            : resolve(process.cwd(), source, DEFAULT_PLUGIN_DIRNAME);
         }
       } else {
         outDir = resolve(process.cwd(), outDir);
@@ -196,7 +183,7 @@ program
         console.log(`Copilot settings: ${result.copilotSettingsPath}`);
       }
     } catch (error) {
-      console.error(error instanceof Error ? error.message : error);
+      reportError(error);
       process.exitCode = 1;
     }
   });
@@ -269,7 +256,7 @@ program
           console.log("Then run: $bwai-advisor  <your idea or @path/to/brief.md>");
         }
       } catch (error) {
-        console.error(error instanceof Error ? error.message : error);
+        reportError(error);
         process.exitCode = 1;
       }
     },
@@ -294,7 +281,7 @@ program
       console.log(`Passed: ${result.passed ? "yes" : "no"}`);
       if (!result.passed) process.exitCode = 1;
     } catch (error) {
-      console.error(error instanceof Error ? error.message : error);
+      reportError(error);
       process.exitCode = 1;
     }
   });
@@ -493,7 +480,7 @@ program
         console.log(`SHA-256: ${result.sha256}`);
         console.log(`Registry: ${result.registryPath}`);
       } catch (error) {
-        console.error(error instanceof Error ? error.message : error);
+        reportError(error);
         process.exitCode = 1;
       }
     },
@@ -519,7 +506,7 @@ program
         `Registry refreshed: ${result.registryPath} (${result.registrySkillCount} skills)`,
       );
     } catch (error) {
-      console.error(error instanceof Error ? error.message : error);
+      reportError(error);
       process.exitCode = 1;
     }
   });
@@ -567,7 +554,7 @@ program
         }
         if (result.entries.some((e) => e.status === "failed")) process.exitCode = 1;
       } catch (error) {
-        console.error(error instanceof Error ? error.message : error);
+        reportError(error);
         process.exitCode = 1;
       }
     },
@@ -582,13 +569,12 @@ program
       await saveRegistry(index, defaultRegistryPath());
       console.log(`Registry refreshed: ${defaultRegistryPath()} (${index.skills.length} skills)`);
     } catch (error) {
-      console.error(error instanceof Error ? error.message : error);
+      reportError(error);
       process.exitCode = 1;
     }
   });
 
 program.parseAsync(process.argv).catch((error: unknown) => {
-  const message = error instanceof Error ? error.message : String(error);
-  console.error(`Error: ${message}`);
+  reportError(error);
   process.exitCode = 1;
 });

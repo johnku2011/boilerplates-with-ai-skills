@@ -1,7 +1,121 @@
 {
-  "indexVersion": 1,
-  "updatedAt": "2026-08-10T03:04:01.782Z",
+  "indexVersion": 2,
+  "updatedAt": "2026-08-24T06:11:56.387Z",
   "skills": [
+    {
+      "name": "express-api-design",
+      "catalogLocation": "local",
+      "catalogPath": "boilerplates/express-api/skills/express-api-design",
+      "description": "Use when adding or changing routes, middleware, or error handling in this Express.js API, to keep endpoints consistent, validated, and testable.",
+      "promotedAt": "2026-07-05T03:00:00.000Z",
+      "sha256": "843c10d094c1d26ae3820f360cbde519a1dbe5016b9c364067132e39de3af5d9",
+      "scan": {
+        "status": "passed",
+        "riskScore": 0,
+        "scannedAt": "2026-07-05T02:45:00.000Z",
+        "threshold": 30
+      },
+      "bundleAll": false,
+      "bundledIn": [
+        "express-api"
+      ],
+      "id": "boilerplate:express-api/skills/express-api-design"
+    },
+    {
+      "name": "fastify-api-design",
+      "catalogLocation": "local",
+      "catalogPath": "boilerplates/fastify-api/skills/fastify-api-design",
+      "description": "Use when adding or changing routes, schemas, or plugins in this Fastify API — keep endpoints validated, typed, and testable.",
+      "promotedAt": "2026-07-05T07:17:52.632Z",
+      "sha256": "7eccae8f243e123544d0309df5c8d18ddeef53757343c30af8c206da94a74c25",
+      "scan": {
+        "status": "pending",
+        "riskScore": null,
+        "scannedAt": null,
+        "threshold": 30
+      },
+      "bundleAll": false,
+      "bundledIn": [
+        "fastify-api"
+      ],
+      "id": "boilerplate:fastify-api/skills/fastify-api-design"
+    },
+    {
+      "name": "nextjs-ai-sdk",
+      "catalogLocation": "local",
+      "catalogPath": "boilerplates/nextjs-ai-app/skills/nextjs-ai-sdk",
+      "description": "Use when adding chat routes, LLM tools, structured outputs, or streaming UI with the Vercel AI SDK in this Next.js AI app.",
+      "promotedAt": "2026-07-16T09:48:00.000Z",
+      "sha256": "c7676103215e1ebccb25880461d5c9dae5fecee53b1abe35dfbe7a16d81523a4",
+      "scan": {
+        "status": "pending",
+        "riskScore": null,
+        "scannedAt": null,
+        "threshold": 30
+      },
+      "bundleAll": false,
+      "bundledIn": [
+        "nextjs-ai-app"
+      ],
+      "id": "boilerplate:nextjs-ai-app/skills/nextjs-ai-sdk"
+    },
+    {
+      "name": "nextjs-app-router",
+      "catalogLocation": "local",
+      "catalogPath": "boilerplates/nextjs-app/skills/nextjs-app-router",
+      "description": "Use when adding pages, layouts, route handlers, or data fetching in this Next.js App Router project, to follow server-first conventions correctly.",
+      "promotedAt": "2026-07-05T03:00:00.000Z",
+      "sha256": "766cefae14cb11b9e936c4447226d6fffac8b57e033afcea6dd73fc428656391",
+      "scan": {
+        "status": "passed",
+        "riskScore": 0,
+        "scannedAt": "2026-07-05T02:45:00.000Z",
+        "threshold": 30
+      },
+      "bundleAll": false,
+      "bundledIn": [
+        "nextjs-app"
+      ],
+      "id": "boilerplate:nextjs-app/skills/nextjs-app-router"
+    },
+    {
+      "name": "python-api-design",
+      "catalogLocation": "local",
+      "catalogPath": "boilerplates/python-service/skills/python-api-design",
+      "description": "Use when adding or changing FastAPI routes, dependencies, or tests in this Python service — keep endpoints typed, validated, and covered by pytest.",
+      "promotedAt": "2026-07-05T07:17:52.632Z",
+      "sha256": "0290156bf22870208ea54dd861fcf3b0fa8a6dee5d83c9e2475fd7eb418b3b1a",
+      "scan": {
+        "status": "pending",
+        "riskScore": null,
+        "scannedAt": null,
+        "threshold": 30
+      },
+      "bundleAll": false,
+      "bundledIn": [
+        "python-service"
+      ],
+      "id": "boilerplate:python-service/skills/python-api-design"
+    },
+    {
+      "name": "react-native-development",
+      "catalogLocation": "local",
+      "catalogPath": "boilerplates/react-native-app/skills/react-native-development",
+      "description": "Use when building screens, navigation, styling, or platform behavior in this Expo React Native app, to follow mobile-first conventions and keep logic testable.",
+      "promotedAt": "2026-07-05T03:00:00.000Z",
+      "sha256": "384107428604c954a4c132d4b4959a80653662f7ee7cc5354fa343c3b46046aa",
+      "scan": {
+        "status": "passed",
+        "riskScore": 0,
+        "scannedAt": "2026-07-05T02:45:00.000Z",
+        "threshold": 30
+      },
+      "bundleAll": false,
+      "bundledIn": [
+        "react-native-app"
+      ],
+      "id": "boilerplate:react-native-app/skills/react-native-development"
+    },
     {
       "name": "bwai-advisor",
       "catalogLocation": "shared",
@@ -16,7 +130,8 @@
         "threshold": 30
       },
       "bundleAll": false,
-      "bundledIn": []
+      "bundledIn": [],
+      "id": "shared:bwai-advisor"
     },
     {
       "name": "code-review",
@@ -42,7 +157,8 @@
         "nextjs-app",
         "node-service",
         "python-service"
-      ]
+      ],
+      "id": "shared:code-review"
     },
     {
       "name": "cto",
@@ -71,7 +187,8 @@
         "node-service",
         "python-service",
         "react-native-app"
-      ]
+      ],
+      "id": "shared:cto"
     },
     {
       "name": "deploy-vercel",
@@ -91,43 +208,8 @@
         "express-api",
         "nextjs-ai-app",
         "nextjs-app"
-      ]
-    },
-    {
-      "name": "express-api-design",
-      "catalogLocation": "local",
-      "catalogPath": "boilerplates/express-api/skills/express-api-design",
-      "description": "Use when adding or changing routes, middleware, or error handling in this Express.js API, to keep endpoints consistent, validated, and testable.",
-      "promotedAt": "2026-07-05T03:00:00.000Z",
-      "sha256": "843c10d094c1d26ae3820f360cbde519a1dbe5016b9c364067132e39de3af5d9",
-      "scan": {
-        "status": "passed",
-        "riskScore": 0,
-        "scannedAt": "2026-07-05T02:45:00.000Z",
-        "threshold": 30
-      },
-      "bundleAll": false,
-      "bundledIn": [
-        "express-api"
-      ]
-    },
-    {
-      "name": "fastify-api-design",
-      "catalogLocation": "local",
-      "catalogPath": "boilerplates/fastify-api/skills/fastify-api-design",
-      "description": "Use when adding or changing routes, schemas, or plugins in this Fastify API — keep endpoints validated, typed, and testable.",
-      "promotedAt": "2026-07-05T07:17:52.632Z",
-      "sha256": "7eccae8f243e123544d0309df5c8d18ddeef53757343c30af8c206da94a74c25",
-      "scan": {
-        "status": "pending",
-        "riskScore": null,
-        "scannedAt": null,
-        "threshold": 30
-      },
-      "bundleAll": false,
-      "bundledIn": [
-        "fastify-api"
-      ]
+      ],
+      "id": "shared:deploy-vercel"
     },
     {
       "name": "founding-engineer",
@@ -156,43 +238,8 @@
         "node-service",
         "python-service",
         "react-native-app"
-      ]
-    },
-    {
-      "name": "nextjs-ai-sdk",
-      "catalogLocation": "local",
-      "catalogPath": "boilerplates/nextjs-ai-app/skills/nextjs-ai-sdk",
-      "description": "Use when adding chat routes, LLM tools, structured outputs, or streaming UI with the Vercel AI SDK in this Next.js AI app.",
-      "promotedAt": "2026-07-16T09:48:00.000Z",
-      "sha256": "c7676103215e1ebccb25880461d5c9dae5fecee53b1abe35dfbe7a16d81523a4",
-      "scan": {
-        "status": "pending",
-        "riskScore": null,
-        "scannedAt": null,
-        "threshold": 30
-      },
-      "bundleAll": false,
-      "bundledIn": [
-        "nextjs-ai-app"
-      ]
-    },
-    {
-      "name": "nextjs-app-router",
-      "catalogLocation": "local",
-      "catalogPath": "boilerplates/nextjs-app/skills/nextjs-app-router",
-      "description": "Use when adding pages, layouts, route handlers, or data fetching in this Next.js App Router project, to follow server-first conventions correctly.",
-      "promotedAt": "2026-07-05T03:00:00.000Z",
-      "sha256": "766cefae14cb11b9e936c4447226d6fffac8b57e033afcea6dd73fc428656391",
-      "scan": {
-        "status": "passed",
-        "riskScore": 0,
-        "scannedAt": "2026-07-05T02:45:00.000Z",
-        "threshold": 30
-      },
-      "bundleAll": false,
-      "bundledIn": [
-        "nextjs-app"
-      ]
+      ],
+      "id": "shared:founding-engineer"
     },
     {
       "name": "product-manager",
@@ -221,7 +268,8 @@
         "node-service",
         "python-service",
         "react-native-app"
-      ]
+      ],
+      "id": "shared:product-manager"
     },
     {
       "name": "project-security",
@@ -245,25 +293,8 @@
         "node-service",
         "python-service",
         "react-native-app"
-      ]
-    },
-    {
-      "name": "python-api-design",
-      "catalogLocation": "local",
-      "catalogPath": "boilerplates/python-service/skills/python-api-design",
-      "description": "Use when adding or changing FastAPI routes, dependencies, or tests in this Python service — keep endpoints typed, validated, and covered by pytest.",
-      "promotedAt": "2026-07-05T07:17:52.632Z",
-      "sha256": "0290156bf22870208ea54dd861fcf3b0fa8a6dee5d83c9e2475fd7eb418b3b1a",
-      "scan": {
-        "status": "pending",
-        "riskScore": null,
-        "scannedAt": null,
-        "threshold": 30
-      },
-      "bundleAll": false,
-      "bundledIn": [
-        "python-service"
-      ]
+      ],
+      "id": "shared:project-security"
     },
     {
       "name": "qa-lead",
@@ -292,25 +323,8 @@
         "node-service",
         "python-service",
         "react-native-app"
-      ]
-    },
-    {
-      "name": "react-native-development",
-      "catalogLocation": "local",
-      "catalogPath": "boilerplates/react-native-app/skills/react-native-development",
-      "description": "Use when building screens, navigation, styling, or platform behavior in this Expo React Native app, to follow mobile-first conventions and keep logic testable.",
-      "promotedAt": "2026-07-05T03:00:00.000Z",
-      "sha256": "384107428604c954a4c132d4b4959a80653662f7ee7cc5354fa343c3b46046aa",
-      "scan": {
-        "status": "passed",
-        "riskScore": 0,
-        "scannedAt": "2026-07-05T02:45:00.000Z",
-        "threshold": 30
-      },
-      "bundleAll": false,
-      "bundledIn": [
-        "react-native-app"
-      ]
+      ],
+      "id": "shared:qa-lead"
     },
     {
       "name": "startup-goal",
@@ -339,7 +353,8 @@
         "node-service",
         "python-service",
         "react-native-app"
-      ]
+      ],
+      "id": "shared:startup-goal"
     },
     {
       "name": "test-driven-development",
@@ -366,7 +381,8 @@
         "node-service",
         "python-service",
         "react-native-app"
-      ]
+      ],
+      "id": "shared:test-driven-development"
     }
   ]
 }

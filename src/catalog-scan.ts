@@ -1,18 +1,23 @@
-import { readdir, stat, mkdir, writeFile } from "node:fs/promises";
+import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { listBoilerplates } from "./catalog.js";
-import { defaultBoilerplatesDir, defaultSharedSkillsDir, packageRoot } from "./paths.js";
+import { packageRoot } from "./paths.js";
 import { scanSkillDirectory, type SkillScanner, type ScanResult } from "./scan.js";
+import {
+  assertValidCatalog,
+  loadCatalogSnapshot,
+  type CatalogArtifactIdentity,
+  type CatalogRoots,
+} from "./catalog-snapshot.js";
 
 export interface CatalogSkillTarget {
-  id: string;
+  id: CatalogArtifactIdentity;
   label: string;
   dir: string;
 }
 
 export interface CatalogScanResult {
   name: string;
-  id: string;
+  id: CatalogArtifactIdentity;
   riskScore: number | null;
   status: "passed" | "failed" | "skipped";
   findings: number;
@@ -26,53 +31,20 @@ export interface CatalogScanReport {
   results: CatalogScanResult[];
 }
 
-async function isSkillDirectory(path: string): Promise<boolean> {
-  try {
-    return (await stat(path)).isDirectory() && (await stat(join(path, "SKILL.md"))).isFile();
-  } catch {
-    return false;
-  }
-}
-
 /** Discover every skill directory shipped in this catalog repo. */
 export async function listCatalogSkillTargets(
-  opts: { boilerplatesDir?: string; sharedSkillsDir?: string } = {},
+  opts: Partial<CatalogRoots> = {},
 ): Promise<CatalogSkillTarget[]> {
-  const sharedDir = opts.sharedSkillsDir ?? defaultSharedSkillsDir();
-  const boilerplatesDir = opts.boilerplatesDir ?? defaultBoilerplatesDir();
-  const targets: CatalogSkillTarget[] = [];
-
-  try {
-    for (const name of (await readdir(sharedDir)).sort()) {
-      const dir = join(sharedDir, name);
-      if (await isSkillDirectory(dir)) {
-        targets.push({ id: `shared-${name}`, label: `shared/${name}`, dir });
-      }
-    }
-  } catch {
-    // no shared dir
-  }
-
-  for (const bp of await listBoilerplates(boilerplatesDir)) {
-    let entries: string[] = [];
-    try {
-      entries = await readdir(bp.skillsDir);
-    } catch {
-      continue;
-    }
-    for (const name of entries.sort()) {
-      const dir = join(bp.skillsDir, name);
-      if (await isSkillDirectory(dir)) {
-        targets.push({
-          id: `${bp.manifest.name}-${name}`,
-          label: `boilerplate/${bp.manifest.name}/${name}`,
-          dir,
-        });
-      }
-    }
-  }
-
-  return targets;
+  const snapshot = await loadCatalogSnapshot(opts);
+  assertValidCatalog(snapshot);
+  return snapshot.skills.map((skill) => ({
+    id: skill.id,
+    label:
+      skill.scope === "shared"
+        ? `shared/${skill.name}`
+        : `boilerplate/${skill.boilerplateName}/${skill.name}`,
+    dir: skill.dir,
+  }));
 }
 
 function safeReportBasename(id: string): string {
@@ -87,6 +59,7 @@ export interface ScanCatalogOptions {
   reportsDir?: string;
   boilerplatesDir?: string;
   sharedSkillsDir?: string;
+  sharedWorkflowsDir?: string;
 }
 
 export async function scanCatalog(options: ScanCatalogOptions): Promise<CatalogScanReport> {

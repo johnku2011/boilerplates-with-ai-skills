@@ -4,8 +4,9 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { spawn } from "node:child_process";
 import { syncUpstreamSkills } from "../src/upstream-sync.js";
-import { saveRegistry } from "../src/registry.js";
+import { loadRegistry, saveRegistry } from "../src/registry.js";
 import type { SkillScanner } from "../src/scan.js";
+import { createCatalogFixture, type CatalogFixture } from "./catalog-fixture.js";
 
 function fakeScanner(risk = 0): SkillScanner {
   return {
@@ -42,32 +43,35 @@ describe("syncUpstreamSkills", () => {
   let upstreamRepo: string;
   let sharedDir: string;
   let registryPath: string;
+  let catalogRoots: CatalogFixture;
 
   beforeEach(async () => {
     root = await mkdtemp(join(tmpdir(), "bwai-upstream-"));
     upstreamRepo = join(root, "upstream.git");
-    sharedDir = join(root, "shared", "skills");
+    catalogRoots = await createCatalogFixture(join(root, "catalog"));
+    sharedDir = catalogRoots.sharedSkillsDir;
     registryPath = join(root, "registry.json");
 
     await mkdir(join(upstreamRepo, "skills", "demo-skill"), { recursive: true });
     await writeFile(
       join(upstreamRepo, "skills", "demo-skill", "SKILL.md"),
-      "---\nname: demo-skill\ndescription: upstream\n---\n\n# Upstream v2\n",
+      "---\nname: demo-skill\ndescription: Use when testing upstream skill synchronization behavior.\nlicense: MIT\n---\n\n# Upstream v2\n",
     );
     await initGitRepo(upstreamRepo);
 
     await mkdir(join(sharedDir, "demo-skill"), { recursive: true });
     await writeFile(
       join(sharedDir, "demo-skill", "SKILL.md"),
-      "---\nname: demo-skill\ndescription: local\n---\n\n# Local v1\n",
+      "---\nname: demo-skill\ndescription: Use when testing local skill synchronization behavior.\nlicense: MIT\n---\n\n# Local v1\n",
     );
 
     await saveRegistry(
       {
-        indexVersion: 1,
+        indexVersion: 2,
         updatedAt: new Date().toISOString(),
         skills: [
           {
+            id: "shared:demo-skill",
             name: "demo-skill",
             catalogLocation: "shared",
             catalogPath: "shared/skills/demo-skill",
@@ -94,7 +98,7 @@ describe("syncUpstreamSkills", () => {
   it("reports drift without --apply", async () => {
     const result = await syncUpstreamSkills({
       registryPath,
-      sharedSkillsDir: sharedDir,
+      catalogRoots,
       scanner: fakeScanner(),
     });
     expect(result.entries).toHaveLength(1);
@@ -106,12 +110,34 @@ describe("syncUpstreamSkills", () => {
   it("applies upstream content when --apply and scan passes", async () => {
     const result = await syncUpstreamSkills({
       registryPath,
-      sharedSkillsDir: sharedDir,
+      catalogRoots,
       scanner: fakeScanner(0),
       apply: true,
     });
     expect(result.entries[0]?.status).toBe("updated");
     const content = await readFile(join(sharedDir, "demo-skill", "SKILL.md"), "utf8");
     expect(content).toContain("Upstream v2");
+  });
+
+  it("resolves --skill names only among shared canonical identities", async () => {
+    const index = await loadRegistry(registryPath);
+    index.skills.unshift({
+      ...index.skills[0]!,
+      id: "boilerplate:demo/skills/demo-skill",
+      catalogLocation: "local",
+      catalogPath: "boilerplates/demo/skills/demo-skill",
+      bundledIn: ["demo"],
+    });
+    await saveRegistry(index, registryPath);
+
+    const result = await syncUpstreamSkills({
+      registryPath,
+      catalogRoots,
+      scanner: fakeScanner(),
+      skillName: "demo-skill",
+    });
+
+    expect(result.entries).toHaveLength(1);
+    expect(result.entries[0]?.status).toBe("drift");
   });
 });

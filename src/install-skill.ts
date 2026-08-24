@@ -1,9 +1,14 @@
-import { cp, mkdir, readdir, stat } from "node:fs/promises";
+import { cp, mkdir } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import type { AgentId } from "./agents.js";
-import { defaultSharedSkillsDir } from "./paths.js";
-import { assertSkillExists } from "./skills.js";
+import {
+  assertValidCatalog,
+  catalogRootsFromOptions,
+  loadCatalogSnapshot,
+  type CatalogRoots,
+  type CatalogSnapshot,
+} from "./catalog-snapshot.js";
 
 /** Global install roots (under the user's home directory). */
 export const GLOBAL_AGENT_TARGETS: Record<AgentId, string> = {
@@ -27,6 +32,7 @@ export interface InstallSkillOptions {
   /** Also install SKILL_DEPENDENCIES for this skill. Default true for CLI. */
   withDeps?: boolean;
   sharedSkillsDir?: string;
+  catalogRoots?: Partial<CatalogRoots>;
 }
 
 export interface InstalledSkillPath {
@@ -39,26 +45,26 @@ export interface InstallSkillResult {
   installed: InstalledSkillPath[];
 }
 
+export interface InstallableSkillOptions {
+  sharedSkillsDir?: string;
+  catalogRoots?: Partial<CatalogRoots>;
+}
+
+async function loadInstallCatalog(options: InstallableSkillOptions = {}): Promise<CatalogSnapshot> {
+  const snapshot = await loadCatalogSnapshot(catalogRootsFromOptions(options));
+  assertValidCatalog(snapshot);
+  return snapshot;
+}
+
 export async function listInstallableSkills(
-  sharedSkillsDir: string = defaultSharedSkillsDir(),
+  options: InstallableSkillOptions | string = {},
 ): Promise<string[]> {
-  let entries: import("node:fs").Dirent[];
-  try {
-    entries = await readdir(sharedSkillsDir, { withFileTypes: true });
-  } catch {
-    return [];
-  }
-  const names: string[] = [];
-  for (const entry of entries) {
-    if (!entry.isDirectory()) continue;
-    try {
-      await stat(join(sharedSkillsDir, entry.name, "SKILL.md"));
-      names.push(entry.name);
-    } catch {
-      // skip non-skill dirs
-    }
-  }
-  return names.sort();
+  const normalized = typeof options === "string" ? { sharedSkillsDir: options } : options;
+  const snapshot = await loadInstallCatalog(normalized);
+  return snapshot.skills
+    .filter((skill) => skill.scope === "shared")
+    .map((skill) => skill.name)
+    .sort();
 }
 
 async function copySkillToAgents(
@@ -87,10 +93,11 @@ async function copySkillToAgents(
  * Install a shared catalog skill into the user's global agent skill directories.
  */
 export async function installSkill(opts: InstallSkillOptions): Promise<InstallSkillResult> {
-  const sharedDir = opts.sharedSkillsDir ?? defaultSharedSkillsDir();
   const homeDir = opts.homeDir ?? homedir();
   const withDeps = opts.withDeps ?? true;
-  const available = await listInstallableSkills(sharedDir);
+  const snapshot = await loadInstallCatalog(opts);
+  const sharedSkills = snapshot.skills.filter((skill) => skill.scope === "shared");
+  const available = sharedSkills.map((skill) => skill.name).sort();
 
   if (!available.includes(opts.skillName)) {
     throw new Error(
@@ -107,9 +114,9 @@ export async function installSkill(opts: InstallSkillOptions): Promise<InstallSk
 
   const installed: InstalledSkillPath[] = [];
   for (const name of toInstall) {
-    const sourceDir = join(sharedDir, name);
-    await assertSkillExists(sourceDir, name);
-    installed.push(...(await copySkillToAgents(name, sourceDir, opts.agents, homeDir)));
+    const skill = sharedSkills.find((entry) => entry.name === name);
+    if (!skill) throw new Error(`Missing companion skill in catalog: ${name}`);
+    installed.push(...(await copySkillToAgents(name, skill.dir, opts.agents, homeDir)));
   }
 
   return { installed };

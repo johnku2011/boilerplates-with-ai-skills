@@ -1,5 +1,21 @@
 export { listBoilerplates, getBoilerplate } from "./catalog.js";
 export type { Boilerplate } from "./catalog.js";
+export {
+  assertValidCatalog,
+  CatalogValidationError,
+  loadCatalogSnapshot,
+} from "./catalog-snapshot.js";
+export type {
+  CatalogArtifactIdentity,
+  CatalogArtifactRecord,
+  CatalogBoilerplate,
+  CatalogDiagnostic,
+  CatalogDiagnosticCode,
+  CatalogRoots,
+  CatalogSkill,
+  CatalogSnapshot,
+  CatalogWorkflow,
+} from "./catalog-snapshot.js";
 export { scaffold } from "./scaffold.js";
 export type { ScaffoldOptions, ScaffoldResult } from "./scaffold.js";
 export { scanProject, SkillSpectorScanner } from "./scan.js";

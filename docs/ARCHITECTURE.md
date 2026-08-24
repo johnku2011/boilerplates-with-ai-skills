@@ -53,6 +53,30 @@ app/
 
 Omit `workflow` for boilerplates that only need skills (e.g. `react-native-app` today).
 
+## Catalog snapshot
+
+Every catalog reader loads one immutable snapshot of boilerplates, skills, and workflows. The
+snapshot assigns scope-qualified identities, validates metadata and relationships, and accumulates
+diagnostics before strict commands perform work. This keeps discovery, reference resolution, and
+identity rules inside one module instead of reconstructing them in each command.
+
+Artifact identities encode scope explicitly:
+
+- Shared skill: `shared:code-review`
+- Boilerplate-local skill: `boilerplate:nextjs-app/skills/nextjs-app-router`
+- Shared workflow: `shared:workflows/bwai-delivery`
+- Boilerplate-local workflow: `boilerplate:<boilerplate>/workflow/<workflow>`
+
+Validation covers manifests and metadata, required templates, declared skill and workflow
+references, undeclared local skills, duplicate declarations and identities, and install-name
+collisions. `list-boilerplates` prints valid entries plus diagnostics and exits non-zero for an
+invalid catalog. SkillSpector and runnable-template checks remain separate gates.
+
+`registry/skills-index.json` uses index version 2 and stores the canonical skill identity in each
+entry. Version 1 registries remain readable: `loadRegistry` migrates them in memory, deriving shared
+IDs from the skill name and local IDs from their scope-qualified catalog path. Registry writes always
+emit version 2.
+
 ## CLI source layout
 
 ```

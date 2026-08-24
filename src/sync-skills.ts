@@ -1,9 +1,14 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { listBoilerplates } from "./catalog.js";
+import {
+  assertValidCatalog,
+  catalogRootsFromOptions,
+  loadCatalogSnapshot,
+  type CatalogRoots,
+} from "./catalog-snapshot.js";
 import {
   buildRegistryFromCatalog,
-  loadRegistry,
+  loadRegistryIfExists,
   saveRegistry,
   type RegistrySkill,
   type SkillsIndex,
@@ -14,6 +19,9 @@ import type { BoilerplateManifest } from "./schema.js";
 export interface SyncSkillsOptions {
   registryPath?: string;
   boilerplatesDir?: string;
+  sharedSkillsDir?: string;
+  sharedWorkflowsDir?: string;
+  catalogRoots?: Partial<CatalogRoots>;
   dryRun?: boolean;
 }
 
@@ -24,7 +32,10 @@ export interface SyncSkillsResult {
   dryRun: boolean;
 }
 
-function manifestHasSkill(manifest: BoilerplateManifest, skillName: string): boolean {
+function manifestHasSkill(
+  manifest: { readonly skills: readonly { readonly name: string }[] },
+  skillName: string,
+): boolean {
   return manifest.skills.some((s) => s.name === skillName);
 }
 
@@ -36,17 +47,16 @@ function skillsToBundle(skill: RegistrySkill, allBoilerplateNames: string[]): st
 
 export async function syncSkills(opts: SyncSkillsOptions = {}): Promise<SyncSkillsResult> {
   const registryPath = opts.registryPath ?? defaultRegistryPath();
-  const boilerplatesDir = opts.boilerplatesDir ?? defaultBoilerplatesDir();
   const dryRun = Boolean(opts.dryRun);
+  const catalogRoots = catalogRootsFromOptions(opts);
+  let snapshot = await loadCatalogSnapshot(catalogRoots);
+  assertValidCatalog(snapshot);
 
-  let index: SkillsIndex;
-  try {
-    index = await loadRegistry(registryPath);
-  } catch {
-    index = await buildRegistryFromCatalog({ registryPath });
-  }
+  const index: SkillsIndex =
+    (await loadRegistryIfExists(registryPath)) ??
+    (await buildRegistryFromCatalog({ registryPath, snapshot }));
 
-  const boilerplates = await listBoilerplates(boilerplatesDir);
+  const boilerplates = snapshot.boilerplates;
   const allNames = boilerplates.map((b) => b.manifest.name);
   const addedToBoilerplates: SyncSkillsResult["addedToBoilerplates"] = [];
 
@@ -71,7 +81,11 @@ export async function syncSkills(opts: SyncSkillsOptions = {}): Promise<SyncSkil
     }
   }
 
-  const rebuilt = await buildRegistryFromCatalog({ registryPath, existing: index });
+  if (!dryRun) {
+    snapshot = await loadCatalogSnapshot(catalogRoots);
+    assertValidCatalog(snapshot);
+  }
+  const rebuilt = await buildRegistryFromCatalog({ registryPath, existing: index, snapshot });
   if (!dryRun) {
     await saveRegistry(rebuilt, registryPath);
   }
@@ -89,9 +103,9 @@ export async function readBoilerplateManifest(
   boilerplateName: string,
   boilerplatesDir = defaultBoilerplatesDir(),
 ): Promise<BoilerplateManifest> {
-  const bp = (await listBoilerplates(boilerplatesDir)).find(
-    (b) => b.manifest.name === boilerplateName,
-  );
+  const snapshot = await loadCatalogSnapshot({ boilerplatesDir });
+  assertValidCatalog(snapshot);
+  const bp = snapshot.boilerplates.find((b) => b.manifest.name === boilerplateName);
   if (!bp) throw new Error(`Unknown boilerplate: ${boilerplateName}`);
   const raw = await readFile(join(bp.dir, "boilerplate.json"), "utf8");
   return JSON.parse(raw) as BoilerplateManifest;
