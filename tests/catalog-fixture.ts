@@ -59,3 +59,21 @@ export function boilerplateManifest(
     ...(workflow ? { workflow } : {}),
   };
 }
+
+export async function writeWorkflow(
+  dir: string,
+  name: string,
+  overrides: Record<string, unknown> = {},
+): Promise<void> {
+  await mkdir(dir, { recursive: true });
+  const manifest = {
+    schemaVersion: "0.1",
+    name,
+    version: "1.0.0",
+    description: `${name} test workflow`,
+    skills: [{ source: "./skills/demo" }],
+    steps: [{ id: "deliver", title: "Deliver", skill: "demo" }],
+    ...overrides,
+  };
+  await writeFile(join(dir, "workflow.json"), `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
+}
