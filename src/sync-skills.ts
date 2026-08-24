@@ -1,9 +1,14 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { assertValidCatalog, loadCatalogSnapshot, type CatalogRoots } from "./catalog-snapshot.js";
+import {
+  assertValidCatalog,
+  catalogRootsFromOptions,
+  loadCatalogSnapshot,
+  type CatalogRoots,
+} from "./catalog-snapshot.js";
 import {
   buildRegistryFromCatalog,
-  loadRegistry,
+  loadRegistryIfExists,
   saveRegistry,
   type RegistrySkill,
   type SkillsIndex,
@@ -27,7 +32,10 @@ export interface SyncSkillsResult {
   dryRun: boolean;
 }
 
-function manifestHasSkill(manifest: BoilerplateManifest, skillName: string): boolean {
+function manifestHasSkill(
+  manifest: { readonly skills: readonly { readonly name: string }[] },
+  skillName: string,
+): boolean {
   return manifest.skills.some((s) => s.name === skillName);
 }
 
@@ -40,21 +48,13 @@ function skillsToBundle(skill: RegistrySkill, allBoilerplateNames: string[]): st
 export async function syncSkills(opts: SyncSkillsOptions = {}): Promise<SyncSkillsResult> {
   const registryPath = opts.registryPath ?? defaultRegistryPath();
   const dryRun = Boolean(opts.dryRun);
-  const catalogRoots: Partial<CatalogRoots> = {
-    ...opts.catalogRoots,
-    ...(opts.boilerplatesDir ? { boilerplatesDir: opts.boilerplatesDir } : {}),
-    ...(opts.sharedSkillsDir ? { sharedSkillsDir: opts.sharedSkillsDir } : {}),
-    ...(opts.sharedWorkflowsDir ? { sharedWorkflowsDir: opts.sharedWorkflowsDir } : {}),
-  };
+  const catalogRoots = catalogRootsFromOptions(opts);
   let snapshot = await loadCatalogSnapshot(catalogRoots);
   assertValidCatalog(snapshot);
 
-  let index: SkillsIndex;
-  try {
-    index = await loadRegistry(registryPath);
-  } catch {
-    index = await buildRegistryFromCatalog({ registryPath, snapshot });
-  }
+  const index: SkillsIndex =
+    (await loadRegistryIfExists(registryPath)) ??
+    (await buildRegistryFromCatalog({ registryPath, snapshot }));
 
   const boilerplates = snapshot.boilerplates;
   const allNames = boilerplates.map((b) => b.manifest.name);

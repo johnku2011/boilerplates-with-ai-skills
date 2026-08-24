@@ -2,6 +2,7 @@ import { mkdir, readdir, readFile, stat } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import {
   assertValidCatalog,
+  catalogRootsFromOptions,
   loadCatalogSnapshot,
   type CatalogBoilerplate,
   type CatalogRoots,
@@ -161,10 +162,12 @@ async function exportFromProject(
 export async function exportPlugin(options: ExportPluginOptions): Promise<ExportPluginResult> {
   const outDir = resolve(options.outDir);
   const source = options.source;
-  const snapshot = await loadCatalogSnapshot({
-    ...options.catalogRoots,
-    ...(options.boilerplatesDir ? { boilerplatesDir: options.boilerplatesDir } : {}),
-  });
+  const projectDir = resolve(source);
+  if (await pathExists(projectDir)) {
+    await mkdir(outDir, { recursive: true });
+    return exportFromProject(projectDir, outDir, Boolean(options.writeCopilotSettings));
+  }
+  const snapshot = await loadCatalogSnapshot(catalogRootsFromOptions(options));
   assertValidCatalog(snapshot);
   const boilerplate = snapshot.boilerplates.find((entry) => entry.manifest.name === source);
   if (boilerplate) {
@@ -172,13 +175,5 @@ export async function exportPlugin(options: ExportPluginOptions): Promise<Export
     return exportFromBoilerplate(boilerplate, outDir);
   }
 
-  const projectDir = resolve(source);
-  if (!(await pathExists(projectDir))) {
-    throw new Error(
-      `Unknown source "${source}" — not a catalog boilerplate and path does not exist`,
-    );
-  }
-
-  await mkdir(outDir, { recursive: true });
-  return exportFromProject(projectDir, outDir, Boolean(options.writeCopilotSettings));
+  throw new Error(`Unknown source "${source}" — not a catalog boilerplate and path does not exist`);
 }

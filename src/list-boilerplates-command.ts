@@ -1,4 +1,9 @@
-import type { CatalogBoilerplate, CatalogSnapshot } from "./catalog-snapshot.js";
+import {
+  CatalogValidationError,
+  formatCatalogError,
+  type CatalogBoilerplate,
+  type CatalogSnapshot,
+} from "./catalog-snapshot.js";
 
 export interface ListBoilerplatesIo {
   loadSnapshot: () => Promise<CatalogSnapshot>;
@@ -22,8 +27,8 @@ export async function runListBoilerplates(io: ListBoilerplatesIo): Promise<0 | 1
   const snapshot = await io.loadSnapshot();
   if (snapshot.boilerplates.length === 0) io.stdout("No boilerplates found.");
   for (const boilerplate of snapshot.boilerplates) renderBoilerplate(boilerplate, io.stdout);
-  for (const diagnostic of snapshot.diagnostics) {
-    io.stderr(`${diagnostic.code} ${diagnostic.path}: ${diagnostic.message}`);
+  for (const line of formatCatalogError(new CatalogValidationError(snapshot.diagnostics))) {
+    io.stderr(line);
   }
   return snapshot.valid ? 0 : 1;
 }

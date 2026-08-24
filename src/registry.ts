@@ -69,15 +69,33 @@ export interface RegistryOptions {
 function migrateSkillId(skill: z.infer<typeof registrySkillV1Schema>): string {
   if (skill.catalogLocation === "shared") return `shared:${skill.name}`;
 
-  const pathMatch = skill.catalogPath.match(/^boilerplates[/\\]([^/\\]+)[/\\]skills[/\\]/);
-  const onlyBundledOwner = skill.bundledIn.length === 1 ? skill.bundledIn.at(0) : undefined;
-  const boilerplateName = pathMatch?.[1] ?? onlyBundledOwner;
-  if (!boilerplateName) {
+  const pathMatch = skill.catalogPath.match(
+    /^boilerplates[/\\]([^/\\]+)[/\\]skills[/\\]([^/\\]+)\/?$/,
+  );
+  if (pathMatch && pathMatch[2] !== skill.name) {
     throw new Error(
-      `Cannot migrate local registry skill "${skill.name}": catalogPath does not identify a boilerplate and bundledIn is ambiguous`,
+      `Cannot migrate local registry skill "${skill.name}": catalogPath name conflicts`,
     );
   }
+  const owners = new Set<string>([...(pathMatch?.[1] ? [pathMatch[1]] : []), ...skill.bundledIn]);
+  if (owners.size !== 1) {
+    throw new Error(
+      `Cannot migrate local registry skill "${skill.name}": ownership is conflicting or ambiguous`,
+    );
+  }
+  const [boilerplateName] = owners;
   return `boilerplate:${boilerplateName}/skills/${skill.name}`;
+}
+
+export async function loadRegistryIfExists(
+  registryPath = defaultRegistryPath(),
+): Promise<SkillsIndex | null> {
+  try {
+    return await loadRegistry(registryPath);
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") return null;
+    throw error;
+  }
 }
 
 function parseSkillDescription(skillMd: string): string | undefined {
@@ -95,7 +113,7 @@ export async function buildRegistryFromCatalog(
   } = {},
 ): Promise<SkillsIndex> {
   const registryPath = opts.registryPath ?? defaultRegistryPath();
-  const existing = opts.existing ?? (await loadRegistry(registryPath).catch(() => null));
+  const existing = opts.existing ?? (await loadRegistryIfExists(registryPath));
   const existingById = new Map(existing?.skills.map((skill) => [skill.id, skill]) ?? []);
   const defaultThreshold = opts.defaultThreshold ?? 30;
   const snapshot = opts.snapshot ?? (await loadCatalogSnapshot(opts.catalogRoots));

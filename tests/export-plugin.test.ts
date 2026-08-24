@@ -6,7 +6,12 @@ import { exportPlugin } from "../src/export-plugin.js";
 import { scaffold } from "../src/scaffold.js";
 import { validateAgentPlugin } from "../src/plugin.js";
 import { CatalogValidationError } from "../src/catalog-snapshot.js";
-import { boilerplateManifest, createCatalogFixture, writeBoilerplate } from "./catalog-fixture.js";
+import {
+  boilerplateManifest,
+  createCatalogFixture,
+  writeBoilerplate,
+  writeSkill,
+} from "./catalog-fixture.js";
 
 async function exists(path: string): Promise<boolean> {
   try {
@@ -79,5 +84,16 @@ describe("export-plugin", () => {
       exportPlugin({ source: "demo", outDir: out, catalogRoots: fixture }),
     ).rejects.toBeInstanceOf(CatalogValidationError);
     expect(await exists(out)).toBe(false);
+  });
+
+  it("exports an existing project without depending on catalog validity", async () => {
+    const fixture = await createCatalogFixture(join(dir, "invalid-catalog-for-project"));
+    await writeBoilerplate(fixture, "broken", boilerplateManifest("wrong"));
+    const project = join(dir, "standalone-project");
+    await writeSkill(join(project, ".bwai", "skills", "demo"), "demo");
+    const out = join(dir, "standalone-export");
+    const result = await exportPlugin({ source: project, outDir: out, catalogRoots: fixture });
+    expect(result.sourceKind).toBe("project");
+    expect(await exists(join(out, "skills", "demo", "SKILL.md"))).toBe(true);
   });
 });

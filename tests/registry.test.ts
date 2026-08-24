@@ -88,6 +88,35 @@ describe("registry", () => {
     expect(JSON.parse(await readFile(registryPath, "utf8")).indexVersion).toBe(2);
   });
 
+  it("rejects conflicting local ownership during version 1 migration", async () => {
+    await writeFile(
+      registryPath,
+      `${JSON.stringify({
+        indexVersion: 1,
+        updatedAt: "2026-01-01T00:00:00.000Z",
+        skills: [
+          {
+            name: "logger",
+            catalogLocation: "local",
+            catalogPath: "boilerplates/alpha/skills/logger",
+            promotedAt: "2026-01-01T00:00:00.000Z",
+            sha256: "abc",
+            scan: { status: "pending", riskScore: null, scannedAt: null, threshold: 30 },
+            bundledIn: ["beta"],
+          },
+        ],
+      })}\n`,
+      "utf8",
+    );
+    await expect(loadRegistry(registryPath)).rejects.toThrow(/conflicting|ambiguous/i);
+  });
+
+  it("does not ignore a malformed existing registry during rebuild", async () => {
+    await writeFile(registryPath, "{bad-json", "utf8");
+    await expect(buildRegistryFromCatalog({ registryPath })).rejects.toThrow();
+    expect(await readFile(registryPath, "utf8")).toBe("{bad-json");
+  });
+
   it("preserves same-named local skills under different canonical identities", async () => {
     const fixture = await createCatalogFixture(join(dir, "catalog"));
     for (const name of ["alpha", "beta"]) {

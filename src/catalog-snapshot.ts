@@ -19,6 +19,22 @@ export interface CatalogRoots {
   sharedWorkflowsDir: string;
 }
 
+export interface CatalogRootOptions {
+  catalogRoots?: Partial<CatalogRoots>;
+  boilerplatesDir?: string;
+  sharedSkillsDir?: string;
+  sharedWorkflowsDir?: string;
+}
+
+export function catalogRootsFromOptions(options: CatalogRootOptions): Partial<CatalogRoots> {
+  return {
+    ...options.catalogRoots,
+    ...(options.boilerplatesDir ? { boilerplatesDir: options.boilerplatesDir } : {}),
+    ...(options.sharedSkillsDir ? { sharedSkillsDir: options.sharedSkillsDir } : {}),
+    ...(options.sharedWorkflowsDir ? { sharedWorkflowsDir: options.sharedWorkflowsDir } : {}),
+  };
+}
+
 export type CatalogArtifactIdentity =
   | `boilerplate:${string}`
   | `shared:${string}`
@@ -56,6 +72,14 @@ export interface CatalogArtifactRecord {
   valid: boolean;
 }
 
+export type DeepReadonly<T> = T extends (...args: never[]) => unknown
+  ? T
+  : T extends readonly (infer Item)[]
+    ? readonly DeepReadonly<Item>[]
+    : T extends object
+      ? { readonly [Key in keyof T]: DeepReadonly<T[Key]> }
+      : T;
+
 export interface CatalogSkill {
   id: CatalogArtifactIdentity;
   name: string;
@@ -69,13 +93,13 @@ export interface CatalogWorkflow {
   name: string;
   scope: "shared" | "local";
   dir: string;
-  manifest: WorkflowManifest;
+  manifest: DeepReadonly<WorkflowManifest>;
   boilerplateName?: string;
 }
 
 export interface CatalogBoilerplate {
   id: CatalogArtifactIdentity;
-  manifest: BoilerplateManifest;
+  manifest: DeepReadonly<BoilerplateManifest>;
   dir: string;
   templateDir: string;
   skillsDir: string;
@@ -103,6 +127,15 @@ export class CatalogValidationError extends Error {
 export function assertValidCatalog(snapshot: CatalogSnapshot): void {
   const errors = snapshot.diagnostics.filter((diagnostic) => diagnostic.severity === "error");
   if (errors.length > 0) throw new CatalogValidationError(errors);
+}
+
+export function formatCatalogError(error: unknown): string[] {
+  if (error instanceof CatalogValidationError) {
+    return error.diagnostics.map(
+      (diagnostic) => `${diagnostic.code} ${diagnostic.path}: ${diagnostic.message}`,
+    );
+  }
+  return [error instanceof Error ? error.message : String(error)];
 }
 
 async function directoryNames(
@@ -190,6 +223,14 @@ async function loadWorkflow(
   }
 }
 
+function deepFreeze<T>(value: T): T {
+  if (value && typeof value === "object") {
+    for (const nested of Object.values(value as Record<string, unknown>)) deepFreeze(nested);
+    if (!Object.isFrozen(value)) Object.freeze(value);
+  }
+  return value;
+}
+
 function freezeSnapshot(snapshot: CatalogSnapshot): CatalogSnapshot {
   for (const item of snapshot.artifacts) Object.freeze(item);
   for (const item of snapshot.skills) Object.freeze(item);
@@ -205,7 +246,7 @@ function freezeSnapshot(snapshot: CatalogSnapshot): CatalogSnapshot {
   Object.freeze(snapshot.workflows);
   Object.freeze(snapshot.boilerplates);
   Object.freeze(snapshot.diagnostics);
-  return Object.freeze(snapshot);
+  return deepFreeze(snapshot);
 }
 
 export async function loadCatalogSnapshot(
@@ -238,6 +279,8 @@ export async function loadCatalogSnapshot(
 
   for (const directoryName of await directoryNames(roots.boilerplatesDir, diagnostics)) {
     const dir = join(roots.boilerplatesDir, directoryName);
+    const localSkillNames = await directoryNames(join(dir, "skills"), diagnostics, false);
+    const localWorkflowNames = await directoryNames(join(dir, "workflow"), diagnostics, false);
     try {
       const raw = await readFile(join(dir, "boilerplate.json"), "utf8");
       const manifest = boilerplateManifestSchema.parse(JSON.parse(raw));
@@ -270,7 +313,7 @@ export async function loadCatalogSnapshot(
         });
       }
 
-      for (const name of await directoryNames(join(dir, "skills"), diagnostics, false)) {
+      for (const name of localSkillNames) {
         const skillDir = join(dir, "skills", name);
         const loaded = await loadSkill(
           skillDir,
@@ -283,7 +326,7 @@ export async function loadCatalogSnapshot(
         artifacts.push(loaded.artifact);
       }
 
-      for (const name of await directoryNames(join(dir, "workflow"), diagnostics, false)) {
+      for (const name of localWorkflowNames) {
         const workflowDir = join(dir, "workflow", name);
         const loaded = await loadWorkflow(
           workflowDir,
@@ -306,6 +349,28 @@ export async function loadCatalogSnapshot(
       });
       artifacts.push({ kind: "boilerplate", path: dir, identity: id, valid });
     } catch (error) {
+      for (const name of localSkillNames) {
+        const loaded = await loadSkill(
+          join(dir, "skills", name),
+          `boilerplate:${directoryName}/skills/${name}`,
+          "local",
+          diagnostics,
+          directoryName,
+        );
+        loaded.artifact.valid = false;
+        artifacts.push(loaded.artifact);
+      }
+      for (const name of localWorkflowNames) {
+        const loaded = await loadWorkflow(
+          join(dir, "workflow", name),
+          `boilerplate:${directoryName}/workflow/${name}`,
+          "local",
+          diagnostics,
+          directoryName,
+        );
+        loaded.artifact.valid = false;
+        artifacts.push(loaded.artifact);
+      }
       diagnostics.push({
         code: "INVALID_BOILERPLATE_MANIFEST",
         severity: "error",
@@ -343,6 +408,7 @@ export async function loadCatalogSnapshot(
   const workflowsById = new Map(workflows.map((workflow) => [workflow.id, workflow]));
   const invalidBoilerplates = new Set<CatalogArtifactIdentity>(duplicateIds);
   const invalidSkills = new Set<CatalogArtifactIdentity>(duplicateIds);
+  const invalidWorkflows = new Set<CatalogArtifactIdentity>(duplicateIds);
 
   for (const boilerplate of discoveredBoilerplates) {
     const { manifest } = boilerplate;
@@ -424,7 +490,7 @@ export async function loadCatalogSnapshot(
         manifest.workflow.source === "shared"
           ? `shared:workflows/${manifest.workflow.name}`
           : `boilerplate:${manifest.name}/workflow/${manifest.workflow.name}`;
-      workflow = workflowsById.get(workflowId);
+      workflow = duplicateIds.has(workflowId) ? undefined : workflowsById.get(workflowId);
       if (!workflow) {
         invalidBoilerplates.add(boilerplate.id);
         diagnostics.push({
@@ -444,7 +510,9 @@ export async function loadCatalogSnapshot(
   for (const artifact of artifacts) {
     if (
       artifact.identity &&
-      (invalidBoilerplates.has(artifact.identity) || invalidSkills.has(artifact.identity))
+      (invalidBoilerplates.has(artifact.identity) ||
+        invalidSkills.has(artifact.identity) ||
+        invalidWorkflows.has(artifact.identity))
     ) {
       artifact.valid = false;
     }
@@ -456,14 +524,16 @@ export async function loadCatalogSnapshot(
       artifacts.some((artifact) => artifact.identity === boilerplate.id && artifact.valid),
   );
   const validSkills = skills.filter((skill) => !invalidSkills.has(skill.id));
+  const validWorkflows = workflows.filter((workflow) => !invalidWorkflows.has(workflow.id));
 
-  diagnostics.sort((a, b) => a.path.localeCompare(b.path) || a.code.localeCompare(b.code));
+  const compare = (left: string, right: string) => (left < right ? -1 : left > right ? 1 : 0);
+  diagnostics.sort((a, b) => compare(a.path, b.path) || compare(a.code, b.code));
   return freezeSnapshot({
     roots,
     artifacts,
     boilerplates,
     skills: validSkills,
-    workflows,
+    workflows: validWorkflows,
     diagnostics,
     valid: diagnostics.every((diagnostic) => diagnostic.severity !== "error"),
   });

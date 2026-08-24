@@ -3,13 +3,14 @@ import { join, resolve } from "node:path";
 import { spawn } from "node:child_process";
 import {
   assertValidCatalog,
+  catalogRootsFromOptions,
   loadCatalogSnapshot,
   type CatalogBoilerplate,
   type CatalogRoots,
 } from "./catalog-snapshot.js";
 import {
   buildRegistryFromCatalog,
-  loadRegistry,
+  loadRegistryIfExists,
   saveRegistry,
   type RegistrySkill,
   type SkillsIndex,
@@ -120,12 +121,7 @@ export async function promoteSkill(opts: PromoteOptions): Promise<PromoteResult>
   const threshold = opts.threshold ?? 30;
   const target = opts.target ?? { kind: "shared" };
   const registryPath = opts.registryPath ?? defaultRegistryPath();
-  const snapshot = await loadCatalogSnapshot({
-    ...opts.catalogRoots,
-    ...(opts.boilerplatesDir ? { boilerplatesDir: opts.boilerplatesDir } : {}),
-    ...(opts.sharedSkillsDir ? { sharedSkillsDir: opts.sharedSkillsDir } : {}),
-    ...(opts.sharedWorkflowsDir ? { sharedWorkflowsDir: opts.sharedWorkflowsDir } : {}),
-  });
+  const snapshot = await loadCatalogSnapshot(catalogRootsFromOptions(opts));
   assertValidCatalog(snapshot);
 
   let targetBoilerplate: CatalogBoilerplate | undefined;
@@ -176,12 +172,9 @@ export async function promoteSkill(opts: PromoteOptions): Promise<PromoteResult>
         await addSkillToBoilerplateManifest(targetBoilerplate!, opts.skillName);
       }
 
-      let index: SkillsIndex;
-      try {
-        index = await loadRegistry(registryPath);
-      } catch {
-        index = await buildRegistryFromCatalog({ registryPath, snapshot });
-      }
+      const index: SkillsIndex =
+        (await loadRegistryIfExists(registryPath)) ??
+        (await buildRegistryFromCatalog({ registryPath, snapshot }));
 
       const now = new Date().toISOString();
       const catalogPath =

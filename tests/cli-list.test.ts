@@ -2,7 +2,11 @@ import { afterEach, describe, expect, it } from "vitest";
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { loadCatalogSnapshot } from "../src/catalog-snapshot.js";
+import {
+  CatalogValidationError,
+  formatCatalogError,
+  loadCatalogSnapshot,
+} from "../src/catalog-snapshot.js";
 import { runListBoilerplates } from "../src/list-boilerplates-command.js";
 import { boilerplateManifest, createCatalogFixture, writeBoilerplate } from "./catalog-fixture.js";
 
@@ -34,5 +38,20 @@ describe("runListBoilerplates", () => {
     expect(stdout.join("\n")).toContain("demo");
     expect(stderr.join("\n")).toContain("INVALID_BOILERPLATE_MANIFEST");
     expect(exitCode).toBe(1);
+  });
+
+  it("formats every diagnostic for strict command catches", async () => {
+    const root = await mkdtemp(join(tmpdir(), "bwai-cli-errors-"));
+    roots.push(root);
+    const fixture = await createCatalogFixture(root);
+    await writeBoilerplate(
+      fixture,
+      "demo",
+      boilerplateManifest("wrong", [{ name: "missing", source: "shared" }]),
+    );
+    const snapshot = await loadCatalogSnapshot(fixture);
+    expect(formatCatalogError(new CatalogValidationError(snapshot.diagnostics))).toEqual(
+      snapshot.diagnostics.map((d) => `${d.code} ${d.path}: ${d.message}`),
+    );
   });
 });

@@ -5,6 +5,7 @@ import { join } from "node:path";
 import {
   assertValidCatalog,
   CatalogValidationError,
+  formatCatalogError,
   loadCatalogSnapshot,
   type CatalogDiagnosticCode,
 } from "../src/catalog-snapshot.js";
@@ -47,6 +48,8 @@ describe("loadCatalogSnapshot", () => {
     );
     expect(Object.isFrozen(snapshot)).toBe(true);
     expect(Object.isFrozen(snapshot.skills)).toBe(true);
+    expect(Object.isFrozen(snapshot.boilerplates[0]?.manifest)).toBe(true);
+    expect(Object.isFrozen(snapshot.boilerplates[0]?.manifest.skills)).toBe(true);
   });
 
   it("retains malformed boilerplate discoveries and reports a diagnostic", async () => {
@@ -65,6 +68,22 @@ describe("loadCatalogSnapshot", () => {
     );
     expect(snapshot.diagnostics.map((diagnostic) => diagnostic.code)).toContain(
       "INVALID_BOILERPLATE_MANIFEST",
+    );
+  });
+
+  it("retains nested artifact records when the parent manifest is malformed", async () => {
+    const fixture = await createCatalogFixture(await newRoot());
+    const dir = join(fixture.boilerplatesDir, "broken");
+    await mkdir(join(dir, "skills", "logger"), { recursive: true });
+    await writeSkill(join(dir, "skills", "logger"), "logger");
+    await writeWorkflow(join(dir, "workflow", "delivery"), "delivery");
+    await writeFile(join(dir, "boilerplate.json"), "{not-json", "utf8");
+    const snapshot = await loadCatalogSnapshot(fixture);
+    expect(snapshot.artifacts).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ kind: "skill", path: join(dir, "skills", "logger") }),
+        expect.objectContaining({ kind: "workflow", path: join(dir, "workflow", "delivery") }),
+      ]),
     );
   });
 
@@ -222,6 +241,36 @@ describe("loadCatalogSnapshot", () => {
     );
   });
 
+  it("excludes duplicate workflow identities from valid collections", async () => {
+    const fixture = await createCatalogFixture(await newRoot());
+    for (const directoryName of ["alpha", "beta"]) {
+      const dir = await writeBoilerplate(
+        fixture,
+        directoryName,
+        boilerplateManifest("demo", [], { name: "delivery", source: "local" }),
+      );
+      await writeWorkflow(join(dir, "workflow", "delivery"), "delivery");
+    }
+    const snapshot = await loadCatalogSnapshot(fixture);
+    expect(snapshot.diagnostics.map((diagnostic) => diagnostic.code)).toContain(
+      "DUPLICATE_ARTIFACT_IDENTITY",
+    );
+    expect(snapshot.workflows).toHaveLength(0);
+  });
+
+  it("renders every structured diagnostic from a strict validation error", async () => {
+    const fixture = await createCatalogFixture(await newRoot());
+    await writeBoilerplate(
+      fixture,
+      "demo",
+      boilerplateManifest("wrong", [{ name: "missing", source: "shared" }]),
+    );
+    const snapshot = await loadCatalogSnapshot(fixture);
+    expect(formatCatalogError(new CatalogValidationError(snapshot.diagnostics))).toHaveLength(
+      snapshot.diagnostics.length,
+    );
+  });
+
   it("orders diagnostics by path and code and exposes all errors from the gate", async () => {
     const fixture = await createCatalogFixture(await newRoot());
     await writeBoilerplate(
@@ -233,8 +282,9 @@ describe("loadCatalogSnapshot", () => {
     await writeSkill(join(localDir, "skills", "orphan"), "orphan");
 
     const snapshot = await loadCatalogSnapshot(fixture);
+    const compare = (left: string, right: string) => (left < right ? -1 : left > right ? 1 : 0);
     const sorted = [...snapshot.diagnostics].sort(
-      (a, b) => a.path.localeCompare(b.path) || a.code.localeCompare(b.code),
+      (a, b) => compare(a.path, b.path) || compare(a.code, b.code),
     );
 
     expect(snapshot.diagnostics).toEqual(sorted);

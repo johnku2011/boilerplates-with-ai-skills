@@ -2,6 +2,7 @@ import { cp, mkdir, readdir, rename, readFile, stat, appendFile } from "node:fs/
 import { join, relative } from "node:path";
 import {
   assertValidCatalog,
+  catalogRootsFromOptions,
   loadCatalogSnapshot,
   type CatalogBoilerplate,
   type CatalogRoots,
@@ -97,10 +98,7 @@ function resolveManifestWorkflow(
 
 export async function scaffold(options: ScaffoldOptions): Promise<ScaffoldResult> {
   const { boilerplateName, targetDir, agents } = options;
-  const snapshot = await loadCatalogSnapshot({
-    ...options.catalogRoots,
-    ...(options.boilerplatesDir ? { boilerplatesDir: options.boilerplatesDir } : {}),
-  });
+  const snapshot = await loadCatalogSnapshot(catalogRootsFromOptions(options));
   assertValidCatalog(snapshot);
   const boilerplate = snapshot.boilerplates.find(
     (entry) => entry.manifest.name === boilerplateName,

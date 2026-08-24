@@ -3,10 +3,15 @@ import { join } from "node:path";
 import { cleanupClone, cloneGitRepo, findSkillDirectory } from "./git.js";
 import { sha256 } from "./provenance.js";
 import { defaultRegistryPath } from "./paths.js";
-import { assertValidCatalog, loadCatalogSnapshot, type CatalogRoots } from "./catalog-snapshot.js";
+import {
+  assertValidCatalog,
+  catalogRootsFromOptions,
+  loadCatalogSnapshot,
+  type CatalogRoots,
+} from "./catalog-snapshot.js";
 import {
   buildRegistryFromCatalog,
-  loadRegistry,
+  loadRegistryIfExists,
   saveRegistry,
   type RegistrySkill,
   type SkillsIndex,
@@ -58,21 +63,13 @@ export async function syncUpstreamSkills(opts: UpstreamSyncOptions): Promise<Ups
   const threshold = opts.threshold ?? 30;
   const apply = Boolean(opts.apply);
   const dryRun = Boolean(opts.dryRun);
-  const catalogRoots: Partial<CatalogRoots> = {
-    ...opts.catalogRoots,
-    ...(opts.boilerplatesDir ? { boilerplatesDir: opts.boilerplatesDir } : {}),
-    ...(opts.sharedSkillsDir ? { sharedSkillsDir: opts.sharedSkillsDir } : {}),
-    ...(opts.sharedWorkflowsDir ? { sharedWorkflowsDir: opts.sharedWorkflowsDir } : {}),
-  };
+  const catalogRoots = catalogRootsFromOptions(opts);
   let snapshot = await loadCatalogSnapshot(catalogRoots);
   assertValidCatalog(snapshot);
 
-  let index: SkillsIndex;
-  try {
-    index = await loadRegistry(registryPath);
-  } catch {
-    index = await buildRegistryFromCatalog({ registryPath, snapshot });
-  }
+  const index: SkillsIndex =
+    (await loadRegistryIfExists(registryPath)) ??
+    (await buildRegistryFromCatalog({ registryPath, snapshot }));
 
   const selectedSkills = index.skills.filter(
     (skill) =>
