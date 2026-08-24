@@ -4,6 +4,8 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { listCatalogSkillTargets, scanCatalog } from "../src/catalog-scan.js";
 import type { SkillScanner } from "../src/scan.js";
+import { CatalogValidationError } from "../src/catalog-snapshot.js";
+import { boilerplateManifest, createCatalogFixture, writeBoilerplate } from "./catalog-fixture.js";
 
 function fakeScanner(opts: {
   available: boolean;
@@ -40,11 +42,11 @@ async function exists(path: string): Promise<boolean> {
 describe("catalog scan", () => {
   it("discovers shared and local catalog skills", async () => {
     const targets = await listCatalogSkillTargets();
-    const labels = targets.map((t) => t.label);
-    expect(labels).toEqual(
-      expect.arrayContaining(["shared/code-review", "shared/test-driven-development"]),
+    const ids = targets.map((target) => target.id);
+    expect(ids).toEqual(
+      expect.arrayContaining(["shared:code-review", "shared:test-driven-development"]),
     );
-    expect(labels.some((l) => l.startsWith("boilerplate/"))).toBe(true);
+    expect(ids.some((id) => id.startsWith("boilerplate:") && id.includes("/skills/"))).toBe(true);
   });
 
   describe("scanCatalog", () => {
@@ -100,6 +102,31 @@ describe("catalog scan", () => {
           reportsDir,
         }),
       ).rejects.toThrow(/not installed/);
+    });
+
+    it("rejects invalid catalog relationships before invoking the scanner", async () => {
+      const fixture = await createCatalogFixture(join(reportsDir, "catalog"));
+      await writeBoilerplate(
+        fixture,
+        "demo",
+        boilerplateManifest("demo", [{ name: "missing", source: "shared" }]),
+      );
+      let scanCalls = 0;
+      const scanner: SkillScanner = {
+        name: "spy",
+        async isAvailable() {
+          return true;
+        },
+        async scan() {
+          scanCalls += 1;
+          return { riskScore: 0, scanMode: "static", findings: 0 };
+        },
+      };
+
+      await expect(scanCatalog({ scanner, reportsDir, ...fixture })).rejects.toBeInstanceOf(
+        CatalogValidationError,
+      );
+      expect(scanCalls).toBe(0);
     });
   });
 });
