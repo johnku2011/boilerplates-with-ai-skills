@@ -1,6 +1,7 @@
 import { Command } from "commander";
 import { stat } from "node:fs/promises";
 import { resolve } from "node:path";
+import packageJson from "../package.json";
 import { assertValidCatalog, formatCatalogError, loadCatalogSnapshot } from "./catalog-snapshot.js";
 import { runListBoilerplates } from "./list-boilerplates-command.js";
 import { scaffold } from "./scaffold.js";
@@ -38,7 +39,7 @@ program
     "boilerplates-with-ai-skills: scaffold projects pre-wired with curated, " +
       "security-vetted, cross-agent AI skills.",
   )
-  .version("0.2.8");
+  .version(packageJson.version);
 
 program
   .command("list-boilerplates")
