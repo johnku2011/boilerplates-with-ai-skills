@@ -1,6 +1,7 @@
 import { Command } from "commander";
 import { resolve } from "node:path";
-import { listBoilerplates } from "./catalog.js";
+import { loadCatalogSnapshot } from "./catalog-snapshot.js";
+import { runListBoilerplates } from "./list-boilerplates-command.js";
 import { scaffold } from "./scaffold.js";
 import { parseAgents, type AgentId } from "./agents.js";
 import { scanCatalog } from "./catalog-scan.js";
@@ -39,20 +40,12 @@ program
   .alias("list")
   .description("List available boilerplates in the catalog.")
   .action(async () => {
-    const boilerplates = await listBoilerplates();
-    if (boilerplates.length === 0) {
-      console.log("No boilerplates found.");
-      return;
-    }
-    for (const b of boilerplates) {
-      console.log(`${b.manifest.name}  (${b.manifest.stack})`);
-      console.log(`  ${b.manifest.description}`);
-      console.log(`  skills: ${b.manifest.skills.map((s) => s.name).join(", ") || "(none)"}`);
-      if (b.manifest.workflow) {
-        console.log(`  workflow: ${b.manifest.workflow.source}:${b.manifest.workflow.name}`);
-      }
-      console.log(`  default agents: ${b.manifest.defaultAgents.join(", ")}`);
-    }
+    const exitCode = await runListBoilerplates({
+      loadSnapshot: () => loadCatalogSnapshot(),
+      stdout: (line) => console.log(line),
+      stderr: (line) => console.error(line),
+    });
+    if (exitCode !== 0) process.exitCode = exitCode;
   });
 
 program

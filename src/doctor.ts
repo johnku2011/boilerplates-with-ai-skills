@@ -1,6 +1,6 @@
 import { access, constants } from "node:fs/promises";
 import { join } from "node:path";
-import { listBoilerplates } from "./catalog.js";
+import { loadCatalogSnapshot, type CatalogRoots } from "./catalog-snapshot.js";
 import { SkillSpectorScanner } from "./scan.js";
 import { readLock } from "./provenance.js";
 import { checkGlobalAdvisorSkills } from "./global-skills-check.js";
@@ -42,7 +42,10 @@ async function commandExists(command: string): Promise<boolean> {
 }
 
 /** Environment and project readiness checks for bwai-cli users. */
-export async function runDoctor(cwd = process.cwd()): Promise<DoctorReport> {
+export async function runDoctor(
+  cwd = process.cwd(),
+  options: { catalogRoots?: Partial<CatalogRoots> } = {},
+): Promise<DoctorReport> {
   const checks: DoctorCheck[] = [];
 
   const major = nodeMajorVersion();
@@ -61,14 +64,19 @@ export async function runDoctor(cwd = process.cwd()): Promise<DoctorReport> {
   }
 
   try {
-    const boilerplates = await listBoilerplates();
+    const snapshot = await loadCatalogSnapshot(options.catalogRoots);
+    const errorCount = snapshot.diagnostics.filter(
+      (diagnostic) => diagnostic.severity === "error",
+    ).length;
     checks.push({
       name: "catalog",
-      status: boilerplates.length > 0 ? "ok" : "fail",
+      status: snapshot.valid && snapshot.boilerplates.length > 0 ? "ok" : "fail",
       message:
-        boilerplates.length > 0
-          ? `${boilerplates.length} boilerplate(s) in catalog`
-          : "No boilerplates found — reinstall bwai-cli or run from repo root",
+        errorCount > 0
+          ? `Catalog invalid: ${errorCount} error(s)`
+          : snapshot.boilerplates.length > 0
+            ? `${snapshot.boilerplates.length} boilerplate(s) in catalog`
+            : "No boilerplates found — reinstall bwai-cli or run from repo root",
     });
   } catch (err) {
     checks.push({

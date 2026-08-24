@@ -1,9 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { stat } from "node:fs/promises";
+import { mkdir, mkdtemp, rm, stat, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { listBoilerplates, getBoilerplate } from "../src/catalog.js";
 import { resolveSkillDirectory } from "../src/skills.js";
 import { defaultSharedSkillsDir } from "../src/paths.js";
+import { CatalogValidationError } from "../src/catalog-snapshot.js";
 
 async function exists(path: string): Promise<boolean> {
   try {
@@ -106,5 +108,18 @@ describe("catalog", () => {
 
   it("throws for an unknown boilerplate", async () => {
     await expect(getBoilerplate("does-not-exist")).rejects.toThrow(/Unknown boilerplate/);
+  });
+
+  it("does not silently skip an invalid boilerplate manifest", async () => {
+    const root = await mkdtemp(join(tmpdir(), "bwai-catalog-invalid-"));
+    try {
+      const dir = join(root, "broken");
+      await mkdir(dir, { recursive: true });
+      await writeFile(join(dir, "boilerplate.json"), "{bad-json", "utf8");
+
+      await expect(listBoilerplates(root)).rejects.toBeInstanceOf(CatalogValidationError);
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
   });
 });
