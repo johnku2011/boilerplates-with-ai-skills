@@ -5,6 +5,8 @@ import { join } from "node:path";
 import { exportPlugin } from "../src/export-plugin.js";
 import { scaffold } from "../src/scaffold.js";
 import { validateAgentPlugin } from "../src/plugin.js";
+import { CatalogValidationError } from "../src/catalog-snapshot.js";
+import { boilerplateManifest, createCatalogFixture, writeBoilerplate } from "./catalog-fixture.js";
 
 async function exists(path: string): Promise<boolean> {
   try {
@@ -62,5 +64,20 @@ describe("export-plugin", () => {
     expect(result.manifest.name).toBe("bwai.node-service");
     expect(result.skillNames.length).toBeGreaterThan(0);
     expect(await exists(join(out, "skills", "code-review", "SKILL.md"))).toBe(true);
+  });
+
+  it("validates a boilerplate catalog before creating output", async () => {
+    const fixture = await createCatalogFixture(join(dir, "invalid-catalog"));
+    await writeBoilerplate(
+      fixture,
+      "demo",
+      boilerplateManifest("demo", [{ name: "missing", source: "shared" }]),
+    );
+    const out = join(dir, "invalid-output");
+
+    await expect(
+      exportPlugin({ source: "demo", outDir: out, catalogRoots: fixture }),
+    ).rejects.toBeInstanceOf(CatalogValidationError);
+    expect(await exists(out)).toBe(false);
   });
 });

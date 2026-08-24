@@ -11,7 +11,7 @@ import {
 import { syncSkills } from "../src/sync-skills.js";
 import { promoteSkill } from "../src/promote.js";
 import type { SkillScanner } from "../src/scan.js";
-import { loadCatalogSnapshot } from "../src/catalog-snapshot.js";
+import { CatalogValidationError, loadCatalogSnapshot } from "../src/catalog-snapshot.js";
 import {
   boilerplateManifest,
   createCatalogFixture,
@@ -192,12 +192,56 @@ describe("syncSkills", () => {
       await rm(dir, { recursive: true, force: true });
     }
   });
+
+  it("validates custom catalog roots before changing manifests", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "bwai-sync-invalid-"));
+    try {
+      const fixture = await createCatalogFixture(join(dir, "catalog"));
+      const boilerplateDir = await writeBoilerplate(
+        fixture,
+        "demo",
+        boilerplateManifest("demo", [{ name: "code-review", source: "shared" }]),
+      );
+      const registryPath = join(dir, "registry.json");
+      await saveRegistry(
+        {
+          indexVersion: 2,
+          updatedAt: new Date().toISOString(),
+          skills: [
+            {
+              id: "shared:project-security",
+              name: "project-security",
+              catalogLocation: "shared",
+              catalogPath: "shared/skills/project-security",
+              promotedAt: new Date().toISOString(),
+              sha256: "abc",
+              scan: { status: "pending", riskScore: null, scannedAt: null, threshold: 30 },
+              bundleAll: true,
+              bundledIn: [],
+            },
+          ],
+        },
+        registryPath,
+      );
+
+      await expect(syncSkills({ registryPath, catalogRoots: fixture })).rejects.toBeInstanceOf(
+        CatalogValidationError,
+      );
+      const manifest = JSON.parse(
+        await readFile(join(boilerplateDir, "boilerplate.json"), "utf8"),
+      ) as { skills: Array<{ name: string }> };
+      expect(manifest.skills.map((skill) => skill.name)).toEqual(["code-review"]);
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
 });
 
 describe("promoteSkill", () => {
   it("copies a local skill into shared and updates the registry", async () => {
     const dir = await mkdtemp(join(tmpdir(), "bwai-promote-"));
     try {
+      const fixture = await createCatalogFixture(join(dir, "catalog"));
       const source = join(dir, "source", "demo-skill");
       await mkdir(source, { recursive: true });
       await writeFile(
@@ -205,19 +249,20 @@ describe("promoteSkill", () => {
         "---\nname: demo-skill\ndescription: Use when testing skill promotion into the shared catalog.\nlicense: MIT\n---\n\n# Demo\n",
       );
 
-      const sharedDir = join(dir, "shared", "skills");
       const registryPath = join(dir, "registry.json");
 
       const result = await promoteSkill({
         skillName: "demo-skill",
         fromPath: source,
         scanner: fakeScanner(0),
-        sharedSkillsDir: sharedDir,
+        catalogRoots: fixture,
         registryPath,
       });
 
       expect(result.dryRun).toBe(false);
-      expect(await readFile(join(sharedDir, "demo-skill", "SKILL.md"), "utf8")).toContain("# Demo");
+      expect(
+        await readFile(join(fixture.sharedSkillsDir, "demo-skill", "SKILL.md"), "utf8"),
+      ).toContain("# Demo");
       const index = await loadRegistry(registryPath);
       expect(index.skills.some((s) => s.name === "demo-skill")).toBe(true);
     } finally {
@@ -228,6 +273,7 @@ describe("promoteSkill", () => {
   it("blocks promotion when risk exceeds threshold", async () => {
     const dir = await mkdtemp(join(tmpdir(), "bwai-promote-block-"));
     try {
+      const fixture = await createCatalogFixture(join(dir, "catalog"));
       const source = join(dir, "source", "risky-skill");
       await mkdir(source, { recursive: true });
       await writeFile(
@@ -241,10 +287,39 @@ describe("promoteSkill", () => {
           fromPath: source,
           scanner: fakeScanner(99),
           threshold: 30,
-          sharedSkillsDir: join(dir, "shared", "skills"),
+          catalogRoots: fixture,
           registryPath: join(dir, "registry.json"),
         }),
       ).rejects.toThrow(/exceeds threshold/);
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("validates existing catalog state before copying a promoted skill", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "bwai-promote-invalid-"));
+    try {
+      const fixture = await createCatalogFixture(join(dir, "catalog"));
+      await writeBoilerplate(
+        fixture,
+        "demo",
+        boilerplateManifest("demo", [{ name: "code-review", source: "shared" }]),
+      );
+      const source = join(dir, "source", "demo-skill");
+      await writeSkill(source, "demo-skill");
+
+      await expect(
+        promoteSkill({
+          skillName: "demo-skill",
+          fromPath: source,
+          scanner: fakeScanner(),
+          registryPath: join(dir, "registry.json"),
+          catalogRoots: fixture,
+        }),
+      ).rejects.toBeInstanceOf(CatalogValidationError);
+      await expect(
+        readFile(join(fixture.sharedSkillsDir, "demo-skill", "SKILL.md")),
+      ).rejects.toThrow();
     } finally {
       await rm(dir, { recursive: true, force: true });
     }

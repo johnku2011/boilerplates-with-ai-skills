@@ -1,9 +1,11 @@
 import { mkdir, readdir, readFile, stat } from "node:fs/promises";
 import { join, resolve } from "node:path";
-import { getBoilerplate, listBoilerplates } from "./catalog.js";
-import { defaultSharedSkillsDir } from "./paths.js";
-import { assertSkillExists, resolveSkillDirectory } from "./skills.js";
-import { resolveWorkflowDirectory } from "./workflows.js";
+import {
+  assertValidCatalog,
+  loadCatalogSnapshot,
+  type CatalogBoilerplate,
+  type CatalogRoots,
+} from "./catalog-snapshot.js";
 import {
   defaultPluginDir,
   listSkillSources,
@@ -24,6 +26,7 @@ export interface ExportPluginOptions {
   /** When exporting a project into itself, also write Copilot settings. */
   writeCopilotSettings?: boolean;
   boilerplatesDir?: string;
+  catalogRoots?: Partial<CatalogRoots>;
 }
 
 export interface ExportPluginResult extends WriteAgentPluginResult {
@@ -41,41 +44,15 @@ async function pathExists(path: string): Promise<boolean> {
   }
 }
 
-async function isBoilerplateName(name: string, boilerplatesDir?: string): Promise<boolean> {
-  try {
-    const all = await listBoilerplates(boilerplatesDir);
-    return all.some((b) => b.manifest.name === name);
-  } catch {
-    return false;
-  }
-}
-
 async function exportFromBoilerplate(
-  boilerplateName: string,
+  boilerplate: CatalogBoilerplate,
   outDir: string,
-  boilerplatesDir?: string,
 ): Promise<ExportPluginResult> {
-  const boilerplate = await getBoilerplate(boilerplateName, boilerplatesDir);
-  const catalogPaths = {
-    boilerplateName: boilerplate.manifest.name,
-    boilerplateSkillsDir: boilerplate.skillsDir,
-    sharedSkillsDir: defaultSharedSkillsDir(),
-  };
-
-  const skills = [];
-  for (const skill of boilerplate.manifest.skills) {
-    const dir = resolveSkillDirectory(skill, catalogPaths);
-    await assertSkillExists(dir, skill.name);
-    skills.push({ name: skill.name, dir });
-  }
+  const skills = boilerplate.skills.map((skill) => ({ name: skill.name, dir: skill.dir }));
 
   // Include delivery workflow skills when the boilerplate declares a workflow (P1-5).
-  if (boilerplate.manifest.workflow) {
-    const workflowDir = resolveWorkflowDirectory(boilerplate.manifest.workflow, {
-      boilerplateName: boilerplate.manifest.name,
-      boilerplateDir: boilerplate.dir,
-    });
-    const wfSkills = await listSkillSources(join(workflowDir, "skills"));
+  if (boilerplate.workflow) {
+    const wfSkills = await listSkillSources(join(boilerplate.workflow.dir, "skills"));
     for (const s of wfSkills) {
       if (!skills.some((x) => x.name === s.name)) skills.push(s);
     }
@@ -183,11 +160,16 @@ async function exportFromProject(
  */
 export async function exportPlugin(options: ExportPluginOptions): Promise<ExportPluginResult> {
   const outDir = resolve(options.outDir);
-  await mkdir(outDir, { recursive: true });
-
   const source = options.source;
-  if (await isBoilerplateName(source, options.boilerplatesDir)) {
-    return exportFromBoilerplate(source, outDir, options.boilerplatesDir);
+  const snapshot = await loadCatalogSnapshot({
+    ...options.catalogRoots,
+    ...(options.boilerplatesDir ? { boilerplatesDir: options.boilerplatesDir } : {}),
+  });
+  assertValidCatalog(snapshot);
+  const boilerplate = snapshot.boilerplates.find((entry) => entry.manifest.name === source);
+  if (boilerplate) {
+    await mkdir(outDir, { recursive: true });
+    return exportFromBoilerplate(boilerplate, outDir);
   }
 
   const projectDir = resolve(source);
@@ -197,5 +179,6 @@ export async function exportPlugin(options: ExportPluginOptions): Promise<Export
     );
   }
 
+  await mkdir(outDir, { recursive: true });
   return exportFromProject(projectDir, outDir, Boolean(options.writeCopilotSettings));
 }

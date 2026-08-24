@@ -2,7 +2,8 @@ import { cp, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { cleanupClone, cloneGitRepo, findSkillDirectory } from "./git.js";
 import { sha256 } from "./provenance.js";
-import { defaultRegistryPath, defaultSharedSkillsDir } from "./paths.js";
+import { defaultRegistryPath } from "./paths.js";
+import { assertValidCatalog, loadCatalogSnapshot, type CatalogRoots } from "./catalog-snapshot.js";
 import {
   buildRegistryFromCatalog,
   loadRegistry,
@@ -15,6 +16,9 @@ import { scanSkillDirectory, type SkillScanner } from "./scan.js";
 export interface UpstreamSyncOptions {
   registryPath?: string;
   sharedSkillsDir?: string;
+  boilerplatesDir?: string;
+  sharedWorkflowsDir?: string;
+  catalogRoots?: Partial<CatalogRoots>;
   scanner: SkillScanner;
   threshold?: number;
   requireScanner?: boolean;
@@ -51,16 +55,33 @@ async function readSkillSha(skillDir: string): Promise<string> {
 
 export async function syncUpstreamSkills(opts: UpstreamSyncOptions): Promise<UpstreamSyncResult> {
   const registryPath = opts.registryPath ?? defaultRegistryPath();
-  const sharedSkillsDir = opts.sharedSkillsDir ?? defaultSharedSkillsDir();
   const threshold = opts.threshold ?? 30;
   const apply = Boolean(opts.apply);
   const dryRun = Boolean(opts.dryRun);
+  const catalogRoots: Partial<CatalogRoots> = {
+    ...opts.catalogRoots,
+    ...(opts.boilerplatesDir ? { boilerplatesDir: opts.boilerplatesDir } : {}),
+    ...(opts.sharedSkillsDir ? { sharedSkillsDir: opts.sharedSkillsDir } : {}),
+    ...(opts.sharedWorkflowsDir ? { sharedWorkflowsDir: opts.sharedWorkflowsDir } : {}),
+  };
+  let snapshot = await loadCatalogSnapshot(catalogRoots);
+  assertValidCatalog(snapshot);
 
   let index: SkillsIndex;
   try {
     index = await loadRegistry(registryPath);
   } catch {
-    index = await buildRegistryFromCatalog({ registryPath });
+    index = await buildRegistryFromCatalog({ registryPath, snapshot });
+  }
+
+  const selectedSkills = index.skills.filter(
+    (skill) =>
+      skill.catalogLocation === "shared" &&
+      skill.id === `shared:${skill.name}` &&
+      (!opts.skillName || skill.name === opts.skillName),
+  );
+  if (opts.skillName && selectedSkills.length > 1) {
+    throw new Error(`Ambiguous shared skill name: ${opts.skillName}`);
   }
 
   const available = await opts.scanner.isAvailable();
@@ -74,20 +95,15 @@ export async function syncUpstreamSkills(opts: UpstreamSyncOptions): Promise<Ups
   const entries: UpstreamSyncEntry[] = [];
   let indexChanged = false;
 
-  for (const skill of index.skills) {
-    if (opts.skillName && skill.name !== opts.skillName) continue;
+  for (const skill of selectedSkills) {
     if (!skillHasUpstream(skill)) continue;
-    if (skill.catalogLocation !== "shared") {
-      entries.push({
-        name: skill.name,
-        status: "skipped",
-        message: "upstream sync applies to shared catalog skills only",
-      });
-      continue;
-    }
 
     const upstream = skill.upstream!;
-    const localDir = join(sharedSkillsDir, skill.name);
+    const catalogSkill = snapshot.skills.find((entry) => entry.id === skill.id);
+    if (!catalogSkill) {
+      throw new Error(`Registry skill is missing from the catalog snapshot: ${skill.id}`);
+    }
+    const localDir = catalogSkill.dir;
     let localDigest: string;
     try {
       localDigest = await readSkillSha(localDir);
@@ -142,8 +158,7 @@ export async function syncUpstreamSkills(opts: UpstreamSyncOptions): Promise<Ups
         }
       }
 
-      const targetDir = join(sharedSkillsDir, skill.name);
-      await cp(upstreamSkillDir, targetDir, { recursive: true, force: true });
+      await cp(upstreamSkillDir, localDir, { recursive: true, force: true });
       const now = new Date().toISOString();
       skill.sha256 = upstreamDigest;
       skill.upstream = { ...upstream, ref: cloned.resolvedRef };
@@ -175,7 +190,9 @@ export async function syncUpstreamSkills(opts: UpstreamSyncOptions): Promise<Ups
   }
 
   if (indexChanged && !dryRun) {
-    const rebuilt = await buildRegistryFromCatalog({ registryPath, existing: index });
+    snapshot = await loadCatalogSnapshot(catalogRoots);
+    assertValidCatalog(snapshot);
+    const rebuilt = await buildRegistryFromCatalog({ registryPath, existing: index, snapshot });
     await saveRegistry(rebuilt, registryPath);
   }
 

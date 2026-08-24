@@ -1,16 +1,16 @@
 import { cp, mkdir, readdir, rename, readFile, stat, appendFile } from "node:fs/promises";
 import { join, relative } from "node:path";
-import { getBoilerplate } from "./catalog.js";
+import {
+  assertValidCatalog,
+  loadCatalogSnapshot,
+  type CatalogBoilerplate,
+  type CatalogRoots,
+  type CatalogSnapshot,
+} from "./catalog-snapshot.js";
 import { AGENT_TARGETS, type AgentId } from "./agents.js";
 import { sha256, writeLock } from "./provenance.js";
 import type { LockedSkill, SkillsLock } from "./schema.js";
-import { defaultBoilerplatesDir, defaultSharedSkillsDir } from "./paths.js";
-import { assertSkillExists, resolveSkillDirectory, skillLockSource } from "./skills.js";
-import {
-  assertWorkflowExists,
-  resolveWorkflowDirectory,
-  workflowAgentsSnippet,
-} from "./workflows.js";
+import { workflowAgentsSnippet } from "./workflows.js";
 import {
   defaultPluginDir,
   listSkillSources,
@@ -26,6 +26,7 @@ export interface ScaffoldOptions {
   targetDir: string;
   agents: AgentId[];
   boilerplatesDir?: string;
+  catalogRoots?: Partial<CatalogRoots>;
   /** Override manifest workflow by name, or false to skip. */
   workflow?: string | false;
 }
@@ -64,7 +65,6 @@ async function installWorkflow(
   workflowName: string,
   sourceDir: string,
 ): Promise<string> {
-  await assertWorkflowExists(sourceDir, workflowName);
   const destDir = join(targetDir, "workflows", workflowName);
   await mkdir(join(targetDir, "workflows"), { recursive: true });
   await cp(sourceDir, destDir, { recursive: true });
@@ -72,7 +72,8 @@ async function installWorkflow(
 }
 
 function resolveManifestWorkflow(
-  boilerplate: Awaited<ReturnType<typeof getBoilerplate>>,
+  snapshot: CatalogSnapshot,
+  boilerplate: CatalogBoilerplate,
   workflowOverride: string | false | undefined,
 ): { name: string; sourceDir: string } | undefined {
   if (workflowOverride === false) return undefined;
@@ -80,27 +81,35 @@ function resolveManifestWorkflow(
   const manifestWorkflow = boilerplate.manifest.workflow;
   if (workflowOverride) {
     const source = manifestWorkflow?.source ?? "shared";
-    const workflow = { name: workflowOverride, source };
-    const sourceDir = resolveWorkflowDirectory(workflow, {
-      boilerplateName: boilerplate.manifest.name,
-      boilerplateDir: boilerplate.dir,
-    });
-    return { name: workflowOverride, sourceDir };
+    const id =
+      source === "shared"
+        ? `shared:workflows/${workflowOverride}`
+        : `boilerplate:${boilerplate.manifest.name}/workflow/${workflowOverride}`;
+    const workflow = snapshot.workflows.find((entry) => entry.id === id);
+    if (!workflow) throw new Error(`Unknown workflow: ${id}`);
+    return { name: workflow.name, sourceDir: workflow.dir };
   }
 
-  if (!manifestWorkflow) return undefined;
-
-  const sourceDir = resolveWorkflowDirectory(manifestWorkflow, {
-    boilerplateName: boilerplate.manifest.name,
-    boilerplateDir: boilerplate.dir,
-  });
-  return { name: manifestWorkflow.name, sourceDir };
+  return boilerplate.workflow
+    ? { name: boilerplate.workflow.name, sourceDir: boilerplate.workflow.dir }
+    : undefined;
 }
 
 export async function scaffold(options: ScaffoldOptions): Promise<ScaffoldResult> {
   const { boilerplateName, targetDir, agents } = options;
-  const boilerplatesDir = options.boilerplatesDir ?? defaultBoilerplatesDir();
-  const boilerplate = await getBoilerplate(boilerplateName, boilerplatesDir);
+  const snapshot = await loadCatalogSnapshot({
+    ...options.catalogRoots,
+    ...(options.boilerplatesDir ? { boilerplatesDir: options.boilerplatesDir } : {}),
+  });
+  assertValidCatalog(snapshot);
+  const boilerplate = snapshot.boilerplates.find(
+    (entry) => entry.manifest.name === boilerplateName,
+  );
+  if (!boilerplate) {
+    const available =
+      snapshot.boilerplates.map((entry) => entry.manifest.name).join(", ") || "(none)";
+    throw new Error(`Unknown boilerplate: "${boilerplateName}". Available: ${available}.`);
+  }
 
   await assertUsableTarget(targetDir);
   await mkdir(targetDir, { recursive: true });
@@ -117,17 +126,9 @@ export async function scaffold(options: ScaffoldOptions): Promise<ScaffoldResult
 
   const lockedSkills: LockedSkill[] = [];
 
-  const catalogPaths = {
-    boilerplateName: boilerplate.manifest.name,
-    boilerplateSkillsDir: boilerplate.skillsDir,
-    sharedSkillsDir: defaultSharedSkillsDir(),
-  };
-
-  for (const skill of boilerplate.manifest.skills) {
-    const sourceSkillDir = resolveSkillDirectory(skill, catalogPaths);
-    await assertSkillExists(sourceSkillDir, skill.name);
+  for (const skill of boilerplate.skills) {
     const canonicalDir = join(canonicalRoot, skill.name);
-    await cp(sourceSkillDir, canonicalDir, { recursive: true });
+    await cp(skill.dir, canonicalDir, { recursive: true });
 
     const skillMd = await readFile(join(canonicalDir, "SKILL.md"), "utf8");
 
@@ -145,7 +146,7 @@ export async function scaffold(options: ScaffoldOptions): Promise<ScaffoldResult
 
     lockedSkills.push({
       name: skill.name,
-      source: skillLockSource(skill, boilerplate.manifest.name),
+      source: skill.id,
       sha256: sha256(skillMd),
       installedTo,
       scan: {
@@ -169,7 +170,7 @@ export async function scaffold(options: ScaffoldOptions): Promise<ScaffoldResult
 
   let workflowPath: string | undefined;
   let workflowName: string | undefined;
-  const resolved = resolveManifestWorkflow(boilerplate, options.workflow);
+  const resolved = resolveManifestWorkflow(snapshot, boilerplate, options.workflow);
   if (resolved) {
     workflowName = resolved.name;
     workflowPath = await installWorkflow(targetDir, resolved.name, resolved.sourceDir);

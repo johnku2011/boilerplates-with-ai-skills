@@ -1,7 +1,12 @@
 import { cp, mkdir, readFile, rm, stat, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { spawn } from "node:child_process";
-import { getBoilerplate } from "./catalog.js";
+import {
+  assertValidCatalog,
+  loadCatalogSnapshot,
+  type CatalogBoilerplate,
+  type CatalogRoots,
+} from "./catalog-snapshot.js";
 import {
   buildRegistryFromCatalog,
   loadRegistry,
@@ -9,7 +14,7 @@ import {
   type RegistrySkill,
   type SkillsIndex,
 } from "./registry.js";
-import { defaultBoilerplatesDir, defaultRegistryPath, defaultSharedSkillsDir } from "./paths.js";
+import { defaultRegistryPath } from "./paths.js";
 import { sha256 } from "./provenance.js";
 import { assertCatalogSkill, assertSkillExists } from "./skills.js";
 import { scanSkillDirectory, type SkillScanner } from "./scan.js";
@@ -29,6 +34,8 @@ export interface PromoteOptions {
   registryPath?: string;
   sharedSkillsDir?: string;
   boilerplatesDir?: string;
+  sharedWorkflowsDir?: string;
+  catalogRoots?: Partial<CatalogRoots>;
 }
 
 export interface PromoteResult {
@@ -91,13 +98,12 @@ async function resolveSourceDir(opts: PromoteOptions): Promise<{ dir: string; cl
   throw new Error("Provide --from <path> or --from-url <git-url> for the skill source.");
 }
 
-function resolveTargetDir(opts: PromoteOptions): string {
+function resolveTargetDir(opts: PromoteOptions, roots: CatalogRoots): string {
   const target = opts.target ?? { kind: "shared" };
   if (target.kind === "shared") {
-    return join(opts.sharedSkillsDir ?? defaultSharedSkillsDir(), opts.skillName);
+    return join(roots.sharedSkillsDir, opts.skillName);
   }
-  const boilerplatesDir = opts.boilerplatesDir ?? defaultBoilerplatesDir();
-  return join(boilerplatesDir, target.name, "skills", opts.skillName);
+  return join(roots.boilerplatesDir, target.name, "skills", opts.skillName);
 }
 
 function parsePromoteTarget(raw: string | undefined): PromoteTarget {
@@ -114,9 +120,20 @@ export async function promoteSkill(opts: PromoteOptions): Promise<PromoteResult>
   const threshold = opts.threshold ?? 30;
   const target = opts.target ?? { kind: "shared" };
   const registryPath = opts.registryPath ?? defaultRegistryPath();
+  const snapshot = await loadCatalogSnapshot({
+    ...opts.catalogRoots,
+    ...(opts.boilerplatesDir ? { boilerplatesDir: opts.boilerplatesDir } : {}),
+    ...(opts.sharedSkillsDir ? { sharedSkillsDir: opts.sharedSkillsDir } : {}),
+    ...(opts.sharedWorkflowsDir ? { sharedWorkflowsDir: opts.sharedWorkflowsDir } : {}),
+  });
+  assertValidCatalog(snapshot);
 
+  let targetBoilerplate: CatalogBoilerplate | undefined;
   if (target.kind === "boilerplate") {
-    await getBoilerplate(target.name, opts.boilerplatesDir);
+    targetBoilerplate = snapshot.boilerplates.find(
+      (boilerplate) => boilerplate.manifest.name === target.name,
+    );
+    if (!targetBoilerplate) throw new Error(`Unknown boilerplate: ${target.name}`);
   }
 
   const { dir: sourceDir, cleanup } = await resolveSourceDir(opts);
@@ -147,7 +164,7 @@ export async function promoteSkill(opts: PromoteOptions): Promise<PromoteResult>
       scanStatus = "skipped";
     }
 
-    const targetDir = resolveTargetDir({ ...opts, target });
+    const targetDir = resolveTargetDir({ ...opts, target }, snapshot.roots);
     const skillMd = await readFile(join(sourceDir, "SKILL.md"), "utf8");
     const digest = sha256(skillMd);
 
@@ -156,14 +173,14 @@ export async function promoteSkill(opts: PromoteOptions): Promise<PromoteResult>
       await cp(sourceDir, targetDir, { recursive: true, force: true });
 
       if (target.kind === "boilerplate") {
-        await addSkillToBoilerplateManifest(target.name, opts.skillName, opts.boilerplatesDir);
+        await addSkillToBoilerplateManifest(targetBoilerplate!, opts.skillName);
       }
 
       let index: SkillsIndex;
       try {
         index = await loadRegistry(registryPath);
       } catch {
-        index = await buildRegistryFromCatalog({ registryPath });
+        index = await buildRegistryFromCatalog({ registryPath, snapshot });
       }
 
       const now = new Date().toISOString();
@@ -198,7 +215,14 @@ export async function promoteSkill(opts: PromoteOptions): Promise<PromoteResult>
       const others = index.skills.filter((skill) => skill.id !== id);
       others.push(entry);
       others.sort((a, b) => a.id.localeCompare(b.id));
-      await saveRegistry({ ...index, updatedAt: now, skills: others }, registryPath);
+      const updatedSnapshot = await loadCatalogSnapshot(snapshot.roots);
+      assertValidCatalog(updatedSnapshot);
+      const rebuilt = await buildRegistryFromCatalog({
+        registryPath,
+        existing: { ...index, updatedAt: now, skills: others },
+        snapshot: updatedSnapshot,
+      });
+      await saveRegistry(rebuilt, registryPath);
     }
 
     return {
@@ -216,13 +240,11 @@ export async function promoteSkill(opts: PromoteOptions): Promise<PromoteResult>
 }
 
 async function addSkillToBoilerplateManifest(
-  boilerplateName: string,
+  boilerplate: CatalogBoilerplate,
   skillName: string,
-  boilerplatesDir?: string,
 ): Promise<void> {
-  const bp = await getBoilerplate(boilerplateName, boilerplatesDir);
-  const manifestPath = join(bp.dir, "boilerplate.json");
-  const manifest = bp.manifest;
+  const manifestPath = join(boilerplate.dir, "boilerplate.json");
+  const manifest = { ...boilerplate.manifest, skills: [...boilerplate.manifest.skills] };
   if (manifest.skills.some((s) => s.name === skillName)) return;
   manifest.skills.push({ name: skillName, source: "local" });
   await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
