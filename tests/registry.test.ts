@@ -2,10 +2,22 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { mkdtemp, rm, readFile, writeFile, mkdir, cp } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { buildRegistryFromCatalog, loadRegistry, saveRegistry } from "../src/registry.js";
+import {
+  applyCatalogScanToRegistry,
+  buildRegistryFromCatalog,
+  loadRegistry,
+  saveRegistry,
+} from "../src/registry.js";
 import { syncSkills } from "../src/sync-skills.js";
 import { promoteSkill } from "../src/promote.js";
 import type { SkillScanner } from "../src/scan.js";
+import { loadCatalogSnapshot } from "../src/catalog-snapshot.js";
+import {
+  boilerplateManifest,
+  createCatalogFixture,
+  writeBoilerplate,
+  writeSkill,
+} from "./catalog-fixture.js";
 
 function fakeScanner(risk = 0): SkillScanner {
   return {
@@ -34,8 +46,9 @@ describe("registry", () => {
 
   it("builds an index from the repo catalog", async () => {
     const index = await buildRegistryFromCatalog({ registryPath });
-    expect(index.indexVersion).toBe(1);
+    expect(index.indexVersion).toBe(2);
     expect(index.skills.some((s) => s.name === "code-review")).toBe(true);
+    expect(index.skills.find((s) => s.name === "code-review")?.id).toBe("shared:code-review");
     expect(index.skills.every((s) => s.sha256.length === 64)).toBe(true);
   });
 
@@ -44,6 +57,70 @@ describe("registry", () => {
     await saveRegistry(index, registryPath);
     const loaded = await loadRegistry(registryPath);
     expect(loaded.skills.length).toBe(index.skills.length);
+  });
+
+  it("loads a version 1 registry and migrates it in memory", async () => {
+    await writeFile(
+      registryPath,
+      `${JSON.stringify({
+        indexVersion: 1,
+        updatedAt: "2026-01-01T00:00:00.000Z",
+        skills: [
+          {
+            name: "code-review",
+            catalogLocation: "shared",
+            catalogPath: "shared/skills/code-review",
+            promotedAt: "2026-01-01T00:00:00.000Z",
+            sha256: "abc",
+            scan: { status: "pending", riskScore: null, scannedAt: null, threshold: 30 },
+            bundleAll: false,
+            bundledIn: [],
+          },
+        ],
+      })}\n`,
+      "utf8",
+    );
+
+    const migrated = await loadRegistry(registryPath);
+    expect(migrated.indexVersion).toBe(2);
+    expect(migrated.skills[0]?.id).toBe("shared:code-review");
+    await saveRegistry(migrated, registryPath);
+    expect(JSON.parse(await readFile(registryPath, "utf8")).indexVersion).toBe(2);
+  });
+
+  it("preserves same-named local skills under different canonical identities", async () => {
+    const fixture = await createCatalogFixture(join(dir, "catalog"));
+    for (const name of ["alpha", "beta"]) {
+      const boilerplateDir = await writeBoilerplate(
+        fixture,
+        name,
+        boilerplateManifest(name, [{ name: "logger", source: "local" }]),
+      );
+      await writeSkill(join(boilerplateDir, "skills", "logger"), "logger");
+    }
+    const snapshot = await loadCatalogSnapshot(fixture);
+
+    const index = await buildRegistryFromCatalog({ registryPath, snapshot });
+
+    expect(index.skills.map((skill) => skill.id)).toEqual(
+      expect.arrayContaining(["boilerplate:alpha/skills/logger", "boilerplate:beta/skills/logger"]),
+    );
+  });
+
+  it("applies scan results by canonical identity", async () => {
+    const index = await buildRegistryFromCatalog({ registryPath });
+    const updated = applyCatalogScanToRegistry(index, [
+      {
+        id: "shared:code-review",
+        label: "presentation-label-that-does-not-match",
+        riskScore: 12,
+        status: "passed",
+      },
+    ]);
+
+    expect(updated.skills.find((skill) => skill.id === "shared:code-review")?.scan.riskScore).toBe(
+      12,
+    );
   });
 });
 
@@ -80,10 +157,11 @@ describe("syncSkills", () => {
 
       await saveRegistry(
         {
-          indexVersion: 1,
+          indexVersion: 2,
           updatedAt: new Date().toISOString(),
           skills: [
             {
+              id: "shared:project-security",
               name: "project-security",
               catalogLocation: "shared",
               catalogPath: "shared/skills/project-security",

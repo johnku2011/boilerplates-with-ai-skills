@@ -64,10 +64,11 @@ describe("syncUpstreamSkills", () => {
 
     await saveRegistry(
       {
-        indexVersion: 1,
+        indexVersion: 2,
         updatedAt: new Date().toISOString(),
         skills: [
           {
+            id: "shared:demo-skill",
             name: "demo-skill",
             catalogLocation: "shared",
             catalogPath: "shared/skills/demo-skill",

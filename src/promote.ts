@@ -1,10 +1,9 @@
 import { cp, mkdir, readFile, rm, stat, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { spawn } from "node:child_process";
-import { getBoilerplate, listBoilerplates } from "./catalog.js";
+import { getBoilerplate } from "./catalog.js";
 import {
   buildRegistryFromCatalog,
-  findRegistrySkill,
   loadRegistry,
   saveRegistry,
   type RegistrySkill,
@@ -172,8 +171,13 @@ export async function promoteSkill(opts: PromoteOptions): Promise<PromoteResult>
         target.kind === "shared"
           ? `shared/skills/${opts.skillName}`
           : `boilerplates/${target.name}/skills/${opts.skillName}`;
+      const id =
+        target.kind === "shared"
+          ? `shared:${opts.skillName}`
+          : `boilerplate:${target.name}/skills/${opts.skillName}`;
 
       const entry: RegistrySkill = {
+        id,
         name: opts.skillName,
         catalogLocation: target.kind === "shared" ? "shared" : "local",
         catalogPath,
@@ -191,9 +195,9 @@ export async function promoteSkill(opts: PromoteOptions): Promise<PromoteResult>
         bundledIn: target.kind === "boilerplate" ? [target.name] : [],
       };
 
-      const others = index.skills.filter((s) => s.name !== opts.skillName);
+      const others = index.skills.filter((skill) => skill.id !== id);
       others.push(entry);
-      others.sort((a, b) => a.name.localeCompare(b.name));
+      others.sort((a, b) => a.id.localeCompare(b.id));
       await saveRegistry({ ...index, updatedAt: now, skills: others }, registryPath);
     }
 
